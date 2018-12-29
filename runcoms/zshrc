@@ -1,13 +1,181 @@
 #
-# Executes commands at the start of an interactive session.
+# Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
 #
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
+# -- Louis 2018/0603
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoredups:ignorespace
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+HISTSIZE=1000
+HISTFILESIZE=2000
+
+# Set default zsh options (setopt) -- Louis 2018/1224
+setopt cdablevars
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-  source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
+# ---------------------- Export
+export LSCOLORS=exfxcxdxbxegedabagacad
+export EDITOR=vim
+
+# Configure python virtualenvwrapper -- Louis 2017/0125
+export WORKON_HOME=$HOME/.virtualenvs
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export PROJECT_HOME=$HOME/Development/PythonDev
+    source /usr/local/bin/virtualenvwrapper.sh
+else
+    export PROJECT_HOME=$HOME/PythonDev
+    # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+    source ~/.local/bin/virtualenvwrapper.sh
+fi
+
+# Separate macOS/Ubuntu setup -- Louis 2018/0603
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # Android SDK path -- Louis 2011/0420
+    export PATH=${PATH}:~/Applications/ADT/tools:~/Applications/ADT/platform-tools
+    # Ruby/gem configuration -- Louis 2015/0203
+    # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
+    # with my own account unless run 'sudo', which is a bad idea
+    # Install rbenv instead to create private Ruby environment to fix this issue
+    #if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+
+    # Since no intention to install multi-version Ruby,just export brew-version Ruby
+    # Also setup GEM_HOME and gem binary path
+    # -- Louis 2018/1220
+    export GEM_HOME=~/.gem
+    export PATH="/usr/local/opt/ruby/bin:$GEM_HOME/bin:$PATH"
+
+    # For tmuxinator auto completion -- Louis 2015/0203
+    source ~/.tmuxinator/tmuxinator.zsh
+
+    # Install brew-version coreutilis -- Louis 2015/0209
+    export PATH=/usr/local/opt/coreutils/libexec/gnubin:${PATH}
+    export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}
+
+    # Update brew Python location
+    export PATH=/usr/local/opt/python/libexec/bin:${PATH}
+
+    # Update brew sqlite location
+    export PATH=/usr/local/opt/sqlite/bin:${PATH}
+
+    # Install jenv for Java version control -- Louis 2016/0905
+    export PATH="$HOME/.jenv/bin:$PATH"
+    if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+else
+    # Add snap package binary into $PATH -- Louis 2018/0710
+    export PATH=/snap/bin:${PATH}
+fi
+
+# Add autocompletion of pipenv -- Louis 2018/0730
+if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
+
+# ---------------------- Alias
+# Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
+if [ -f ~/.zsh_aliases ]; then
+    . ~/.zsh_aliases
+fi
+
+# ---------------------- Function
+# Add extract() function to facilitate extract action -- Louis 2015/0311
+extract() {
+    if [ -f $1 ]; then
+        case $1 in
+            *.tar.bz2)  tar xjf $1      ;;
+            *.tar.gz)   tar xzf $1      ;;
+            *.bz2)      bunzip2 $1      ;;
+            *.rar)      unrar e $1      ;;
+            *.gz)       gunzip $1       ;;
+            *.tar)      tar xf $1       ;;
+            *.tbz2)     tar xjf $1      ;;
+            *.tgz)      tar xzf $1      ;;
+            *.zip)      unzip $1        ;;
+            *.Z)        uncompress $1   ;;
+            *)          echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+       echo "'$1' is not a valid file"
+    fi
+}
+
+# Add smartresize() function to resize image file(s) by utilizing ImageMagick -- Louis 2015/0629
+# smartresize $INPUT_FILE $EXPECTED_WIDTH $OUTPUT_PATH
+smartresize() {
+    mogrify -path $3 -filter Triangle -define filter:support=2 -thumbnail $2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
+}
+
+# Replace vim with this function to force vim opens 'real' files instead of symbolic link
+# -- Louis 2018/0731
+# Make function more generic to different OS platform -- Louis 2018/0813
+# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
+#VIM_PATH=`which vim`
+#
+#function vim(){
+#    args=()
+#    for i in $@; do
+#        if [[ -h $1 ]]; then
+#            args+=`readlink $i`
+#        else
+#            args+=$i
+#        fi
+#    done
+#    /usr/local/bin/vim -p "${args[@]}"
+#    $VIM_PATH -p "${args[@]}"
+#}
+
+# Replace default diff by piping to ydiff for better result rendering
+# -- Louis 2018/0830
+function diff(){
+    args=()
+    for i in $@; do
+        args+=$i
+    done
+    /usr/bin/diff -ur "${args[@]}" | ydiff
+}
+
+# List brew installation dependency
+# -- Louis 2018/1219
+#function brewdep(){
+#    brew list | while read cask; do echo -n "\e[1;34m$cask ->\e[0m"; brew deps $cask | awk '{printf(" %s ", $0)}'; echo ""; done
+#}
+
+precmd() {print ""}
+
+# ---------------------- Obsolete
+
+# append to the history file, don't overwrite it
+#shopt -s histappend
+
 # Customize to your needs...
+#case "$TERM" in
+#xterm|rxvt)
+#    export LSCOLORS=deadfxdxcxegedabagacad
+#    ;;
+#*)
+#    if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
+#        source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+#    fi
+#    export LSCOLORS=exfxcxdxbxegedabagacad
+#    ;;
+#esac
+
+# Obsolete -- Louis 2016/0505
+#alias gitrepofs='sshfs nshiu@gitrepo:/Users/nshiu ~/RDisk/Monet -oauto_cache,reconnect,default_permissions,volname=Monet; cd ~/RDisk/Monet'
+#alias degasfs='sshfs nshiu@degas:/home/nshiu ~/RDisk/Degas -oauto_cache,reconnect,default_permissions,volname=Degas; cd ~/RDisk/Degas'
+#alias ugitrepo='cd ~/; umount ~/RDisk/Monet'
+#alias udegas='cd ~/; umount ~/RDisk/Degas'
+
+# APK analysis tool
+#alias apka='cd /Applications/Third_Party/Development/APKAnalyser; java -Xmx1024m -jar apkanalyser-5.2-exec.jar &'
+
+# Add dex2jar into PATH -- Louis 2015/0127
+#export PATH=${PATH}:/Applications/Third_Party/Development/dex2jar-0.0.9.15
+
+# Set brew github token for unlimited search access -- Louis 0303/2015
+#export HOMEBREW_GITHUB_API_TOKEN=6b2721545370ef554df9622c1388c92367b91ebd
+#export HOMEBREW_GITHUB_API_TOKEN=62476089779a92fb38513a9d2be83fa312cb4539
