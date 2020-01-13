@@ -1,6 +1,6 @@
 # ------------------------ Alias
 #alias less='less -I'
-alias ls="ls --color -CF --group-directories-first --ignore=$'Icon\r'"
+alias ls="clear;\ls --color -CF --group-directories-first --ignore=$'Icon\r'"
 #alias ll='ls -ahl | less'
 alias ll='ls -ahl'
 alias grep='grep --color'
@@ -21,8 +21,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     #alias diff='icdiff -N --no-bold'
     export YDIFF_OPTIONS='-s -w 0 --wrap'
     alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-    # For Wistron working directory -- Louis 2017/1103
-    #alias wistron='cd ~/Documents/Wistron'
 
     alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim'
     alias brewdep='brew deps --tree --installed | less'
@@ -33,3 +31,72 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 else
     alias diff='colordiff -yW "`tput cols`" --suppress-common-lines'
 fi
+
+# ------------------------ Functions
+# Useful adb commands
+getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
+    if [ -z "$1" ]; then
+        set "1"
+    fi
+    cstring="service call iphonesubinfo 3 i32 $1 | grep -oE \"[0-9a-f]{8} \" | while read hex; do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; done; echo"
+    IMEI=$(adb shell $cstring)
+    echo IMEI_$1: $IMEI
+}
+
+# Add extract() function to facilitate extract action -- Louis 2015/0311
+extract() {
+    if [ -f $1 ]; then
+        case $1 in
+            *.tar.bz2)  tar xjf $1      ;;
+            *.tar.gz)   tar xzf $1      ;;
+            *.bz2)      bunzip2 $1      ;;
+            *.rar)      unrar e $1      ;;
+            *.gz)       gunzip $1       ;;
+            *.tar)      tar xf $1       ;;
+            *.tbz2)     tar xjf $1      ;;
+            *.tgz)      tar xzf $1      ;;
+            *.zip)      unzip $1        ;;
+            *.Z)        uncompress $1   ;;
+            *)          echo "'$1' cannot be extracted via extract()" ;;
+        esac
+    else
+        echo "'$1' is not a valid file"
+    fi
+}
+
+# Add smartresize() function to resize image file(s) by utilizing ImageMagick -- Louis 2015/0629
+# smartresize $INPUT_FILE $EXPECTED_WIDTH $OUTPUT_PATH
+smartresize() {
+    mogrify -path $3 -filter Triangle -define filter:support=2 -thumbnail $2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
+}
+
+# Replace default diff by piping to ydiff for better result rendering
+# -- Louis 2018/0830
+function diff(){
+    args=()
+    for i in $@; do
+        args+=$i
+    done
+    /usr/bin/diff -ur "${args[@]}" | ydiff
+}
+
+# ---------------------- Obsolete
+# Replace vim with this function to force vim opens 'real' files instead of symbolic link
+# -- Louis 2018/0731
+# Make function more generic to different OS platform -- Louis 2018/0813
+# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
+#VIM_PATH=`which vim`
+#
+#function vim(){
+#    args=()
+#    for i in $@; do
+#        if [[ -h $1 ]]; then
+#            args+=`readlink $i`
+#        else
+#            args+=$i
+#        fi
+#    done
+#    /usr/local/bin/vim -p "${args[@]}"
+#    $VIM_PATH -p "${args[@]}"
+#}
+

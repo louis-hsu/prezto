@@ -75,74 +75,11 @@ fi
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
 
-# ---------------------- Alias
+# ---------------------- Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
 fi
-
-# ---------------------- Function
-# Add extract() function to facilitate extract action -- Louis 2015/0311
-extract() {
-    if [ -f $1 ]; then
-        case $1 in
-            *.tar.bz2)  tar xjf $1      ;;
-            *.tar.gz)   tar xzf $1      ;;
-            *.bz2)      bunzip2 $1      ;;
-            *.rar)      unrar e $1      ;;
-            *.gz)       gunzip $1       ;;
-            *.tar)      tar xf $1       ;;
-            *.tbz2)     tar xjf $1      ;;
-            *.tgz)      tar xzf $1      ;;
-            *.zip)      unzip $1        ;;
-            *.Z)        uncompress $1   ;;
-            *)          echo "'$1' cannot be extracted via extract()" ;;
-        esac
-    else
-       echo "'$1' is not a valid file"
-    fi
-}
-
-# Add smartresize() function to resize image file(s) by utilizing ImageMagick -- Louis 2015/0629
-# smartresize $INPUT_FILE $EXPECTED_WIDTH $OUTPUT_PATH
-smartresize() {
-    mogrify -path $3 -filter Triangle -define filter:support=2 -thumbnail $2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
-}
-
-# Replace vim with this function to force vim opens 'real' files instead of symbolic link
-# -- Louis 2018/0731
-# Make function more generic to different OS platform -- Louis 2018/0813
-# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
-#VIM_PATH=`which vim`
-#
-#function vim(){
-#    args=()
-#    for i in $@; do
-#        if [[ -h $1 ]]; then
-#            args+=`readlink $i`
-#        else
-#            args+=$i
-#        fi
-#    done
-#    /usr/local/bin/vim -p "${args[@]}"
-#    $VIM_PATH -p "${args[@]}"
-#}
-
-# Replace default diff by piping to ydiff for better result rendering
-# -- Louis 2018/0830
-function diff(){
-    args=()
-    for i in $@; do
-        args+=$i
-    done
-    /usr/bin/diff -ur "${args[@]}" | ydiff
-}
-
-# List brew installation dependency
-# -- Louis 2018/1219
-#function brewdep(){
-#    brew list | while read cask; do echo -n "\e[1;34m$cask ->\e[0m"; brew deps $cask | awk '{printf(" %s ", $0)}'; echo ""; done
-#}
 
 precmd() {print ""}
 
