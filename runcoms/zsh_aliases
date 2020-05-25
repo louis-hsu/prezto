@@ -9,7 +9,7 @@ alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 #export LESS=-SMRFX
 alias tree='tree -AC'
-alias du='du -ch -d 1'
+alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
 alias ag='ag --pager=less'
 alias jq='jq -C'
