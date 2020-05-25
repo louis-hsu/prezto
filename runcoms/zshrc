@@ -59,7 +59,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}
 
     # Update brew Python location
-    export PATH=/usr/local/opt/python/libexec/bin:${PATH}
+    # Update brew Python@3.8 location -- Louis 2020/0409
+    #export PATH=/usr/local/opt/python/libexec/bin:${PATH}
+    export PATH=/usr/local/opt/python@3.8/bin:${PATH}
 
     # Update brew sqlite location
     export PATH=/usr/local/opt/sqlite/bin:${PATH}
