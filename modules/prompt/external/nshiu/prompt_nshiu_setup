@@ -106,8 +106,8 @@ function prompt_nshiu_setup {
     zstyle ':prezto:module:git:info:unmerged' format ' %%B%F{yellow}═%f%%b'
     zstyle ':prezto:module:git:info:untracked' format ' %%B%F{white}?%f%%b'
     zstyle ':prezto:module:git:info:keys' format \
-      'status' '[$(coalesce "%b" "%p" "%c")%s]' \
-      'indicator' '%A%B%S%a%d%m%r%U%u'
+      'status' '[$(coalesce "%b" "%p" "%c")%s' \
+      'indicator' '%A%B%S%a%d%m%r%U%u]'
     # Set python-info parameters.
     zstyle ':prezto:module:python:info:virtualenv' format '(%F{yellow}%v%f) '
 
@@ -118,8 +118,10 @@ function prompt_nshiu_setup {
         PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]%(!. %B%F{1}#%f%b.)$prompt_newline%B%F{3}>>> %f%b'
         RPROMPT='%(?:: %F{1}✘%f)${VIM:+" %B%F{2}V%f%b"}${INSIDE_EMACS:+" %B%F{6}E%f%b"}'
     else
-        PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
-        RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}${git_info[indicator]}'
+        #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
+        PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}${git_info[indicator]}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
+        #RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}${git_info[indicator]}'
+        RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}'
     fi
     SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
     #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{214}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
