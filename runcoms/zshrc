@@ -27,11 +27,13 @@ export EDITOR=vim
 export WORKON_HOME=$HOME/.virtualenvs
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export PROJECT_HOME=$HOME/Development/PythonDev
-    source /usr/local/bin/virtualenvwrapper.sh
+    # Remove specifying script path after Python3.8 -- Louis 2020/0712
+    #source ~/Library/Python/3.8/bin/virtualenvwrapper.sh
+    source virtualenvwrapper.sh
 else
     export PROJECT_HOME=$HOME/PythonDev
     # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
-    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+    export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
     source ~/.local/bin/virtualenvwrapper.sh
 fi
 
@@ -59,9 +61,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}
 
     # Update brew Python location
-    # Update brew Python@3.8 location -- Louis 2020/0409
+    # Comment this since in Pyhon 3.8 the executable is linked to /usr/local/bin/python3 directly
+    # -- Louis 2020/0712
     #export PATH=/usr/local/opt/python/libexec/bin:${PATH}
-    export PATH=/usr/local/opt/python@3.8/bin:${PATH}
 
     # Update brew sqlite location
     export PATH=/usr/local/opt/sqlite/bin:${PATH}
@@ -69,6 +71,9 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     # Install jenv for Java version control -- Louis 2016/0905
     export PATH="$HOME/.jenv/bin:$PATH"
     if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+
+    # Add local PERL module directory to @INC
+    export PERL5LIB=~/.perl5lib
 else
     # Add snap package binary into $PATH -- Louis 2018/0710
     export PATH=/snap/bin:${PATH}
