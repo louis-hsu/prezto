@@ -3,7 +3,11 @@
 alias ls="clear;\ls --color -CF --group-directories-first --ignore=$'Icon\r'"
 #alias ll='ls -ahl | less'
 alias ll='ls -ahl'
-alias grep='grep --color'
+
+# Configure grep color -- Louis 2021/0119
+export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+alias grep='grep -n -C 2 --color'
+
 alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
@@ -11,7 +15,10 @@ alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
 alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
-alias ag='ag --pager=less'
+
+# Configure ag color following grep -- Louis 2021/0120
+alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --pager=less'
+
 alias jq='jq -C'
 alias gotop='gotop -p -s'
 alias task='clear; task'
@@ -24,7 +31,7 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 
     alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim'
-    alias brewdep='brew deps --tree --installed | less'
+    alias brewdep='brew deps --tree --installed'
 
     # Alias vim to nvim -- Louis 2019 1022
     alias vim='nvim'

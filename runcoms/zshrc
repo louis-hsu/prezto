@@ -41,6 +41,10 @@ fi
 if [[ "$OSTYPE" == "darwin"* ]]; then
     # Android SDK path -- Louis 2011/0420
     export PATH=${PATH}:~/Applications/ADT/tools:~/Applications/ADT/platform-tools
+
+    # My utility tools -- Louis 2020/1015
+    export PATH=${PATH}:~/Applications/Utilities
+
     # Ruby/gem configuration -- Louis 2015/0203
     # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
     # with my own account unless run 'sudo', which is a bad idea
@@ -53,12 +57,13 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     export GEM_HOME=~/.gem
     export PATH="/usr/local/opt/ruby/bin:$GEM_HOME/bin:$PATH"
 
-    # For tmuxinator auto completion -- Louis 2015/0203
-    source ~/.tmuxinator/tmuxinator.zsh
-
     # Install brew-version coreutilis -- Louis 2015/0209
     export PATH=/usr/local/opt/coreutils/libexec/gnubin:${PATH}
     export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}
+
+    # Install gnu getopt -- Louis 2020/1112
+    export PATH=/usr/local/opt/gnu-getopt/bin:${PATH}
+    export MANPATH=/usr/local/opt/gnu-getopt/share/man:${MANPATH}
 
     # Update brew Python location
     # Comment this since in Pyhon 3.8 the executable is linked to /usr/local/bin/python3 directly
@@ -74,6 +79,14 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
 
     # Add local PERL module directory to @INC
     export PERL5LIB=~/.perl5lib
+
+    # For tmuxinator auto completion -- Louis 2015/0203
+    source ~/.tmuxinator/tmuxinator.zsh
+
+    # Install brew-version grep  -- Louis 2021/0119
+    export PATH=/usr/local/opt/grep/libexec/gnubin:${PATH}
+    export MANPATH=/usr/local/opt/grep/libexec/man:${MANPATH}
+
 else
     # Add snap package binary into $PATH -- Louis 2018/0710
     export PATH=/snap/bin:${PATH}
