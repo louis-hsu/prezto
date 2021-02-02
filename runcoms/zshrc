@@ -24,6 +24,8 @@ export LSCOLORS=exfxcxdxbxegedabagacad
 export EDITOR=vim
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
+# fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
 if [[ "$OSTYPE" == "darwin"* ]]; then
     export PROJECT_HOME=$HOME/Development/PythonDev
@@ -32,8 +34,6 @@ if [[ "$OSTYPE" == "darwin"* ]]; then
     source virtualenvwrapper.sh
 else
     export PROJECT_HOME=$HOME/PythonDev
-    # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
-    export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
     source ~/.local/bin/virtualenvwrapper.sh
 fi
 
