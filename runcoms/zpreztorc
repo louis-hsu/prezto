@@ -40,9 +40,13 @@ zstyle ':prezto:load' pmodule \
   'spectrum' \
   'utility' \
   'completion' \
+<<<<<<< HEAD
   'git' \
   'tmux' \
   'python' \
+=======
+  'history-substring-search' \
+>>>>>>> upstream/master
   'prompt'
 
 #
