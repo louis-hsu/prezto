@@ -17,11 +17,14 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --pager=less'
+alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --pager=less --number'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
 alias task='clear; task'
+
+# Quick alias for taskwarrior -- Louis 2021/0316
+alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+1w'
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
     alias updatedb='sudo /usr/libexec/locate.updatedb'
