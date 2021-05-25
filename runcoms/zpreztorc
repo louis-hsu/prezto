@@ -43,8 +43,8 @@ zstyle ':prezto:load' pmodule \
   'git' \
   'tmux' \
   'python' \
-  'history-substring-search' \
   'prompt'
+#  'fzf-tab' \ # Remove it due to issue that <tab> will eat the line up -- Louis 2021/0523
 
 #
 # Autosuggestions
@@ -90,10 +90,10 @@ zstyle ':prezto:module:editor' key-bindings 'vi'
 
 #
 # History Substring Search
-#
+zstyle ':prezto:module:history-substring-search' color 'yes'
 
 # Set the query found color.
-zstyle ':prezto:module:history-substring-search:color' found ''
+#zstyle ':prezto:module:history-substring-search:color' found ''
 
 # Set the query not found color.
 # zstyle ':prezto:module:history-substring-search:color' not-found ''
