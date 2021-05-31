@@ -4,66 +4,171 @@
 # Authors:
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
+# Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
 
+# ---- Script ----
+# rationalize-path()
+# Later we'll need to trim down the paths that follow because the ones
+# given here are for all my accounts, some of which have unusual
+# paths in them.  rationalize-path will remove
+# nonexistent directories from an array.
 #
-# Browser
-#
+# To be honest, I don't know what exactly it does, but it works -- Louis 2021/0526
+rationalize-path () {
+    # Note that this works only on arrays, not colon-delimited strings.
+    # Not that this is a problem now that there is typeset -T.
+    local element
+    local build
+    build=()
+    # Evil quoting to survive an eval and to make sure that
+    # this works even with variables containing IFS characters, if I'm
+    # crazy enough to setopt shwordsplit.
+    eval '
+    foreach element in "$'"$1"'[@]"
+    do
+        if [[ -d "$element" ]]
+        then
+            build=("$build[@]" "$element")
+        fi
+    done
+    '"$1"'=( "$build[@]" )
+    '
+}
+
+# ---- Browser ----
 
 if [[ "$OSTYPE" == darwin* ]]; then
     export BROWSER='open'
 fi
 
-#
-# Editors
-#
+# ---- Editors ----
 
 export EDITOR='vim'
 export VISUAL='vim'
 export PAGER='less'
 
-#
-# Language
-#
+# ---- Language ----
 
 if [[ -z "$LANG" ]]; then
     export LANG='en_US.UTF-8'
 fi
 
-#
-# Paths
-#
+# ---- Paths ----
+
+# Set the list of directories that Zsh searches for programs.
+path=(
+    ~/Applications/Utilities                # My utility tools -- Louis 2020/1015
+    ~/Applications/ADT/tools                # Android SDK path -- Louis 2011/0420
+    ~/Applications/ADT/platform-tools
+    ~/.gem/bin                              # Export brew-version Ruby -- Louis 2021/1220
+    /usr/local/opt/ruby/bin
+    /usr/local/opt/coreutils/libexec/gnubin # Install brew-version coreutilis -- Louis 2015/0209
+    /usr/local/opt/gnu-getopt/bin           # Install gnu getopt -- Louis 2020/1112
+    /usr/local/opt/sqlite/bin               # Update brew sqlite location
+    /usr/local/opt/grep/libexec/gnubin      # Install brew-version grep  -- Louis 2021/0119
+    /usr/local/opt/gnu-time/libexec/gnubin  # Install gnu version time -- Louis 2021/0530
+    /usr/local/{bin,sbin}
+    $path
+)
+export PATH
+
+manpath=(
+    /usr/local/opt/coreutils/libexec/gnuman # Install brew-version coreutilis -- Louis 2015/0209
+    /usr/local/opt/gnu-getopt/share/man     # Install gnu getopt -- Louis 2020/1112
+    /usr/local/opt/grep/libexec/man         # Install brew-version grep -- Louis 2021/0119
+    /usr/local/opt/fzf/share/man
+    $manpath
+)
+export MANPATH
 
 # Ensure path arrays do not contain duplicates.
-typeset -gU cdpath fpath mailpath path
-export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+typeset -gU cdpath fpath mailpath path manpath
+#export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
 # export $path
+
+# Remove directories not existing
+rationalize-path path
+rationalize-path manpath
 
 # Set the list of directories that cd searches.
 # cdpath=(
 #   $cdpath
 # )
 
-# Set the list of directories that Zsh searches for programs.
-path=(
-    /usr/local/{bin,sbin}
-    $path
-)
+# ---- Colors ----
 
-#
-# Less
-#
+# For ls/exa -- Louis 2021/0523
+export LSCOLORS=exfxcxdxbxegedabagacad
+# tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
+GREY_COLOR="38;5;248"
+GREY_COLOR_2="38;5;240"
+GREY_COLOR_3="38;5;102"
+#export EXA_COLORS="reset:uu=${GREY_COLOR_2}:un=${GREY_COLOR_2}:gu=${GREY_COLOR_2}:gn=${GREY_COLOR_2}:ur=${GREY_COLOR}:uw=${GREY_COLOR}:ue=${GREY_COLOR}:ux=${GREY_COLOR}:gr=${GREY_COLOR}:gw=${GREY_COLOR}:gx=${GREY_COLOR}:tr=${GREY_COLOR}:tw=${GREY_COLOR}:tx=${GREY_COLOR}:da=38;5;102"
+export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}"
+
+# Configure grep color -- Louis 2021/0119
+export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+
+# ---- Less ----
 
 # Set the default Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
 #export LESS='-F -g -i -M -R -S -w -X -z-4'
-export LESS='-F -g -i -M -R -w -X -z-4'
+# export LESS='-F -g -i -M -R -w -X -z-4'
+export LESS="-MR+Gg"
 
 # Set the Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
 if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
+
+# ---- Others ----
+
+# Configure python virtualenvwrapper -- Louis 2017/0125
+# fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/Development/PythonDev
+
+# Remove jenv setup since I might not really need multiple Java version
+# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
+#export PATH=/usr/local/opt/openjdk/bin:${PATH}
+export JAVA_HOME=`/usr/libexec/java_home -v 15.0.2`
+
+# Add local PERL module directory to @INC
+export PERL5LIB=~/.perl5lib/lib/perl5
+
+# Configure zsh history behavior -- Louis 2021/0523
+export SAVEHIST=10000
+export HISTSIZE=10000
+export HISTFILE="${HOME}/.zsh_history"
+export HISTCONTROL=ignorespace:ignoredups
+
+# "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
+export FD_OPTIONS="--hidden --follow --exclude .git"
+
+# Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
+export BAT_PAGER="less -R"
+export BAT_STYLE="changes,numbers"
+export BAT_THEME="Nord"
+
+# 'junegunn/fzf', command line fuzzy finder
+# Do do preview fisrt, need to think about it -- Louis 2021/0523
+# export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --info=inline --preview='$HOME/.vim/plugged/fzf.vim/bin/preview.sh {}' --preview-window='right:60%:wrap' --bind='f2:toggle-preview,f3:execute(bat --style=numbers {} || less -f {}),f4:execute($EDITOR {}),alt-w:toggle-preview-wrap,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+} | pbcopy),ctrl-x:execute(rm -i {+})+abort,ctrl-l:clear-query'"
+export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --border --info=inline"
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+--color fg:#D8DEE9,hl:#A3BE8C,fg+:#D8DEE9,bg+:#434C5E,hl+:#A3BE8C
+--color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B
+'
+export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
+export MANPATH="/usr/local/share/fzf/man:$MANPATH"
+
+# Setup GEM_HOME and gem binary path -- Louis 2018/1220
+export GEM_HOME=~/.
 
 # pip zsh completion start
 function _pip_completion {
@@ -76,4 +181,3 @@ function _pip_completion {
 }
 compctl -K _pip_completion pip3
 # pip zsh completion end
-

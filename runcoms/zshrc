@@ -2,14 +2,8 @@
 # Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
 #
 # -- Louis 2018/0603
-
-# don't put duplicate lines in the history. See bash(1) for more options
-# ... or force ignoredups and ignorespace
-HISTCONTROL=ignoredups:ignorespace
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
+#
+# Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
 
 # Set default zsh options (setopt) -- Louis 2018/1224
 setopt cdablevars
@@ -19,85 +13,35 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
     source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# ---------------------- Export
-export LSCOLORS=exfxcxdxbxegedabagacad
-export EDITOR=vim
-
 # Configure python virtualenvwrapper -- Louis 2017/0125
-# fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
-export WORKON_HOME=$HOME/.virtualenvs
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    export PROJECT_HOME=$HOME/Development/PythonDev
-    # Remove specifying script path after Python3.8 -- Louis 2020/0712
-    #source ~/Library/Python/3.8/bin/virtualenvwrapper.sh
-    source virtualenvwrapper.sh
-else
-    export PROJECT_HOME=$HOME/PythonDev
-    source ~/.local/bin/virtualenvwrapper.sh
-fi
+source virtualenvwrapper.sh
 
-# Separate macOS/Ubuntu setup -- Louis 2018/0603
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    # Android SDK path -- Louis 2011/0420
-    export PATH=${PATH}:~/Applications/ADT/tools:~/Applications/ADT/platform-tools
+# For tmuxinator auto completion -- Louis 2015/0203
+source ~/.tmuxinator/tmuxinator.zsh
 
-    # My utility tools -- Louis 2020/1015
-    export PATH=${PATH}:~/Applications/Utilities
+# Move all "export" commands to 'zprofile'
+# But keep some comments in case needing to restore them in future -- Louis 2021/0526
 
-    # Ruby/gem configuration -- Louis 2015/0203
-    # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
-    # with my own account unless run 'sudo', which is a bad idea
-    # Install rbenv instead to create private Ruby environment to fix this issue
-    #if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# Ruby/gem configuration -- Louis 2015/0203
+# Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
+# with my own account unless run 'sudo', which is a bad idea
+# Install rbenv instead to create private Ruby environment to fix this issue
+#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
-    # Since no intention to install multi-version Ruby,just export brew-version Ruby
-    # Also setup GEM_HOME and gem binary path
-    # -- Louis 2018/1220
-    export GEM_HOME=~/.gem
-    export PATH="/usr/local/opt/ruby/bin:$GEM_HOME/bin:$PATH"
+# Update brew Python location
+# Comment this since in Pyhon 3.8 the executable is linked to /usr/local/bin/python3 directly
+# -- Louis 2020/0712
+#export PATH=/usr/local/opt/python/libexec/bin:${PATH}
 
-    # Install brew-version coreutilis -- Louis 2015/0209
-    export PATH=/usr/local/opt/coreutils/libexec/gnubin:${PATH}
-    export MANPATH=/usr/local/opt/coreutils/libexec/gnuman:${MANPATH}
+# Install jenv for Java version control -- Louis 2016/0905
+#
+# Remove jenv setup since I might not really need multiple Java version
+# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
+#export PATH=/usr/local/opt/openjdk/bin:${PATH}
 
-    # Install gnu getopt -- Louis 2020/1112
-    export PATH=/usr/local/opt/gnu-getopt/bin:${PATH}
-    export MANPATH=/usr/local/opt/gnu-getopt/share/man:${MANPATH}
-
-    # Update brew Python location
-    # Comment this since in Pyhon 3.8 the executable is linked to /usr/local/bin/python3 directly
-    # -- Louis 2020/0712
-    #export PATH=/usr/local/opt/python/libexec/bin:${PATH}
-
-    # Update brew sqlite location
-    export PATH=/usr/local/opt/sqlite/bin:${PATH}
-
-    # Install jenv for Java version control -- Louis 2016/0905
-    #
-    # Remove jenv setup since I might not really need multiple Java version
-    # Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
-    #export PATH=/usr/local/opt/openjdk/bin:${PATH}
-    export JAVA_HOME=`/usr/libexec/java_home -v 15.0.2`
-
-    # export PATH="$HOME/.jenv/bin:$PATH"
-    # export JENV_ROOT=/usr/local/opt/jenv
-    # if which jenv > /dev/null; then eval "$(jenv init -)"; fi
-
-    # Add local PERL module directory to @INC
-    export PERL5LIB=~/.perl5lib/lib/perl5
-
-    # For tmuxinator auto completion -- Louis 2015/0203
-    source ~/.tmuxinator/tmuxinator.zsh
-
-    # Install brew-version grep  -- Louis 2021/0119
-    export PATH=/usr/local/opt/grep/libexec/gnubin:${PATH}
-    export MANPATH=/usr/local/opt/grep/libexec/man:${MANPATH}
-
-else
-    # Add snap package binary into $PATH -- Louis 2018/0710
-    export PATH=/snap/bin:${PATH}
-fi
+# export PATH="$HOME/.jenv/bin:$PATH"
+# export JENV_ROOT=/usr/local/opt/jenv
+# if which jenv > /dev/null; then eval "$(jenv init -)"; fi
 
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
@@ -110,8 +54,10 @@ fi
 
 precmd() {print ""}
 
-# ---------------------- Obsolete
+# fzf integration -- Louis 2021/0523
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
+# ---------------------- Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
 

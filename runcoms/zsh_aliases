@@ -2,13 +2,18 @@
 #alias less='less -I'
 alias ls="clear;\ls --color -CF --group-directories-first --ignore=$'Icon\r'"
 #alias ll='ls -ahl | less'
-alias ll='ls -ahl'
+#alias ll='ls -ahl'
+
+# Another better look 'ls' alternative: exa -- Louis 2021/0523
+export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color-scale --ignore-glob=Icon$'\r'"
+alias ll="clear; exa -a $EXA_OPTIONS"
+alias lt="clear; exa $EXA_OPTIONS -T -L 2"
 
 # Configure grep color -- Louis 2021/0119
-export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+#export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 alias grep='grep -n -C 2 --color'
 
-alias xterm='xterm &'
+#alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 #export LESS=-SMRFX
@@ -17,7 +22,7 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --pager=less --number'
+alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
@@ -26,22 +31,20 @@ alias task='clear; task'
 # Quick alias for taskwarrior -- Louis 2021/0316
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+1w'
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    alias updatedb='sudo /usr/libexec/locate.updatedb'
-    alias monitor='monitor &'
-    #alias diff='icdiff -N --no-bold'
-    export YDIFF_OPTIONS='-s -w 0 --wrap'
-    alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+# "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
+alias fd='fd --hidden --follow --exclude .git'
 
-    alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim'
-    alias brewdep='brew deps --tree --installed'
+alias updatedb='sudo /usr/libexec/locate.updatedb'
 
-    # Alias vim to nvim -- Louis 2019 1022
-    alias vim='nvim'
-    alias vi='nvim'
-else
-    alias diff='colordiff -yW "`tput cols`" --suppress-common-lines'
-fi
+# Remove due to Google deprecated Android Device Monitor -- Louis 2021/0528
+#alias monitor='monitor &'
+#alias diff='icdiff -N --no-bold'
+export YDIFF_OPTIONS='-s -w 0 --wrap'
+
+alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+
+alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim'
+alias brewdep='brew deps --tree --installed'
 
 # ------------------------ Functions
 # Useful adb commands
