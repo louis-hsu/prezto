@@ -22,7 +22,7 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
+alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R"'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
@@ -32,7 +32,8 @@ alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+1w'
 
 # "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
-alias fd='fd --hidden --follow --exclude .git'
+# Comment out the alias since parameter $FD_OPTIONS has been defined in zprofile -- Louis 2021/0618
+#alias fd='fd --hidden --follow --exclude .git'
 
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 
