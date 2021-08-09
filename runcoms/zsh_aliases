@@ -22,7 +22,8 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R"'
+alias agless='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R"'
+alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
@@ -44,7 +45,7 @@ export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 
-alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim'
+alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
 alias brewdep='brew deps --tree --installed'
 
 # ------------------------ Functions
