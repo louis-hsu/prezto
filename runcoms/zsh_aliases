@@ -30,7 +30,7 @@ alias gotop='gotop -p -s'
 alias task='clear; task'
 
 # Quick alias for taskwarrior -- Louis 2021/0316
-alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+1w'
+alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 
 # "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
 # Comment out the alias since parameter $FD_OPTIONS has been defined in zprofile -- Louis 2021/0618
@@ -47,6 +47,9 @@ alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status
 
 alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
 alias brewdep='brew deps --tree --installed'
+
+# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
+alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
 
 # ------------------------ Functions
 # Useful adb commands
