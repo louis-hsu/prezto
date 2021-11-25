@@ -22,15 +22,16 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias agless='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R"'
-alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
+alias ag='ag -i -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R" -r'
+#alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
-alias task='clear; task'
 
-# Quick alias for taskwarrior -- Louis 2021/0316
-alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
+# Taskwarror alias
+alias task='clear; task'
+alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
+alias tinfo=task_project_info
 
 # "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
 # Comment out the alias since parameter $FD_OPTIONS has been defined in zprofile -- Louis 2021/0618
@@ -50,6 +51,12 @@ alias brewdep='brew deps --tree --installed'
 
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
 alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+
+# ------------------------ Bind keys
+# Select file and open with vim directly
+bindkey -s '^v' 'vim_with_fzf\n'
+bindkey -s '^f' 'cd_with_fzf\n'
+bindkey -s '^o' 'open_with_fzf\n'
 
 # ------------------------ Functions
 # Useful adb commands
@@ -118,6 +125,29 @@ function diff(){
     /usr/bin/diff -ur "${args[@]}" | ydiff
 }
 
+# Open file selected from fzf -- Louis 2021/1125
+# TODO
+# How to handle review with different file type
+open_with_fzf() {
+#    fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
+    fd -t f -H -I | fzf -m --print0 | xargs -0 open 2>&-
+}
+
+# cd to directory selected from fzf -- Louis 2021/1125
+cd_with_fzf() {
+    cd "$(fd -t d | fzf --preview="tree -L 1 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+}
+
+# vim the file selected from fzf -- Louis 2021/1125
+vim_with_fzf() {
+    vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    [[ ! -z "$vim_file" ]] && vim "$vim_file"
+}
+
+# Show project info from Taskwarrior -- Louis 2021/1126
+task_project_info() {
+    task +Info "$@" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+}
 # ---------------------- Obsolete
 # Replace vim with this function to force vim opens 'real' files instead of symbolic link
 # -- Louis 2018/0731
