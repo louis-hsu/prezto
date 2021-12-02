@@ -53,6 +53,9 @@ if [[ -z "$LANG" ]]; then
     export LANG='en_US.UTF-8'
 fi
 
+# ---- Android ----
+export ANDROID_HOME=$HOME/Applications/ADT
+
 # ---- Paths ----
 
 # Set the list of directories that Zsh searches for programs.
@@ -76,7 +79,8 @@ manpath=(
     /usr/local/opt/coreutils/libexec/gnuman # Install brew-version coreutilis -- Louis 2015/0209
     /usr/local/opt/gnu-getopt/share/man     # Install gnu getopt -- Louis 2020/1112
     /usr/local/opt/grep/libexec/man         # Install brew-version grep -- Louis 2021/0119
-    /usr/local/opt/fzf/share/man
+    /usr/share/man
+    /usr/local/share/man
     $manpath
 )
 export MANPATH
@@ -114,15 +118,10 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 # Set the default Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
-#export LESS='-F -g -i -M -R -S -w -X -z-4'
-# export LESS='-F -g -i -M -R -w -X -z-4'
-export LESS="-MR+Gg"
+export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
-# Set the Less input preprocessor.
-# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
-if (( $#commands[(i)lesspipe(|.sh)] )); then
-  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
-fi
+# ---- Homebrew ----
+export HOMEBREW_NO_INSTALL_CLEANUP=1
 
 # ---- Others ----
 
@@ -150,7 +149,7 @@ export HISTCONTROL=ignorespace:ignoredups
 export FD_OPTIONS="--hidden --follow --exclude .git"
 
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
-export BAT_PAGER="less -R"
+export BAT_PAGER="less -RF"
 export BAT_STYLE="changes,numbers"
 export BAT_THEME="Nord"
 
@@ -165,7 +164,6 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
-export MANPATH="/usr/local/share/fzf/man:$MANPATH"
 
 # Setup GEM_HOME and gem binary path -- Louis 2018/1220
 export GEM_HOME=~/.

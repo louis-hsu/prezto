@@ -1,13 +1,9 @@
 # ------------------------ Alias
-#alias less='less -I'
-alias ls="clear;\ls --color -CF --group-directories-first --ignore=$'Icon\r'"
-#alias ll='ls -ahl | less'
-#alias ll='ls -ahl'
-
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
-export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color-scale --ignore-glob=Icon$'\r'"
-alias ll="clear; exa -a $EXA_OPTIONS"
-alias lt="clear; exa $EXA_OPTIONS -T -L 2"
+export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
+alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
+alias ll="clear; exa -a $EXA_OPTIONS | less -RFX"
+alias lt="clear; exa $EXA_OPTIONS -T -L 2 | less -RFX"
 
 # Configure grep color -- Louis 2021/0119
 #export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
@@ -16,14 +12,15 @@ alias grep='grep -n -C 2 --color'
 #alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
-#export LESS=-SMRFX
 alias tree='tree -AC'
 alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -i -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -R" -r'
-#alias ag='ag -n -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number'
+# TODO
+# Figure out out to reserve color output from ag
+# | less -R or use bat doesn't work
+alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
@@ -50,7 +47,8 @@ alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &
 alias brewdep='brew deps --tree --installed'
 
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+# Comment out cuz not that useful -- Louis 2021/1130
+# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
 
 # ------------------------ Bind keys
 # Select file and open with vim directly
@@ -135,7 +133,7 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    cd "$(fd -t d | fzf --preview="tree -L 1 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
 }
 
 # vim the file selected from fzf -- Louis 2021/1125
@@ -143,6 +141,9 @@ vim_with_fzf() {
     vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview" --preview-window=:hidden)"
     [[ ! -z "$vim_file" ]] && vim "$vim_file"
 }
+
+# TODO -- Louis 2021/1130
+# 1. Create function with ag/fzf to vim file which has keyword directly
 
 # Show project info from Taskwarrior -- Louis 2021/1126
 task_project_info() {
