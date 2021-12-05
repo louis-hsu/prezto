@@ -21,6 +21,9 @@ source ~/.tmuxinator/tmuxinator.zsh
 
 # Move all "export" commands to 'zprofile'
 # But keep some comments in case needing to restore them in future -- Louis 2021/0526
+# TODO
+# 1. If Ruby/Gem rbenv is required and how to install/configure
+# 2. If jenv is required/configured for multiple Java version
 
 # Ruby/gem configuration -- Louis 2015/0203
 # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
@@ -28,17 +31,8 @@ source ~/.tmuxinator/tmuxinator.zsh
 # Install rbenv instead to create private Ruby environment to fix this issue
 #if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
-# Update brew Python location
-# Comment this since in Pyhon 3.8 the executable is linked to /usr/local/bin/python3 directly
-# -- Louis 2020/0712
-#export PATH=/usr/local/opt/python/libexec/bin:${PATH}
-
 # Install jenv for Java version control -- Louis 2016/0905
-#
 # Remove jenv setup since I might not really need multiple Java version
-# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
-#export PATH=/usr/local/opt/openjdk/bin:${PATH}
-
 # export PATH="$HOME/.jenv/bin:$PATH"
 # export JENV_ROOT=/usr/local/opt/jenv
 # if which jenv > /dev/null; then eval "$(jenv init -)"; fi

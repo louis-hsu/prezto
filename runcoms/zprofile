@@ -119,6 +119,9 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
 export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
+# For lesspip preprocessor -- Louis 2021/1205
+export LESSOPEN="|/usr/local/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
+
 # ---- Homebrew ----
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
@@ -133,7 +136,7 @@ export PROJECT_HOME=$HOME/Development/PythonDev
 # Remove jenv setup since I might not really need multiple Java version
 # Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
 #export PATH=/usr/local/opt/openjdk/bin:${PATH}
-export JAVA_HOME=`/usr/libexec/java_home -v 15.0.2`
+export JAVA_HOME=`/usr/libexec/java_home`
 
 # Add local PERL module directory to @INC
 export PERL5LIB=~/.perl5lib/lib/perl5
