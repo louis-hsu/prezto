@@ -165,7 +165,7 @@ export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
 
 # Setup GEM_HOME and gem binary path -- Louis 2018/1220
-export GEM_HOME=~/.
+export GEM_HOME=~/.gem
 
 # pip zsh completion start
 function _pip_completion {
