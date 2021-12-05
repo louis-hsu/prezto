@@ -30,15 +30,8 @@ alias task='clear; task'
 alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias tinfo=task_project_info
 
-# "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
-# Comment out the alias since parameter $FD_OPTIONS has been defined in zprofile -- Louis 2021/0618
-#alias fd='fd --hidden --follow --exclude .git'
-
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 
-# Remove due to Google deprecated Android Device Monitor -- Louis 2021/0528
-#alias monitor='monitor &'
-#alias diff='icdiff -N --no-bold'
 export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
@@ -149,6 +142,7 @@ vim_with_fzf() {
 task_project_info() {
     task +Info "$@" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 }
+
 # ---------------------- Obsolete
 # Replace vim with this function to force vim opens 'real' files instead of symbolic link
 # -- Louis 2018/0731
