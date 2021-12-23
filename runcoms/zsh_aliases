@@ -128,12 +128,12 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
 # vim the file selected from fzf -- Louis 2021/1125
 vim_with_fzf() {
-    vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
     [[ ! -z "$vim_file" ]] && vim "$vim_file"
 }
 
