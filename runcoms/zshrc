@@ -15,7 +15,7 @@ fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
 export PROJECT_HOME=$HOME/PythonDev
-source ~/.local/bin/virtualenvwrapper.sh
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 
 export PATH=/snap/bin:${PATH}
 
