@@ -2,8 +2,8 @@
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
 export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
 alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
-#alias ll="clear; exa $EXA_OPTIONS -R -L 1 | less -RFX"
-#alias lt="clear; exa $EXA_OPTIONS -T -L 2 $1 | less -RFX"
+#alias ll="clear; exa -a $EXA_OPTIONS | less -RFX"
+#alias lt="clear; exa $EXA_OPTIONS -T -L 2 | less -RFX"
 alias ll=exa_ll
 alias lt=exa_lt
 
@@ -27,23 +27,17 @@ alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --col
 alias jq='jq -C'
 alias gotop='gotop -p -s'
 
-# Taskwarror alias
-alias task='clear; task'
-alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
-alias tinfo=task_project_info
+# 'fd' to 'fdfind' -- Louis/2021/1205
+alias fd='fdfind'
 
-alias updatedb='sudo /usr/libexec/locate.updatedb'
+# 'bat' to 'batcat' -- Louis 2021/0530
+alias bat='batcat'
 
 export YDIFF_OPTIONS='-s -w 0 --wrap'
 
-alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+alias rtime='time -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 
-alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
-alias brewdep='brew deps --tree --installed'
-
-# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-# Comment out cuz not that useful -- Louis 2021/1130
-# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+alias mux='tmuxinator'
 
 # ------------------------ Bind keys
 # Select file and open with vim directly
@@ -128,12 +122,12 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
 }
 
 # vim the file selected from fzf -- Louis 2021/1125
 vim_with_fzf() {
-    vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    vim_file="$(fd -t f -H -I | fzf --preview="batcat --color always {}" --bind="space:toggle-preview" --preview-window=:hidden)"
     [[ ! -z "$vim_file" ]] && vim "$vim_file"
 }
 

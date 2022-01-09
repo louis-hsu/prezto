@@ -9,33 +9,15 @@
 setopt cdablevars
 
 # Source Prezto.
-if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+if [[ -s ${ZDOTDIR:-$HOME}/.zprezto/init.zsh ]]; then
+    source ${ZDOTDIR:-$HOME}/.zprezto/init.zsh
 fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
-source virtualenvwrapper.sh
+export PROJECT_HOME=$HOME/PythonDev
+source ~/.local/bin/virtualenvwrapper.sh
 
-# For tmuxinator auto completion -- Louis 2015/0203
-source ~/.tmuxinator/tmuxinator.zsh
-
-# Move all "export" commands to 'zprofile'
-# But keep some comments in case needing to restore them in future -- Louis 2021/0526
-# TODO
-# 1. If Ruby/Gem rbenv is required and how to install/configure
-# 2. If jenv is required/configured for multiple Java version
-
-# Ruby/gem configuration -- Louis 2015/0203
-# Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
-# with my own account unless run 'sudo', which is a bad idea
-# Install rbenv instead to create private Ruby environment to fix this issue
-#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
-# Install jenv for Java version control -- Louis 2016/0905
-# Remove jenv setup since I might not really need multiple Java version
-# export PATH="$HOME/.jenv/bin:$PATH"
-# export JENV_ROOT=/usr/local/opt/jenv
-# if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+export PATH=/snap/bin:${PATH}
 
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
@@ -43,13 +25,25 @@ if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
 # ---------------------- Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ~/.zsh_aliases ]; then
-    . ~/.zsh_aliases
+    source ~/.zsh_aliases
 fi
 
 precmd() {print ""}
 
 # fzf integration -- Louis 2021/0523
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+# Update the setting to cover no .fzf.zsh in Linux -- Louis 2021/0618
+#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+#
+if [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+else
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    source /usr/share/doc/fzf/examples/completion.zsh
+fi
+
+# Somehow .zshenv not working. Source .zprofile here -- Louis 2021/0601
+# TODO: Fix .zshenv
+source ~/.zprofile
 
 # ---------------------- Obsolete
 # append to the history file, don't overwrite it

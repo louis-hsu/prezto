@@ -35,12 +35,6 @@ rationalize-path () {
     '
 }
 
-# ---- Browser ----
-
-if [[ "$OSTYPE" == darwin* ]]; then
-    export BROWSER='open'
-fi
-
 # ---- Editors ----
 
 export EDITOR='vim'
@@ -53,31 +47,18 @@ if [[ -z "$LANG" ]]; then
     export LANG='en_US.UTF-8'
 fi
 
-# ---- Android ----
-export ANDROID_HOME=$HOME/Applications/ADT
-
 # ---- Paths ----
 
 # Set the list of directories that Zsh searches for programs.
 path=(
-    ~/Applications/Utilities                # My utility tools -- Louis 2020/1015
-    ~/Applications/ADT/tools                # Android SDK path -- Louis 2011/0420
-    ~/Applications/ADT/platform-tools
-    ~/.gem/bin                              # Export brew-version Ruby -- Louis 2021/1220
-    /usr/local/opt/ruby/bin
-    /usr/local/opt/coreutils/libexec/gnubin # Install brew-version coreutilis -- Louis 2015/0209
-    /usr/local/opt/gnu-getopt/bin           # Install gnu getopt -- Louis 2020/1112
-    /usr/local/opt/sqlite/bin               # Update brew sqlite location
-    /usr/local/opt/grep/libexec/gnubin      # Install brew-version grep  -- Louis 2021/0119
-    /usr/local/opt/gnu-time/libexec/gnubin  # Install gnu version time -- Louis 2021/0530
+    ~/bin
+    ~/.gem/bin
+    /snap/bin
     /usr/local/{bin,sbin}
     $path
 )
 
 manpath=(
-    /usr/local/opt/coreutils/libexec/gnuman # Install brew-version coreutilis -- Louis 2015/0209
-    /usr/local/opt/gnu-getopt/share/man     # Install gnu getopt -- Louis 2020/1112
-    /usr/local/opt/grep/libexec/man         # Install brew-version grep -- Louis 2021/0119
     /usr/share/man
     /usr/local/share/man
     $manpath
@@ -85,6 +66,8 @@ manpath=(
 
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path manpath
+#export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
+# export $path
 
 # Remove directories not existing
 rationalize-path path
@@ -92,7 +75,6 @@ rationalize-path manpath
 
 export PATH
 export MANPATH
-
 # Set the list of directories that cd searches.
 # cdpath=(
 #   $cdpath
@@ -119,24 +101,23 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
 export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
-# For lesspip preprocessor -- Louis 2021/1205
-export LESSOPEN="|/usr/local/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
-
-# ---- Homebrew ----
-export HOMEBREW_NO_INSTALL_CLEANUP=1
+# Set the Less input preprocessor.
+# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
+if (( $#commands[(i)lesspipe(|.sh)] )); then
+  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
+fi
 
 # ---- Others ----
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
 # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/Development/PythonDev
+export PROJECT_HOME=$HOME/PythonDev
 
 # Remove jenv setup since I might not really need multiple Java version
 # Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
-#export PATH=/usr/local/opt/openjdk/bin:${PATH}
-export JAVA_HOME=`/usr/libexec/java_home`
+#export JAVA_HOME=/usr/lib/jvm/java-16-openjdk-amd64
 
 # Add local PERL module directory to @INC
 export PERL5LIB=~/.perl5lib/lib/perl5
@@ -153,7 +134,7 @@ export FD_OPTIONS="--hidden --follow --exclude .git"
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
 export BAT_PAGER="less -RF"
 export BAT_STYLE="changes,numbers"
-export BAT_THEME="Nord"
+export BAT_THEME="Monokai Extended"
 
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
