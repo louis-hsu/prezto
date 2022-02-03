@@ -11,6 +11,7 @@ alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
 alias du='du -ch -d 1 | sort -hr'                   # Add sorting by size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
+alias mux='tmuxinator'
 
 # Configure ag color following grep -- Louis 2021/0120
 alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
@@ -22,6 +23,7 @@ alias gotop='gotop -p -s'
 alias task='clear; task'
 alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias tinfo=task_project_info
+
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'

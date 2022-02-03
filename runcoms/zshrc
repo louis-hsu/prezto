@@ -12,7 +12,7 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 source virtualenvwrapper.sh                         # Configure python virtualenvwrapper -- Louis 2017/0125
-source ~/.tmuxinator/tmuxinator.zsh                 # For tmuxinator auto completion -- Louis 2015/0203
+#source ~/.tmuxinator/tmuxinator.zsh                 # For tmuxinator auto completion -- Louis 2015/0203
 
 # Move all "export" commands to 'zprofile'
 # But keep some comments in case needing to restore them in future -- Louis 2021/0526
