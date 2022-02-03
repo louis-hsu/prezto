@@ -17,6 +17,8 @@ export PROJECT_HOME=$HOME/PythonDev
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 export PATH=/snap/bin:${PATH}
 
+source ~/.tmuxinator/tmuxinator.zsh # For tmuxinator auto completion -- Louis 2015/0203
+
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
 
