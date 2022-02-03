@@ -23,6 +23,7 @@ alias gotop='gotop -p -s'
 alias fd='fdfind'                   # 'fd' to 'fdfind' -- Louis/2021/1205
 alias bat='batcat'                  # 'bat' to 'batcat' -- Louis 2021/0530
 alias rtime='time -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+alias mux='tmuxinator'
 
 # ------------------------ Bind keys
 # Select file and open with vim directly
