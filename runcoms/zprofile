@@ -97,11 +97,6 @@ rationalize-path manpath
 export PATH
 export MANPATH
 
-# Set the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
-
 # ---- Colors ----
 
 # For ls/exa -- Louis 2021/0523

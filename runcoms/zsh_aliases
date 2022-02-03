@@ -2,16 +2,12 @@
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
 export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
 alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
-#alias ll="clear; exa $EXA_OPTIONS -R -L 1 | less -RFX"
-#alias lt="clear; exa $EXA_OPTIONS -T -L 2 $1 | less -RFX"
 alias ll=exa_ll
 alias lt=exa_lt
 
 # Configure grep color -- Louis 2021/0119
-#export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 alias grep='grep -n -C 2 --color'
 
-#alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
@@ -19,9 +15,6 @@ alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-# TODO
-# Figure out out to reserve color output from ag
-# | less -R or use bat doesn't work
 alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
 
 alias jq='jq -C'

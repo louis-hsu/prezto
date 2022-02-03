@@ -70,19 +70,3 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 #    export LSCOLORS=exfxcxdxbxegedabagacad
 #    ;;
 #esac
-
-# Obsolete -- Louis 2016/0505
-#alias gitrepofs='sshfs nshiu@gitrepo:/Users/nshiu ~/RDisk/Monet -oauto_cache,reconnect,default_permissions,volname=Monet; cd ~/RDisk/Monet'
-#alias degasfs='sshfs nshiu@degas:/home/nshiu ~/RDisk/Degas -oauto_cache,reconnect,default_permissions,volname=Degas; cd ~/RDisk/Degas'
-#alias ugitrepo='cd ~/; umount ~/RDisk/Monet'
-#alias udegas='cd ~/; umount ~/RDisk/Degas'
-
-# APK analysis tool
-#alias apka='cd /Applications/Third_Party/Development/APKAnalyser; java -Xmx1024m -jar apkanalyser-5.2-exec.jar &'
-
-# Add dex2jar into PATH -- Louis 2015/0127
-#export PATH=${PATH}:/Applications/Third_Party/Development/dex2jar-0.0.9.15
-
-# Set brew github token for unlimited search access -- Louis 0303/2015
-#export HOMEBREW_GITHUB_API_TOKEN=6b2721545370ef554df9622c1388c92367b91ebd
-#export HOMEBREW_GITHUB_API_TOKEN=62476089779a92fb38513a9d2be83fa312cb4539
