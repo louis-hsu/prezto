@@ -151,8 +151,9 @@ exa_ll() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
 }
 
+# Ignore .git* folder/files as well -- Louis 2022/0118
 exa_lt() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' -T -L 2 $@ | less -RFX
+    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' --ignore-glob='.git*' -T -L 3 $@ | less -RFX
 }
 
 # ---------------------- Obsolete
