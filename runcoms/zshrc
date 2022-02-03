@@ -1,23 +1,18 @@
 #
 # Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
-#
 # -- Louis 2018/0603
-#
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
+# Use git branch to manage .z* files for different platform -- Louis 2022/0203
 
-# Set default zsh options (setopt) -- Louis 2018/1224
-setopt cdablevars
+setopt cdablevars                                   # Set default zsh options (setopt) -- Louis 2018/1224
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
     source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-# Configure python virtualenvwrapper -- Louis 2017/0125
-source virtualenvwrapper.sh
-
-# For tmuxinator auto completion -- Louis 2015/0203
-source ~/.tmuxinator/tmuxinator.zsh
+source virtualenvwrapper.sh                         # Configure python virtualenvwrapper -- Louis 2017/0125
+source ~/.tmuxinator/tmuxinator.zsh                 # For tmuxinator auto completion -- Louis 2015/0203
 
 # Move all "export" commands to 'zprofile'
 # But keep some comments in case needing to restore them in future -- Louis 2021/0526
@@ -40,7 +35,7 @@ source ~/.tmuxinator/tmuxinator.zsh
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
 
-# ---------------------- Alias/Function
+# ------------------------ Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ~/.zsh_aliases ]; then
     . ~/.zsh_aliases
@@ -48,13 +43,12 @@ fi
 
 precmd() {print ""}
 
-# fzf integration -- Louis 2021/0523
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh              # fzf integration -- Louis 2021/0523
 
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
-# ---------------------- Obsolete
+# ------------------------ Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
 
