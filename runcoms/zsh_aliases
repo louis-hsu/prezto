@@ -2,8 +2,6 @@
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
 export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
 alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
-#alias ll="clear; exa -a $EXA_OPTIONS | less -RFX"
-#alias lt="clear; exa $EXA_OPTIONS -T -L 2 | less -RFX"
 alias ll=exa_ll
 alias lt=exa_lt
 
@@ -11,32 +9,20 @@ alias lt=exa_lt
 #export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 alias grep='grep -n -C 2 --color'
 
-#alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
-alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/0424
+alias du='du -ch -d 1 | sort -hr'   # Add sorting from largest size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-# TODO
-# Figure out out to reserve color output from ag
-# | less -R or use bat doesn't work
 alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
-
-# 'fd' to 'fdfind' -- Louis/2021/1205
-alias fd='fdfind'
-
-# 'bat' to 'batcat' -- Louis 2021/0530
-alias bat='batcat'
-
-export YDIFF_OPTIONS='-s -w 0 --wrap'
-
+alias fd='fdfind'                   # 'fd' to 'fdfind' -- Louis/2021/1205
+alias bat='batcat'                  # 'bat' to 'batcat' -- Louis 2021/0530
 alias rtime='time -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-
 alias mux='tmuxinator'
 
 # ------------------------ Bind keys
@@ -102,8 +88,7 @@ smartresize() {
     fi
 }
 
-# Replace default diff by piping to ydiff for better result rendering
-# -- Louis 2018/0830
+# Replace default diff by piping to ydiff for better result rendering -- Louis 2018/0830
 function diff(){
     args=()
     for i in $@; do
@@ -122,12 +107,12 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
 # vim the file selected from fzf -- Louis 2021/1125
 vim_with_fzf() {
-    vim_file="$(fd -t f -H -I | fzf --preview="batcat --color always {}" --bind="space:toggle-preview" --preview-window=:hidden)"
+    vim_file="$(fd -t f -H | fzf --preview="batcat --color always {}" --bind="space:toggle-preview,ctrl-l:preview-page_up,ctrl-h:preview-page-down" --preview-window=:hidden)"
     [[ ! -z "$vim_file" ]] && vim "$vim_file"
 }
 
@@ -139,14 +124,14 @@ task_project_info() {
     task +Info "$@" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 }
 
-# Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
+# Some exa | less combination in alias cannot handle listing directory directly '(e.g. ll .vim)
 # Change to function as workaround -- Louis 2021/1206
 exa_ll() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
 }
 
 exa_lt() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' -T -L 2 $@ | less -RFX
+    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' --ignore-glob='.git*' -T -L 2 $@ | less -RFX
 }
 
 # ---------------------- Obsolete
@@ -168,4 +153,3 @@ exa_lt() {
 #    /usr/local/bin/vim -p "${args[@]}"
 #    $VIM_PATH -p "${args[@]}"
 #}
-

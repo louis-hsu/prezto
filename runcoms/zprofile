@@ -6,7 +6,7 @@
 #
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
 
-# ---- Script ----
+# ------------------------ Script
 # rationalize-path()
 # Later we'll need to trim down the paths that follow because the ones
 # given here are for all my accounts, some of which have unusual
@@ -35,20 +35,17 @@ rationalize-path () {
     '
 }
 
-# ---- Editors ----
-
+# ------------------------ Editors
 export EDITOR='vim'
 export VISUAL='vim'
 export PAGER='less'
 
-# ---- Language ----
-
+# ------------------------ Language
 if [[ -z "$LANG" ]]; then
     export LANG='en_US.UTF-8'
 fi
 
-# ---- Paths ----
-
+# ------------------------ Paths
 # Set the list of directories that Zsh searches for programs.
 path=(
     ~/bin
@@ -66,8 +63,6 @@ manpath=(
 
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path manpath
-#export PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/opt/X11/bin
-# export $path
 
 # Remove directories not existing
 rationalize-path path
@@ -75,27 +70,22 @@ rationalize-path manpath
 
 export PATH
 export MANPATH
-# Set the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
 
-# ---- Colors ----
-
+# ------------------------ Colors
 # For ls/exa -- Louis 2021/0523
 export LSCOLORS=exfxcxdxbxegedabagacad
+
 # tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
 GREY_COLOR_3="38;5;102"
 #export EXA_COLORS="reset:uu=${GREY_COLOR_2}:un=${GREY_COLOR_2}:gu=${GREY_COLOR_2}:gn=${GREY_COLOR_2}:ur=${GREY_COLOR}:uw=${GREY_COLOR}:ue=${GREY_COLOR}:ux=${GREY_COLOR}:gr=${GREY_COLOR}:gw=${GREY_COLOR}:gx=${GREY_COLOR}:tr=${GREY_COLOR}:tw=${GREY_COLOR}:tx=${GREY_COLOR}:da=38;5;102"
-export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}"
+export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33"
 
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
-# ---- Less ----
-
+# ------------------------ Less
 # Set the default Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
@@ -107,8 +97,7 @@ if (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
-# ---- Others ----
-
+# ------------------------ Others
 # Configure python virtualenvwrapper -- Louis 2017/0125
 # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
 export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
@@ -148,8 +137,8 @@ export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
 
-# Setup GEM_HOME and gem binary path -- Louis 2018/1220
-export GEM_HOME=~/.gem
+export GEM_HOME=~/.gem              # Setup GEM_HOME and gem binary path -- Louis 2018/1220
+export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 # pip zsh completion start
 function _pip_completion {

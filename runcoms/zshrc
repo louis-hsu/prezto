@@ -1,9 +1,8 @@
 #
 # Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
-#
 # -- Louis 2018/0603
-#
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
+# Use git branch to manage .z* files for different platform -- Louis 2022/0203
 
 # Set default zsh options (setopt) -- Louis 2018/1224
 setopt cdablevars
@@ -16,7 +15,6 @@ fi
 # Configure python virtualenvwrapper -- Louis 2017/0125
 export PROJECT_HOME=$HOME/PythonDev
 source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-
 export PATH=/snap/bin:${PATH}
 
 # Add autocompletion of pipenv -- Louis 2018/0730
@@ -31,9 +29,6 @@ fi
 precmd() {print ""}
 
 # fzf integration -- Louis 2021/0523
-# Update the setting to cover no .fzf.zsh in Linux -- Louis 2021/0618
-#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-#
 if [ -f ~/.fzf.zsh ]; then
     source ~/.fzf.zsh
 else
@@ -44,6 +39,9 @@ fi
 # Somehow .zshenv not working. Source .zprofile here -- Louis 2021/0601
 # TODO: Fix .zshenv
 source ~/.zprofile
+
+# Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
 # ---------------------- Obsolete
 # append to the history file, don't overwrite it
@@ -61,19 +59,3 @@ source ~/.zprofile
 #    export LSCOLORS=exfxcxdxbxegedabagacad
 #    ;;
 #esac
-
-# Obsolete -- Louis 2016/0505
-#alias gitrepofs='sshfs nshiu@gitrepo:/Users/nshiu ~/RDisk/Monet -oauto_cache,reconnect,default_permissions,volname=Monet; cd ~/RDisk/Monet'
-#alias degasfs='sshfs nshiu@degas:/home/nshiu ~/RDisk/Degas -oauto_cache,reconnect,default_permissions,volname=Degas; cd ~/RDisk/Degas'
-#alias ugitrepo='cd ~/; umount ~/RDisk/Monet'
-#alias udegas='cd ~/; umount ~/RDisk/Degas'
-
-# APK analysis tool
-#alias apka='cd /Applications/Third_Party/Development/APKAnalyser; java -Xmx1024m -jar apkanalyser-5.2-exec.jar &'
-
-# Add dex2jar into PATH -- Louis 2015/0127
-#export PATH=${PATH}:/Applications/Third_Party/Development/dex2jar-0.0.9.15
-
-# Set brew github token for unlimited search access -- Louis 0303/2015
-#export HOMEBREW_GITHUB_API_TOKEN=6b2721545370ef554df9622c1388c92367b91ebd
-#export HOMEBREW_GITHUB_API_TOKEN=62476089779a92fb38513a9d2be83fa312cb4539
