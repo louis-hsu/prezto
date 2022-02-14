@@ -29,13 +29,16 @@ alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status
 alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
 alias brewdep='brew deps --tree --installed'
 
+# Move to nvim from vim -- Louis 2022/0207
+alias vim='nvim'
+
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
 # Comment out cuz not that useful -- Louis 2021/1130
 # alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
 
 # ------------------------ Bind keys
-# Select file and open with vim directly
-bindkey -s '^v' 'vim_with_fzf\n'
+# Select file and open with nvim directly
+bindkey -s '^v' 'nvim_with_fzf\n'
 bindkey -s '^f' 'cd_with_fzf\n'
 bindkey -s '^o' 'open_with_fzf\n'
 
@@ -111,7 +114,7 @@ function diff(){
 # How to handle review with different file type
 open_with_fzf() {
 #    fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
-    fd -t f -H -I | fzf -m --print0 | xargs -0 open 2>&-
+    fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
 }
 
 # cd to directory selected from fzf -- Louis 2021/1125
@@ -119,10 +122,10 @@ cd_with_fzf() {
     cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
-# vim the file selected from fzf -- Louis 2021/1125
-vim_with_fzf() {
-    vim_file="$(fd -t f -H | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
-    [[ ! -z "$vim_file" ]] && vim "$vim_file"
+# nvim the file selected from fzf -- Louis 2021/1125
+nvim_with_fzf() {
+    nvim_file="$(fd -t f -H -L | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    [[ ! -z "$nvim_file" ]] && nvim "$nvim_file"
 }
 
 # TODO -- Louis 2021/1130

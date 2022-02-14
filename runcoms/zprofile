@@ -42,8 +42,8 @@ if [[ "$OSTYPE" == darwin* ]]; then
 fi
 
 # ------------------------ Editors
-export EDITOR='vim'
-export VISUAL='vim'
+export EDITOR='nvim'
+export VISUAL='nvim'
 export PAGER='less'
 
 # ------------------------ Language
@@ -111,7 +111,7 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
 # For lesspip preprocessor -- Louis 2021/1205
-export LESSOPEN="|/usr/local/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
+export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
 
 # ------------------------ Homebrew
 export HOMEBREW_NO_INSTALL_CLEANUP=1
