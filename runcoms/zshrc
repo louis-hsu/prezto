@@ -4,15 +4,16 @@
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
 # Use git branch to manage .z* files for different platform -- Louis 2022/0203
 
-setopt cdablevars                                   # Set default zsh options (setopt) -- Louis 2018/1224
+# Set default zsh options (setopt) -- Louis 2018/1224
+setopt cdablevars
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
     source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
 fi
 
-source virtualenvwrapper.sh                         # Configure python virtualenvwrapper -- Louis 2017/0125
-#source ~/.tmuxinator/tmuxinator.zsh                 # For tmuxinator auto completion -- Louis 2015/0203
+# Configure python virtualenvwrapper -- Louis 2017/0125
+source virtualenvwrapper.sh
 
 # Move all "export" commands to 'zprofile'
 # But keep some comments in case needing to restore them in future -- Louis 2021/0526
@@ -31,6 +32,9 @@ source virtualenvwrapper.sh                         # Configure python virtualen
 # export PATH="$HOME/.jenv/bin:$PATH"
 # export JENV_ROOT=/usr/local/opt/jenv
 # if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+#  TODO
+#  1. If multiple Java environment is required
+#  2. If yes, if jenv is the one for multi-java management
 
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
@@ -43,7 +47,8 @@ fi
 
 precmd() {print ""}
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh              # fzf integration -- Louis 2021/0523
+# fzf integration -- Louis 2021/0523
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
