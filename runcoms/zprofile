@@ -55,7 +55,8 @@ fi
 export ANDROID_HOME=$HOME/Library/Android/sdk
 
 # ------------------------ Path
-eval "$(/opt/homebrew/bin/brew shellenv)"           # New brew configuration -- Louis 2021/1226
+# New brew configuration -- Louis 2021/1226
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Set the list of directories that Zsh searches for programs.
 path=(
@@ -93,7 +94,9 @@ export PATH
 export MANPATH
 
 # ------------------------ Colors
-export LSCOLORS=exfxcxdxbxegedabagacad              # For ls/exa -- Louis 2021/0523
+# For ls/exa -- Louis 2021/0523
+export LSCOLORS=exfxcxdxbxegedabagacad
+
 # tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
@@ -128,7 +131,8 @@ export PROJECT_HOME=$HOME/Development/PythonDev
 #export PATH=/usr/local/opt/openjdk/bin:${PATH}
 #export JAVA_HOME=`/usr/libexec/java_home`
 
-export PERL5LIB=~/.perl5lib/lib/perl5               # Add local PERL module directory to @INC
+# Add local PERL module directory to @INC
+export PERL5LIB=~/.perl5lib/lib/perl5
 
 # Configure zsh history behavior -- Louis 2021/0523
 export SAVEHIST=10000
@@ -155,7 +159,9 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
-export GEM_HOME=~/.gem                              # Setup gem home/binary path -- Louis 2018/1220
+
+# Setup gem home/binary path -- Louis 2018/1220
+export GEM_HOME=~/.gem
 export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 # pip zsh completion start
@@ -164,8 +170,8 @@ function _pip_completion {
   read -Ac words
   read -cn cword
   reply=( $( COMP_WORDS="$words[*]" \
-             COMP_CWORD=$(( cword-1 )) \
-             PIP_AUTO_COMPLETE=1 $words[1] 2>/dev/null ))
+    COMP_CWORD=$(( cword-1 )) \
+    PIP_AUTO_COMPLETE=1 $words[1] 2>/dev/null ))
 }
 compctl -K _pip_completion pip3
 # pip zsh completion end
