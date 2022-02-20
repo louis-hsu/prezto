@@ -5,11 +5,13 @@ alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=I
 alias ll=exa_ll
 alias lt=exa_lt
 
-alias grep='grep -n -C 2 --color'                   # Configure grep color -- Louis 2021/0119
+# Configure grep color -- Louis 2021/0119
+alias grep='grep -n -C 2 --color'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
-alias du='du -ch -d 1 | sort -hr'                   # Add sorting by size -- Louis 2020/0424
+# Add sorting by size to du -- Louis 2020/0424
+alias du='du -ch -d 1 | sort -hr'
 alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
 
