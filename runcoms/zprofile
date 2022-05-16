@@ -37,14 +37,20 @@ rationalize-path () {
 }
 
 # ------------------------ Browser
-if [[ "$OSTYPE" == darwin* ]]; then
-    export BROWSER='open'
+if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
+  export BROWSER='open'
 fi
 
 # ------------------------ Editors
-export EDITOR='nvim'
-export VISUAL='nvim'
-export PAGER='less'
+if [[ -z "$EDITOR" ]]; then
+  export EDITOR='nvim'
+fi
+if [[ -z "$VISUAL" ]]; then
+  export VISUAL='nvim'
+fi
+if [[ -z "$PAGER" ]]; then
+  export PAGER='less'
+fi
 
 # ------------------------ Language
 if [[ -z "$LANG" ]]; then
@@ -70,8 +76,10 @@ path=(
     $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
     $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
     $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
+    $HOME/{,s}bin(N)
+    /opt/{homebrew,local}/{,s}bin(N)
+    /usr/local/{,s}bin(N)
     $path
-    /usr/local/{bin,sbin}
 )
 
 manpath=(
