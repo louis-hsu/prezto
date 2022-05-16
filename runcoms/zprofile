@@ -89,6 +89,7 @@ typeset -gU cdpath fpath mailpath path manpath
 # Remove directories not existing
 rationalize-path path
 rationalize-path manpath
+rationalize-path fpath
 
 export PATH
 export MANPATH
@@ -162,6 +163,7 @@ export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
 
 # Setup gem home/binary path -- Louis 2018/1220
 export GEM_HOME=~/.gem
+
 export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 # pip zsh completion start

@@ -23,8 +23,8 @@ alias gotop='gotop -p -s'
 
 # Taskwarror alias
 alias task='clear; task'
-alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
-alias tinfo=task_project_info
+alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
+alias taskproj=task_project_info
 
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
@@ -135,7 +135,15 @@ nvim_with_fzf() {
 
 # Show project info from Taskwarrior -- Louis 2021/1126
 task_project_info() {
-    task +Info "$@" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+    re="\+."
+    if [[ $1 =~ $re ]]; then
+      str="$1"
+    else
+      str="+$1"
+    fi
+    str=`echo $str | tr '[a-z]' '[A-Z]'` 
+#    echo $str
+    task +Info "$str" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 }
 
 # Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
