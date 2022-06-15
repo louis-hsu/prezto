@@ -52,6 +52,7 @@ path=(
     ~/.gem/bin
     /snap/bin
     /usr/local/{bin,sbin}
+    ~/.local/bin
     $path
 )
 
