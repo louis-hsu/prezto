@@ -35,10 +35,22 @@ rationalize-path () {
     '
 }
 
+# ------------------------ Browser
+if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
+  export BROWSER='open'
+fi
+
 # ------------------------ Editors
-export EDITOR='vim'
-export VISUAL='vim'
-export PAGER='less'
+if [[ -z "$EDITOR" ]]; then
+  export EDITOR='nvim'
+fi
+if [[ -z "$VISUAL" ]]; then
+  export VISUAL='nvim'
+fi
+if [[ -z "$PAGER" ]]; then
+  export PAGER='less'
+fi
+>>>>>>> upstream/master
 
 # ------------------------ Language
 if [[ -z "$LANG" ]]; then
@@ -68,6 +80,7 @@ typeset -gU cdpath fpath mailpath path manpath
 # Remove directories not existing
 rationalize-path path
 rationalize-path manpath
+rationalize-path fath
 
 export PATH
 export MANPATH
@@ -94,7 +107,7 @@ export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
 # Set the Less input preprocessor.
 # Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
-if (( $#commands[(i)lesspipe(|.sh)] )); then
+if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
   export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
 fi
 
