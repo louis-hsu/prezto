@@ -50,7 +50,6 @@ fi
 if [[ -z "$PAGER" ]]; then
   export PAGER='less'
 fi
->>>>>>> upstream/master
 
 # ------------------------ Language
 if [[ -z "$LANG" ]]; then
