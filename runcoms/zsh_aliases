@@ -143,7 +143,8 @@ task_project_info() {
     fi
     str=`echo $str | tr '[a-z]' '[A-Z]'` 
 #    echo $str
-    task +Info "$str" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+#   Fix issue with extra leading white spaces -- Louis 2022/0705
+    task +Info "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 }
 
 # Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
