@@ -16,7 +16,7 @@ alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
 
 # Configure ag color following grep -- Louis 2021/0120
-alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
+alias ag='ag -i -r -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
@@ -24,7 +24,7 @@ alias gotop='gotop -p -s'
 # Taskwarror alias
 alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
-alias taskproj=task_project_info
+alias projinfo=task_project_info
 
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
