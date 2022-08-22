@@ -138,7 +138,7 @@ nvim_with_fzf() {
 task_project_info() {
     re="\+."
     if [[ $# -eq 0 ]]; then
-      task +Info
+      task project:OnePage priority != L
     else
       if [[ $1 =~ $re ]]; then
         str="$1"
@@ -147,7 +147,7 @@ task_project_info() {
       fi
       str=`echo $str | tr '[a-z]' '[A-Z]'` 
 #   Fix issue with extra leading white spaces -- Louis 2022/0705
-      task +Info "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
     fi
 }
 
