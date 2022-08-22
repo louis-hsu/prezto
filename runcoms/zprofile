@@ -37,15 +37,32 @@ rationalize-path () {
 
 # ---- Browser ----
 
+<<<<<<< HEAD
 if [[ "$OSTYPE" == darwin* ]]; then
     export BROWSER='open'
+=======
+if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
+  export BROWSER='open'
+>>>>>>> upstream/master
 fi
 
 # ---- Editors ----
 
+<<<<<<< HEAD
 export EDITOR='vim'
 export VISUAL='vim'
 export PAGER='less'
+=======
+if [[ -z "$EDITOR" ]]; then
+  export EDITOR='nano'
+fi
+if [[ -z "$VISUAL" ]]; then
+  export VISUAL='nano'
+fi
+if [[ -z "$PAGER" ]]; then
+  export PAGER='less'
+fi
+>>>>>>> upstream/master
 
 # ---- Language ----
 
@@ -98,7 +115,17 @@ export MANPATH
 #   $cdpath
 # )
 
+<<<<<<< HEAD
 # ---- Colors ----
+=======
+# Set the list of directories that Zsh searches for programs.
+path=(
+  $HOME/{,s}bin(N)
+  /opt/{homebrew,local}/{,s}bin(N)
+  /usr/local/{,s}bin(N)
+  $path
+)
+>>>>>>> upstream/master
 
 # For ls/exa -- Louis 2021/0523
 export LSCOLORS=exfxcxdxbxegedabagacad
@@ -116,6 +143,7 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
 # Set the default Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
+<<<<<<< HEAD
 # Remove -X and -F (exit if the content fits on one screen) to enable it.
 export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
 
@@ -181,3 +209,15 @@ function _pip_completion {
 }
 compctl -K _pip_completion pip3
 # pip zsh completion end
+=======
+# Remove -X to enable it.
+if [[ -z "$LESS" ]]; then
+  export LESS='-g -i -M -R -S -w -X -z-4'
+fi
+
+# Set the Less input preprocessor.
+# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
+if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
+  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
+fi
+>>>>>>> upstream/master
