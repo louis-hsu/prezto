@@ -59,7 +59,7 @@ fi
 # ------------------------ Paths
 # Set the list of directories that Zsh searches for programs.
 path=(
-    ~/bin
+    ~/.bin
     ~/.gem/bin
     /snap/bin
     /usr/local/{bin,sbin}
