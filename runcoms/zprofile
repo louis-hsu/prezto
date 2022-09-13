@@ -76,7 +76,7 @@ path=(
     $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
     $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
     $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
-    $HOME/{,s}bin(N)
+    $HOME/.{,s}bin(N)
     /opt/{homebrew,local}/{,s}bin(N)
     /usr/local/{,s}bin(N)
     $path
@@ -111,7 +111,7 @@ GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
 GREY_COLOR_3="38;5;102"
 #export EXA_COLORS="reset:uu=${GREY_COLOR_2}:un=${GREY_COLOR_2}:gu=${GREY_COLOR_2}:gn=${GREY_COLOR_2}:ur=${GREY_COLOR}:uw=${GREY_COLOR}:ue=${GREY_COLOR}:ux=${GREY_COLOR}:gr=${GREY_COLOR}:gw=${GREY_COLOR}:gx=${GREY_COLOR}:tr=${GREY_COLOR}:tw=${GREY_COLOR}:tx=${GREY_COLOR}:da=38;5;102"
-export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33"
+export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33:lp=33"
 
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
@@ -150,7 +150,7 @@ export HISTFILE="${HOME}/.zsh_history"
 export HISTCONTROL=ignorespace:ignoredups
 
 # "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
-export FD_OPTIONS="--hidden --follow --exclude .git"
+export FD_OPTIONS="--hidden --follow"
 
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
 export BAT_PAGER="less -RF"
