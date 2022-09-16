@@ -53,6 +53,32 @@ precmd() {print ""}
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
+# ----------------------- Hack of command not found
+# Parse prefix 'tp' to enable tmux popup feature 
+# https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
+# -- Louis 2022/0916 
+command_not_found_handler() {
+  # read the "missing command" entered
+  missingcmd="$1"
+  # remove it from the argument list
+  shift
+  # check if starts with "tp"
+  if [[ "${missingcmd:0:2}" == "tp" ]] ; then
+    # read part after "tp"
+    prefixedcmd="${missingcmd:2}"
+    # check if it's a real command
+    #echo "$(which ${prefixedcmd})"
+    if which "$prefixedcmd" &> /dev/null ; then
+      # run sudo with the cmd and the rest of the argument list
+        tmux popup -d "#{pane_current_path}" -h 80% -w 80% -E "$prefixedcmd" "$@"
+        return $?
+    fi
+  fi
+  # default command not found behavior
+  echo "zsh: command not found: $missingcmd" >&2
+  return 127
+}
+
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
