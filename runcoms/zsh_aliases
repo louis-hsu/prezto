@@ -20,8 +20,10 @@ alias du='du -ch -d 1 | sort -hr'
 alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
 
-# Configure ag color following grep -- Louis 2021/0120
-#alias ag='ag -i -r -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
+# Configure ag color following grep. As for color/style code adapted:
+# 1. color-match: fg is ANSI color code, and bg is RGB 
+# 2. color-line-number: fg is ANSI color/style code, and no bg
+# -- Louis 2021/0120
 alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
 alias fd="fd $FD_OPTIONS"
 

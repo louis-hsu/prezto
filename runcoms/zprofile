@@ -155,7 +155,7 @@ export FD_OPTIONS="--hidden --follow"
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
 export BAT_PAGER="less -RF"
 export BAT_STYLE="changes,numbers"
-export BAT_THEME="Nord"
+export BAT_THEME="base16-256"
 
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
@@ -168,6 +168,9 @@ export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
 export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
+
+#export FZF_TMUX_OPTS="-p"
+#export FZF_CTRL_R_OPTS="--reverse --preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
 
 # Setup gem home/binary path -- Louis 2018/1220
 export GEM_HOME=~/.gem
