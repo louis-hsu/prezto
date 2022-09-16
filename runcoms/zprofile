@@ -118,9 +118,10 @@ export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
 # ------------------------ Less
 # Set the default Less options.
-# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
-# Remove -X and -F (exit if the content fits on one screen) to enable it.
-export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
+# Remove -F (quit if only one page) and -J (info column) to correct
+# 'bat' formation issue -- Louis 2022/0916
+#export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
+export LESS='-i -M -R -W -X -z-4 -g -j4'
 
 # For lesspip preprocessor -- Louis 2021/1205
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
@@ -153,8 +154,9 @@ export HISTCONTROL=ignorespace:ignoredups
 export FD_OPTIONS="--hidden --follow"
 
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
-export BAT_PAGER="less -RF"
-export BAT_STYLE="changes,numbers"
+# Remove -F (quit if only one page) -- Louis 2022/0916
+export BAT_PAGER="less -R"
+export BAT_STYLE="full"
 export BAT_THEME="base16-256"
 
 # 'junegunn/fzf', command line fuzzy finder
