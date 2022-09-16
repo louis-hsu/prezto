@@ -3,10 +3,11 @@
 # Comment it out since EXA_OPTIONS is not exa official environment variable
 # -- Louis 2022/0903
 #export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
-alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
-alias ll="clear; exa_ll"
-alias lt="clear; exa_lt"
-alias llt="clear; exa_llt"
+alias ls="exa_ls"
+alias ll="exa_ll"
+
+alias lt="exa_lt"
+alias llt="exa_llt"
 
 # Configure grep color -- Louis 2021/0119
 alias grep='grep -n -C 2 --color'
@@ -43,10 +44,6 @@ alias brewdep='brew deps --tree --installed'
 
 # Move to nvim from vim -- Louis 2022/0207
 alias vim='nvim'
-
-# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-# Comment out cuz not that useful -- Louis 2021/1130
-# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
 
 # ------------------------ Bind keys
 # Select file and open with nvim directly
@@ -162,6 +159,13 @@ task_project_info() {
 
 # Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
 # Change to function as workaround -- Louis 2021/1206
+#
+# TODO
+# prefix 'tpls' not working, seems exa color theme cannot be applied. -- Louis 2022/0916
+exa_ls() {
+  exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r' $@
+}
+
 exa_ll() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
 }
@@ -177,6 +181,10 @@ exa_llt() {
 }
 
 # ---------------------- Obsolete
+# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
+# Comment out cuz not that useful -- Louis 2021/1130
+# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+
 # Replace vim with this function to force vim opens 'real' files instead of symbolic link
 # -- Louis 2018/0731
 # Make function more generic to different OS platform -- Louis 2018/0813
