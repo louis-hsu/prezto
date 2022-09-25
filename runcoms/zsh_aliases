@@ -1,7 +1,9 @@
 # ------------------------ Alias
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
-export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
-alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
+# Comment it out since EXA_OPTIONS is not exa official environment variable
+# -- Louis 2022/0903
+#export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
+alias ls=exa_ls
 alias ll=exa_ll
 alias lt=exa_lt
 
@@ -32,6 +34,23 @@ bindkey -s '^f' 'cd_with_fzf\n'
 bindkey -s '^o' 'open_with_fzf\n'
 
 # ------------------------ Functions
+# Replace existing cd by adding onefetch function to show git info
+# -- Louis 2022/0920
+ONEFETCH_LAST_REPO=""
+function cd() {
+    builtin cd "$@";
+    git rev-parse 2>/dev/null;
+
+    if [ $? -eq 0 ]; then
+        if [ "$ONEFETCH_LAST_REPO" != $(basename $(git rev-parse --show-toplevel)) ]; then
+            clear
+            onefetch
+            ONEFETCH_LAST_REPO=$(basename $(git rev-parse --show-toplevel))
+        fi
+    fi
+}
+
+
 # Useful adb commands
 getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
     if [ -z "$1" ]; then
@@ -126,6 +145,10 @@ task_project_info() {
 
 # Some exa | less combination in alias cannot handle listing directory directly '(e.g. ll .vim)
 # Change to function as workaround -- Louis 2021/1206
+exa_ls() {
+    exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'
+}
+
 exa_ll() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
 }
