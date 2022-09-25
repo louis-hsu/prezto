@@ -237,6 +237,10 @@ zstyle ':prezto:module:prompt' theme 'nshiu'
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
 
+# Add the support of tmuxinator
+# Set default tmuxinator project going to open -- Louis 2022/0922
+ zstyle ':prezto:module:tmux:tmuxinator' name 'prezto_mux'
+
 #
 # Utility
 #
