@@ -70,8 +70,9 @@ command_not_found_handler() {
     #echo "$(which ${prefixedcmd})"
     if which "$prefixedcmd" &> /dev/null ; then
       # run sudo with the cmd and the rest of the argument list
-        tmux popup -d "#{pane_current_path}" -h 80% -w 80% -E "$prefixedcmd" "$@"
-        return $?
+      #tmux popup -d "#{pane_current_path}" -h 80% -w 80% -E "$prefixedcmd" "$@"
+      tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$prefixedcmd" "$@"
+      return $?
     fi
   fi
   # default command not found behavior
