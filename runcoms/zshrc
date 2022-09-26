@@ -95,3 +95,10 @@ command_not_found_handler() {
 #    export LSCOLORS=exfxcxdxbxegedabagacad
 #    ;;
 #esac
+
+# Comment first since at presnet iTerm imgcat doesn't support plain tmux
+# environment
+# -- Louis 2022/0921
+#
+#test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+#

@@ -157,7 +157,7 @@ export FD_OPTIONS="--hidden --follow"
 # Remove -F (quit if only one page) -- Louis 2022/0916
 export BAT_PAGER="less -R"
 export BAT_STYLE="full"
-export BAT_THEME="base16-256"
+export BAT_THEME="TwoDark"
 
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
