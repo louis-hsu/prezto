@@ -36,6 +36,7 @@ zstyle ':prezto:load' pmodule \
   'history' \
   'syntax-highlighting' \
   'history-substring-search' \
+  'autosuggestions' \
   'directory' \
   'spectrum' \
   'utility' \
@@ -51,7 +52,7 @@ zstyle ':prezto:load' pmodule \
 #
 
 # Set the query found color.
-# zstyle ':prezto:module:autosuggestions:color' found ''
+ zstyle ':prezto:module:autosuggestions:color' found ''
 
 #
 # Completions
@@ -231,10 +232,14 @@ zstyle ':prezto:module:prompt' theme 'nshiu'
  zstyle ':prezto:module:tmux:auto-start' remote 'yes'
 
 # Integrate with iTerm2.
- zstyle ':prezto:module:tmux:iterm' integrate 'yes'
+# zstyle ':prezto:module:tmux:iterm' integrate 'yes'
 
 # Set the default session name:
 # zstyle ':prezto:module:tmux:session' name 'YOUR DEFAULT SESSION NAME'
+
+# Add the support of tmuxinator
+# Set default tmuxinator project going to open -- Louis 2022/0922
+ zstyle ':prezto:module:tmux:tmuxinator' name 'guinevere_mux'
 
 #
 # Utility

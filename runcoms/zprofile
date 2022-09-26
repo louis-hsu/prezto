@@ -6,7 +6,7 @@
 #
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
 
-# ---- Script ----
+# ------------------------ Script
 # rationalize-path()
 # Later we'll need to trim down the paths that follow because the ones
 # given here are for all my accounts, some of which have unusual
@@ -35,66 +35,40 @@ rationalize-path () {
     '
 }
 
-# ---- Browser ----
-
-<<<<<<< HEAD
-if [[ "$OSTYPE" == darwin* ]]; then
-    export BROWSER='open'
-=======
+# ------------------------ Browser
 if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
   export BROWSER='open'
->>>>>>> upstream/master
 fi
 
-# ---- Editors ----
-
-<<<<<<< HEAD
-export EDITOR='vim'
-export VISUAL='vim'
-export PAGER='less'
-=======
+# ------------------------ Editors
 if [[ -z "$EDITOR" ]]; then
-  export EDITOR='nano'
+  export EDITOR='nvim'
 fi
 if [[ -z "$VISUAL" ]]; then
-  export VISUAL='nano'
+  export VISUAL='nvim'
 fi
 if [[ -z "$PAGER" ]]; then
   export PAGER='less'
 fi
->>>>>>> upstream/master
 
-# ---- Language ----
-
+# ------------------------ Language
 if [[ -z "$LANG" ]]; then
     export LANG='en_US.UTF-8'
 fi
 
-# ---- Android ----
-export ANDROID_HOME=$HOME/Applications/ADT
-
-# ---- Paths ----
-
+# ------------------------ Paths
 # Set the list of directories that Zsh searches for programs.
 path=(
-    ~/Applications/Utilities                # My utility tools -- Louis 2020/1015
-    ~/Applications/ADT/tools                # Android SDK path -- Louis 2011/0420
-    ~/Applications/ADT/platform-tools
-    ~/.gem/bin                              # Export brew-version Ruby -- Louis 2021/1220
-    /usr/local/opt/ruby/bin
-    /usr/local/opt/coreutils/libexec/gnubin # Install brew-version coreutilis -- Louis 2015/0209
-    /usr/local/opt/gnu-getopt/bin           # Install gnu getopt -- Louis 2020/1112
-    /usr/local/opt/sqlite/bin               # Update brew sqlite location
-    /usr/local/opt/grep/libexec/gnubin      # Install brew-version grep  -- Louis 2021/0119
-    /usr/local/opt/gnu-time/libexec/gnubin  # Install gnu version time -- Louis 2021/0530
+    ~/.bin
+    ~/.gem/bin
+    ~/.cargo/bin
+    /snap/bin
     /usr/local/{bin,sbin}
+    ~/.local/bin
     $path
 )
 
 manpath=(
-    /usr/local/opt/coreutils/libexec/gnuman # Install brew-version coreutilis -- Louis 2015/0209
-    /usr/local/opt/gnu-getopt/share/man     # Install gnu getopt -- Louis 2020/1112
-    /usr/local/opt/grep/libexec/man         # Install brew-version grep -- Louis 2021/0119
     /usr/share/man
     /usr/local/share/man
     $manpath
@@ -106,65 +80,49 @@ typeset -gU cdpath fpath mailpath path manpath
 # Remove directories not existing
 rationalize-path path
 rationalize-path manpath
+rationalize-path fath
 
 export PATH
 export MANPATH
 
-# Set the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
-
-<<<<<<< HEAD
-# ---- Colors ----
-=======
-# Set the list of directories that Zsh searches for programs.
-path=(
-  $HOME/{,s}bin(N)
-  /opt/{homebrew,local}/{,s}bin(N)
-  /usr/local/{,s}bin(N)
-  $path
-)
->>>>>>> upstream/master
-
+# ------------------------ Colors
 # For ls/exa -- Louis 2021/0523
 export LSCOLORS=exfxcxdxbxegedabagacad
+
 # tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
 GREY_COLOR_3="38;5;102"
 #export EXA_COLORS="reset:uu=${GREY_COLOR_2}:un=${GREY_COLOR_2}:gu=${GREY_COLOR_2}:gn=${GREY_COLOR_2}:ur=${GREY_COLOR}:uw=${GREY_COLOR}:ue=${GREY_COLOR}:ux=${GREY_COLOR}:gr=${GREY_COLOR}:gw=${GREY_COLOR}:gx=${GREY_COLOR}:tr=${GREY_COLOR}:tw=${GREY_COLOR}:tx=${GREY_COLOR}:da=38;5;102"
-export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}"
+export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33"
 
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
-# ---- Less ----
-
+# ------------------------ Less
 # Set the default Less options.
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
-<<<<<<< HEAD
-# Remove -X and -F (exit if the content fits on one screen) to enable it.
-export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
+# Remove -F (quit if only one page) and -J (info column) to correct
+# 'bat' formation issue -- Louis 2022/0916
+#export LESS='-F -i -J -M -R -W -x4 -X -z-4 -g'
+export LESS='-i -M -R -W -X -z-4 -g -j4'
 
-# For lesspip preprocessor -- Louis 2021/1205
-export LESSOPEN="|/usr/local/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
+# Set the Less input preprocessor.
+# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
+if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
+  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
+fi
 
-# ---- Homebrew ----
-export HOMEBREW_NO_INSTALL_CLEANUP=1
-
-# ---- Others ----
-
+# ------------------------ Others
 # Configure python virtualenvwrapper -- Louis 2017/0125
 # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/Development/PythonDev
+export PROJECT_HOME=$HOME/PythonDev
 
 # Remove jenv setup since I might not really need multiple Java version
 # Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
-#export PATH=/usr/local/opt/openjdk/bin:${PATH}
-export JAVA_HOME=`/usr/libexec/java_home`
+#export JAVA_HOME=/usr/lib/jvm/java-16-openjdk-amd64
 
 # Add local PERL module directory to @INC
 export PERL5LIB=~/.perl5lib/lib/perl5
@@ -179,9 +137,9 @@ export HISTCONTROL=ignorespace:ignoredups
 export FD_OPTIONS="--hidden --follow --exclude .git"
 
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
-export BAT_PAGER="less -RF"
-export BAT_STYLE="changes,numbers"
-export BAT_THEME="Nord"
+export BAT_PAGER="less -R"
+export BAT_STYLE="full"
+export BAT_THEME="Monokai Extended"
 
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
@@ -195,8 +153,8 @@ export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
 
-# Setup GEM_HOME and gem binary path -- Louis 2018/1220
-export GEM_HOME=~/.gem
+export GEM_HOME=~/.gem              # Setup GEM_HOME and gem binary path -- Louis 2018/1220
+export YDIFF_OPTIONS='-s -w 0 --wrap'
 
 # pip zsh completion start
 function _pip_completion {
@@ -209,15 +167,3 @@ function _pip_completion {
 }
 compctl -K _pip_completion pip3
 # pip zsh completion end
-=======
-# Remove -X to enable it.
-if [[ -z "$LESS" ]]; then
-  export LESS='-g -i -M -R -S -w -X -z-4'
-fi
-
-# Set the Less input preprocessor.
-# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
-if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
-  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
-fi
->>>>>>> upstream/master

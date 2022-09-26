@@ -1,9 +1,9 @@
 # ------------------------ Alias
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
-export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
-alias ls="clear; exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'"
-#alias ll="clear; exa $EXA_OPTIONS -R -L 1 | less -RFX"
-#alias lt="clear; exa $EXA_OPTIONS -T -L 2 $1 | less -RFX"
+# Comment it out since EXA_OPTIONS is not exa official environment variable
+# -- Louis 2022/0903
+#export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
+alias ls=exa_ls
 alias ll=exa_ll
 alias lt=exa_lt
 
@@ -11,39 +11,21 @@ alias lt=exa_lt
 #export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 alias grep='grep -n -C 2 --color'
 
-#alias xterm='xterm &'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='tree -AC'
-alias du='du -ch -d 1 | sort -hr' # Add sorting from largest size -- Louis 2020/0424
+alias du='du -ch -d 1 | sort -hr'   # Add sorting from largest size -- Louis 2020/0424
 alias tag='/usr/local/bin/ctags'
 
 # Configure ag color following grep -- Louis 2021/0120
-# TODO
-# Figure out out to reserve color output from ag
-# | less -R or use bat doesn't work
 alias ag='ag -i -n --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX" -r'
 
 alias jq='jq -C'
 alias gotop='gotop -p -s'
-
-# Taskwarror alias
-alias task='clear; task'
-alias ttoday='task scheduled.before:today status.is:pending or due.before:today+2w'
-alias tinfo=task_project_info
-
-alias updatedb='sudo /usr/libexec/locate.updatedb'
-
-export YDIFF_OPTIONS='-s -w 0 --wrap'
-
-alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-
-alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
-alias brewdep='brew deps --tree --installed'
-
-# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-# Comment out cuz not that useful -- Louis 2021/1130
-# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+alias fd='fdfind'                   # 'fd' to 'fdfind' -- Louis/2021/1205
+alias bat='batcat'                  # 'bat' to 'batcat' -- Louis 2021/0530
+alias rtime='time -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+alias mux='tmuxinator'
 
 # ------------------------ Bind keys
 # Select file and open with vim directly
@@ -52,6 +34,23 @@ bindkey -s '^f' 'cd_with_fzf\n'
 bindkey -s '^o' 'open_with_fzf\n'
 
 # ------------------------ Functions
+# Replace existing cd by adding onefetch function to show git info
+# -- Louis 2022/0920
+ONEFETCH_LAST_REPO=""
+function cd() {
+    builtin cd "$@";
+    git rev-parse 2>/dev/null;
+
+    if [ $? -eq 0 ]; then
+        if [ "$ONEFETCH_LAST_REPO" != $(basename $(git rev-parse --show-toplevel)) ]; then
+            clear
+            onefetch
+            ONEFETCH_LAST_REPO=$(basename $(git rev-parse --show-toplevel))
+        fi
+    fi
+}
+
+
 # Useful adb commands
 getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
     if [ -z "$1" ]; then
@@ -108,8 +107,7 @@ smartresize() {
     fi
 }
 
-# Replace default diff by piping to ydiff for better result rendering
-# -- Louis 2018/0830
+# Replace default diff by piping to ydiff for better result rendering -- Louis 2018/0830
 function diff(){
     args=()
     for i in $@; do
@@ -123,7 +121,7 @@ function diff(){
 # How to handle review with different file type
 open_with_fzf() {
 #    fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
-    fd -t f -H -I | fzf -m --print0 | xargs -0 open 2>&-
+    fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
 }
 
 # cd to directory selected from fzf -- Louis 2021/1125
@@ -133,7 +131,7 @@ cd_with_fzf() {
 
 # vim the file selected from fzf -- Louis 2021/1125
 vim_with_fzf() {
-    vim_file="$(fd -t f -H -I | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    vim_file="$(fd -t f -L | fzf --preview="batcat --color always {}" --bind="space:toggle-preview,ctrl-l:preview-page_up,ctrl-h:preview-page-down" --preview-window=:hidden)"
     [[ ! -z "$vim_file" ]] && vim "$vim_file"
 }
 
@@ -145,14 +143,18 @@ task_project_info() {
     task +Info "$@" | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 }
 
-# Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
+# Some exa | less combination in alias cannot handle listing directory directly '(e.g. ll .vim)
 # Change to function as workaround -- Louis 2021/1206
+exa_ls() {
+    exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r'
+}
+
 exa_ll() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
 }
 
 exa_lt() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' -T -L 2 $@ | less -RFX
+    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' --ignore-glob='.git*' -T -L 2 $@ | less -RFX
 }
 
 # ---------------------- Obsolete
@@ -174,4 +176,3 @@ exa_lt() {
 #    /usr/local/bin/vim -p "${args[@]}"
 #    $VIM_PATH -p "${args[@]}"
 #}
-

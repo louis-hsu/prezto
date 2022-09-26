@@ -1,41 +1,21 @@
 #
 # Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
-#
 # -- Louis 2018/0603
-#
 # Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
+# Use git branch to manage .z* files for different platform -- Louis 2022/0203
 
 # Set default zsh options (setopt) -- Louis 2018/1224
 setopt cdablevars
 
 # Source Prezto.
-if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+if [[ -s ${ZDOTDIR:-$HOME}/.zprezto/init.zsh ]]; then
+    source ${ZDOTDIR:-$HOME}/.zprezto/init.zsh
 fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
-source virtualenvwrapper.sh
-
-# For tmuxinator auto completion -- Louis 2015/0203
-source ~/.tmuxinator/tmuxinator.zsh
-
-# Move all "export" commands to 'zprofile'
-# But keep some comments in case needing to restore them in future -- Louis 2021/0526
-# TODO
-# 1. If Ruby/Gem rbenv is required and how to install/configure
-# 2. If jenv is required/configured for multiple Java version
-
-# Ruby/gem configuration -- Louis 2015/0203
-# Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
-# with my own account unless run 'sudo', which is a bad idea
-# Install rbenv instead to create private Ruby environment to fix this issue
-#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
-# Install jenv for Java version control -- Louis 2016/0905
-# Remove jenv setup since I might not really need multiple Java version
-# export PATH="$HOME/.jenv/bin:$PATH"
-# export JENV_ROOT=/usr/local/opt/jenv
-# if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+export PROJECT_HOME=$HOME/PythonDev
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+export PATH=/snap/bin:${PATH}
 
 # Add autocompletion of pipenv -- Louis 2018/0730
 if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
@@ -43,13 +23,25 @@ if which pipenv > /dev/null; then eval "$(pipenv --completion)" > /dev/null; fi
 # ---------------------- Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ~/.zsh_aliases ]; then
-    . ~/.zsh_aliases
+    source ~/.zsh_aliases
 fi
 
 precmd() {print ""}
 
 # fzf integration -- Louis 2021/0523
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+else
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+    source /usr/share/doc/fzf/examples/completion.zsh
+fi
+
+# Somehow .zshenv not working. Source .zprofile here -- Louis 2021/0601
+# TODO: Fix .zshenv
+source ~/.zprofile
+
+# Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
 # ---------------------- Obsolete
 # append to the history file, don't overwrite it
@@ -67,19 +59,3 @@ precmd() {print ""}
 #    export LSCOLORS=exfxcxdxbxegedabagacad
 #    ;;
 #esac
-
-# Obsolete -- Louis 2016/0505
-#alias gitrepofs='sshfs nshiu@gitrepo:/Users/nshiu ~/RDisk/Monet -oauto_cache,reconnect,default_permissions,volname=Monet; cd ~/RDisk/Monet'
-#alias degasfs='sshfs nshiu@degas:/home/nshiu ~/RDisk/Degas -oauto_cache,reconnect,default_permissions,volname=Degas; cd ~/RDisk/Degas'
-#alias ugitrepo='cd ~/; umount ~/RDisk/Monet'
-#alias udegas='cd ~/; umount ~/RDisk/Degas'
-
-# APK analysis tool
-#alias apka='cd /Applications/Third_Party/Development/APKAnalyser; java -Xmx1024m -jar apkanalyser-5.2-exec.jar &'
-
-# Add dex2jar into PATH -- Louis 2015/0127
-#export PATH=${PATH}:/Applications/Third_Party/Development/dex2jar-0.0.9.15
-
-# Set brew github token for unlimited search access -- Louis 0303/2015
-#export HOMEBREW_GITHUB_API_TOKEN=6b2721545370ef554df9622c1388c92367b91ebd
-#export HOMEBREW_GITHUB_API_TOKEN=62476089779a92fb38513a9d2be83fa312cb4539
