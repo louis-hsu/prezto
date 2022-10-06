@@ -51,6 +51,12 @@ function prompt_nshiu_pwd {
     fi
 }
 
+# Add code to calculate command execution time -- Louis 2022/0907
+function prompt_nshiu_preexec {
+  zmodload zsh/datetime 
+  prompt_prexec_realtime=${EPOCHREALTIME}
+}
+
 function prompt_nshiu_precmd {
     setopt LOCAL_OPTIONS
     unsetopt XTRACE KSH_ARRAYS
@@ -67,6 +73,30 @@ function prompt_nshiu_precmd {
     if (( $+functions[python-info] )); then
         python-info
     fi
+
+    # Add code to calculate command execution time -- Louis 2022/0907
+    if (( prompt_prexec_realtime )); then
+      local -rF elapsed_realtime=$(( EPOCHREALTIME - prompt_prexec_realtime ))
+      local -rF s=$(( elapsed_realtime%60 ))
+      local -ri elapsed_s=${elapsed_realtime}
+      local -ri m=$(( (elapsed_s/60)%60 ))
+      local -ri h=$(( elapsed_s/3600 ))
+      if (( h > 0 )); then
+        printf -v prompt_elapsed_time '(%ih%im)' ${h} ${m}
+      elif (( m > 0 )); then
+        printf -v prompt_elapsed_time '(%im%is)' ${m} ${s}
+      elif (( s >= 10 )); then
+        printf -v prompt_elapsed_time '(%.2fs)' ${s} # 12.34s
+      elif (( s >= 1 )); then
+        printf -v prompt_elapsed_time '(%.3fs)' ${s} # 1.234s
+      else
+        printf -v prompt_elapsed_time '(%ims)' $(( s*1000 ))
+      fi
+      unset prompt_prexec_realtime
+    else
+      # Clear previous result when hitting ENTER with no command to execute
+      unset prompt_elapsed_time
+    fi
 }
 
 function prompt_nshiu_setup {
@@ -78,6 +108,7 @@ function prompt_nshiu_setup {
     autoload -Uz add-zsh-hook
 
     # Add hook for calling git-info before each command.
+    add-zsh-hook preexec prompt_nshiu_preexec 
     add-zsh-hook precmd prompt_nshiu_precmd
 
     # Tell prezto we can manage this prompt
@@ -121,7 +152,7 @@ function prompt_nshiu_setup {
         #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
         PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}${git_info[indicator]}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
         #RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}${git_info[indicator]}'
-        RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}'
+        RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"} %F{1}${prompt_elapsed_time}%f%F{none}%f'
     fi
     SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
     #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{214}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
