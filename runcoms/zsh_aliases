@@ -34,8 +34,9 @@ alias gotop='gotop -p -s'
 # Taskwarror alias
 alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
-alias projinfo=task_project_info
-alias projectinfo=task_project_info
+# Remove the aliases, which is covered by script in .bin -- Louis 2022/1024
+#alias projectinfo=task_project_info
+alias projectinfo='~/.bin/projinfo'
 
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
@@ -148,22 +149,6 @@ nvim_with_fzf() {
 # TODO -- Louis 2021/1130
 # 1. Create function with ag/fzf to vim file which has keyword directly
 
-# Show project info from Taskwarrior -- Louis 2021/1126
-task_project_info() {
-    re="\+."
-    if [[ $# -eq 0 ]]; then
-      task project:OnePage priority != L
-    else
-      if [[ $1 =~ $re ]]; then
-        str="$1"
-      else
-        str="+$1"
-      fi
-      str=`echo $str | tr '[a-z]' '[A-Z]'` 
-#   Fix issue with extra leading white spaces -- Louis 2022/0705
-      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
-    fi
-}
 
 # Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
 # Change to function as workaround -- Louis 2021/1206
@@ -211,3 +196,22 @@ exa_llt() {
 #    /usr/local/bin/vim -p "${args[@]}"
 #    $VIM_PATH -p "${args[@]}"
 #}
+#
+# Show project info from Taskwarrior -- Louis 2021/1126
+# Remove the aliases, which is covered by script in .bin -- Louis 2022/1024
+#task_project_info() {
+#    re="\+."
+#    if [[ $# -eq 0 ]]; then
+#      task project:OnePage priority != L
+#    else
+#      if [[ $1 =~ $re ]]; then
+#        str="$1"
+#      else
+#        str="+$1"
+#      fi
+#      str=`echo $str | tr '[a-z]' '[A-Z]'` 
+##   Fix issue with extra leading white spaces -- Louis 2022/0705
+#      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+#    fi
+#}
+#
