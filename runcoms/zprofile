@@ -125,7 +125,8 @@ export PROJECT_HOME=$HOME/PythonDev
 #export JAVA_HOME=/usr/lib/jvm/java-16-openjdk-amd64
 
 # Add local PERL module directory to @INC
-export PERL5LIB=~/.perl5lib/lib/perl5
+# Covered in .zshrc -- Louis 2022/1011
+#export PERL5LIB=~/.perl5lib/lib/perl5
 
 # Configure zsh history behavior -- Louis 2021/0523
 export SAVEHIST=10000
