@@ -159,13 +159,19 @@ exa_ls() {
   exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r' $@
 }
 
+# Remove 'Icon?' and '.DS_Store' from result
+# -- Louis 2023/0109
 exa_ll() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' $@ | less -RFX
+    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
 }
 
 # Simple tree view, ignore .git* folder/files as well -- Louis 2022/0118
+# Fix issue:
+# Remove 'Icon?', '.DS_Store' and .git directory from result
+# But keep other .git* files
+# -- Louis 2023/0109 
 exa_lt() {
-    exa --group-directories-first --color=always --ignore-glob=Icon$'\r' --ignore-glob='.git*' -T -L 3 $@ | less -RFX
+    exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # Long tree view, ignore .git* folder/files as well -- Louis 2022/0118
