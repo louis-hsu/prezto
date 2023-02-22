@@ -101,7 +101,7 @@ rationalize-path fpath
 export PATH
 export MANPATH
 
-# ------------------------ Colors
+# ------------------------ Colors (exa/ag/grep)
 # For ls/exa -- Louis 2021/0523
 export LSCOLORS=exfxcxdxbxegedabagacad
 
@@ -128,6 +128,32 @@ export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
 # ------------------------ Homebrew
 export HOMEBREW_NO_INSTALL_CLEANUP=1
 
+# ------------------------ Fzf
+# 'junegunn/fzf', command line fuzzy finder
+# Do do preview fisrt, need to think about it -- Louis 2021/0523
+# export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --info=inline --preview='$HOME/.vim/plugged/fzf.vim/bin/preview.sh {}' --preview-window='right:60%:wrap' --bind='f2:toggle-preview,f3:execute(bat --style=numbers {} || less -f {}),f4:execute($EDITOR {}),alt-w:toggle-preview-wrap,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+} | pbcopy),ctrl-x:execute(rm -i {+})+abort,ctrl-l:clear-query'"
+export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --border --info=inline"
+export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
+--color fg:#D8DEE9,hl:#A3BE8C,fg+:#D8DEE9,bg+:#434C5E,hl+:#A3BE8C
+--color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B
+'
+export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
+export FZF_CTRL_R_OPTS="--reverse"
+
+export FZF_TMUX_OPTS="-p -w 80% -h 80%"
+
+#export FZF_TMUX_OPTS="-p"
+#export FZF_CTRL_R_OPTS="--reverse --preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
+
+# ------------------------ Bat (better cat)
+# Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
+# Remove -F (quit if only one page) -- Louis 2022/0916
+export BAT_PAGER="less -FR"
+export BAT_STYLE="full"
+export BAT_THEME="TwoDark"
+
 # ------------------------ Others
 # Configure python virtualenvwrapper -- Louis 2017/0125
 # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
@@ -152,27 +178,6 @@ export HISTCONTROL=ignorespace:ignoredups
 
 # "fd" file finder, modern replacement for GNU find -- Louis 2021/0523
 export FD_OPTIONS="--hidden --follow"
-
-# Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
-# Remove -F (quit if only one page) -- Louis 2022/0916
-export BAT_PAGER="less -FR"
-export BAT_STYLE="full"
-export BAT_THEME="TwoDark"
-
-# 'junegunn/fzf', command line fuzzy finder
-# Do do preview fisrt, need to think about it -- Louis 2021/0523
-# export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --info=inline --preview='$HOME/.vim/plugged/fzf.vim/bin/preview.sh {}' --preview-window='right:60%:wrap' --bind='f2:toggle-preview,f3:execute(bat --style=numbers {} || less -f {}),f4:execute($EDITOR {}),alt-w:toggle-preview-wrap,ctrl-d:half-page-down,ctrl-u:half-page-up,ctrl-y:execute-silent(echo {+} | pbcopy),ctrl-x:execute(rm -i {+})+abort,ctrl-l:clear-query'"
-export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --border --info=inline"
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---color fg:#D8DEE9,hl:#A3BE8C,fg+:#D8DEE9,bg+:#434C5E,hl+:#A3BE8C
---color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B
-'
-export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
-
-#export FZF_TMUX_OPTS="-p"
-#export FZF_CTRL_R_OPTS="--reverse --preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
 
 # Setup gem home/binary path -- Louis 2018/1220
 export GEM_HOME=~/.gem
