@@ -1,8 +1,5 @@
 # ------------------------ Alias
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
-# Comment it out since EXA_OPTIONS is not exa official environment variable
-# -- Louis 2022/0903
-#export EXA_OPTIONS="-laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r'"
 alias ls="exa_ls"
 alias ll="exa_ll"
 
@@ -137,26 +134,27 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    cd "$(fd -t d -H -L | fzf --preview="tree  -FC -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    # Swith to exa for directory review in tree-structure
+    # And use fzf-tmux to utilize popup pane
+    # -- Louis 2023/0110
+    cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="exa -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
 # nvim the file selected from fzf -- Louis 2021/1125
 nvim_with_fzf() {
-    nvim_file="$(fd -t f -H -L | fzf --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+    # Use fzf-tmux to utilize tmux popup pane
+    # -- Louis 2023/0110
+    nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
     [[ ! -z "$nvim_file" ]] && nvim "$nvim_file"
 }
 
 # TODO -- Louis 2021/1130
 # 1. Create function with ag/fzf to vim file which has keyword directly
 
-
-# Some exa | less combination in alias cannot handle list directory directly '(e.g. ll .vim)
-# Change to function as workaround -- Louis 2021/1206
-#
 # TODO
 # prefix 'tpls' not working, seems exa color theme cannot be applied. -- Louis 2022/0916
 exa_ls() {
-  exa -F --color=always --group-directories-first --ignore-glob=Icon$'\r' $@
+  exa -F --color=always --group-directories-first --ignore-glob="Icon?" $@ 
 }
 
 # Remove 'Icon?' and '.DS_Store' from result
@@ -175,8 +173,12 @@ exa_lt() {
 }
 
 # Long tree view, ignore .git* folder/files as well -- Louis 2022/0118
+# Remove 'Icon?', '.DS_Store' and .git directory from result
+# But keep other .git* files
+# -- Louis 2023/0223
+ 
 exa_llt() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob=Icon$'\r' --ignore-glob='.git*' -T -L 3 $@ | less -RFX
+    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # ---------------------- Obsolete
