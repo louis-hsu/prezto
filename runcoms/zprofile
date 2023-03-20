@@ -113,7 +113,7 @@ GREY_COLOR_3="38;5;102"
 export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33:lp=33"
 
 # Configure grep color -- Louis 2021/0119
-export GREP_COLORS='ms=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
 # ------------------------ Less
 # Set the default Less options.
