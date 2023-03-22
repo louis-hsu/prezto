@@ -15,6 +15,7 @@
 } &!
 
 # Execute code only if STDERR is bound to a TTY.
+# Uninstall 'fortune' due to tmux will cut the line -- Louis 2023/0301
 if [[ -o INTERACTIVE && -t 2 ]]; then
 
   # Print a random, hopefully interesting, adage.

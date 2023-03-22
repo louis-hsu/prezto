@@ -155,6 +155,9 @@ export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
 export GEM_HOME=~/.gem              # Setup GEM_HOME and gem binary path -- Louis 2018/1220
 export YDIFF_OPTIONS='-s -w 0 --wrap'
 
+# For ranger setup -- Louis 2022/1213
+export RANGER_LOAD_DEFAULT_RC=FALSE
+
 # pip zsh completion start
 function _pip_completion {
   local words cword
