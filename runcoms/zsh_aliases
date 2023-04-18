@@ -19,7 +19,7 @@ alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
 
 # Configure ag color following grep. As for color/style code adapted:
-# 1. color-match: fg is ANSI color code, and bg is RGB 
+# 1. color-match: fg is ANSI color code, and bg is RGB
 # 2. color-line-number: fg is ANSI color/style code, and no bg
 # -- Louis 2021/0120
 alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
@@ -50,6 +50,11 @@ alias duf="duf --hide-mp '*timemachine*'"
 
 # Add clear command before onefetch -- Louis 2022/1004
 alias onefetch="clear; onefetch"
+
+# 1. 'mygeoip' is added .sh file extension for better syntax highlight
+# 2. Add alias for no-sh extension
+# -- Louis 2023/0411
+alias mygeoip="~/.bin/mygeoip.sh"
 
 # ------------------------ Bind keys
 # Select file and open with nvim directly
@@ -154,7 +159,7 @@ nvim_with_fzf() {
 # TODO
 # prefix 'tpls' not working, seems exa color theme cannot be applied. -- Louis 2022/0916
 exa_ls() {
-  exa -F --color=always --group-directories-first --ignore-glob="Icon?" $@ 
+  exa -F --color=always --group-directories-first --ignore-glob="Icon?" $@
 }
 
 # Remove 'Icon?' and '.DS_Store' from result
@@ -167,7 +172,7 @@ exa_ll() {
 # Fix issue:
 # Remove 'Icon?', '.DS_Store' and .git directory from result
 # But keep other .git* files
-# -- Louis 2023/0109 
+# -- Louis 2023/0109
 exa_lt() {
     exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
@@ -176,7 +181,7 @@ exa_lt() {
 # Remove 'Icon?', '.DS_Store' and .git directory from result
 # But keep other .git* files
 # -- Louis 2023/0223
- 
+
 exa_llt() {
     exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
@@ -217,7 +222,7 @@ exa_llt() {
 #      else
 #        str="+$1"
 #      fi
-#      str=`echo $str | tr '[a-z]' '[A-Z]'` 
+#      str=`echo $str | tr '[a-z]' '[A-Z]'`
 ##   Fix issue with extra leading white spaces -- Louis 2022/0705
 #      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
 #    fi
