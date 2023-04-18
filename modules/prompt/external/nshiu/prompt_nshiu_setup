@@ -53,7 +53,7 @@ function prompt_nshiu_pwd {
 
 # Add code to calculate command execution time -- Louis 2022/0907
 function prompt_nshiu_preexec {
-  zmodload zsh/datetime 
+  zmodload zsh/datetime
   prompt_prexec_realtime=${EPOCHREALTIME}
 }
 
@@ -108,7 +108,7 @@ function prompt_nshiu_setup {
     autoload -Uz add-zsh-hook
 
     # Add hook for calling git-info before each command.
-    add-zsh-hook preexec prompt_nshiu_preexec 
+    add-zsh-hook preexec prompt_nshiu_preexec
     add-zsh-hook precmd prompt_nshiu_precmd
 
     # Tell prezto we can manage this prompt
@@ -117,9 +117,13 @@ function prompt_nshiu_setup {
 
     # Set editor-info parameters.
     zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
-    zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{red}❯%F{yellow}❯%F{green}❯%f%b'
+    #zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{red}❯%F{yellow}❯%F{green}❯%f%b'
+    #zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{green}❮%F{yellow}❮%F{red}❮%f%b'
+    # Change prompt symbols to fit JetBrain Nerd font presentation
+    # -- Louis 2023-04-18 20:22
+    zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{red}▷%F{yellow}▷%F{green}▷%f%b'
     zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
-    zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{green}❮%F{yellow}❮%F{red}❮%f%b'
+    zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{green}◁%F{yellow}◁%F{red}◁%f%b'
 
     # Set git-info parameters.
     zstyle ':prezto:module:git:info' verbose 'yes'
