@@ -149,10 +149,14 @@ export FZF_TMUX_OPTS="-p -w 80% -h 80%"
 
 # ------------------------ Bat (better cat)
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
-# Remove -F (quit if only one page) -- Louis 2022/0916
-export BAT_PAGER="less -FR"
-export BAT_STYLE="full"
-export BAT_THEME="TwoDark"
+# Remove environmental variables which are covered by ~/.config/bat/config -- Louis 2023-03-26 14:25
+#export BAT_PAGER="less -FR"
+#export BAT_STYLE="full"
+#export BAT_THEME="TwoDark"
+
+# Use 'bat' to better colorize manpage -- Louis 2023-04-11 15:08
+export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
+export MANROFFOPT="-c"
 
 # ------------------------ Others
 # Configure python virtualenvwrapper -- Louis 2017/0125
