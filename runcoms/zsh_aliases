@@ -121,12 +121,15 @@ smartresize() {
 
 # Replace default diff by piping to ydiff for better result rendering
 # -- Louis 2018/0830
+# Replace 'ydiff' to 'delta'
+# -- Louis 2023-05-12 16:38
 function diff(){
     args=()
     for i in $@; do
         args+=$i
     done
-    /usr/bin/diff -ur "${args[@]}" | ydiff
+    # /usr/bin/diff -ur "${args[@]}" | ydiff
+    /usr/bin/diff -ur "${args[@]}" | delta -s --features nshiu_nordbase
 }
 
 # Open file selected from fzf -- Louis 2021/1125
