@@ -65,58 +65,58 @@ bindkey -s '^o' 'open_with_fzf\n'
 # ------------------------ Functions
 # Useful adb commands
 getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
-    if [ -z "$1" ]; then
-        set "1"
-    fi
-    cstring="service call iphonesubinfo 3 i32 $1 | grep -oE \"[0-9a-f]{8} \" | while read hex; do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; done; echo"
-    IMEI=$(adb shell $cstring)
-    echo IMEI_$1: $IMEI
+  if [ -z "$1" ]; then
+    set "1"
+  fi
+  cstring="service call iphonesubinfo 3 i32 $1 | grep -oE \"[0-9a-f]{8} \" | while read hex; do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; done; echo"
+  IMEI=$(adb shell $cstring)
+  echo IMEI_$1: $IMEI
 }
 
 # Add extract() function to facilitate extract action -- Louis 2015/0311
 # Modify script to unzip to specified direectory -- Louis 2020/0712
 extract() {
-    if [ -f $1 ]; then
-        dName="$1_dir"
-        if [ ! -d "$dName" ]; then
-            echo "Create directory $dName"
-            mkdir -p $dName
-        fi
-
-        mv $1 ./$dName
-        cd ./$dName
-
-        case $1 in
-            *.tar.bz2)  tar xjf $1      ;;
-            *.tar.gz)   tar xzf $1      ;;
-            *.bz2)      bunzip2 $1      ;;
-            *.rar)      unrar e $1      ;;
-            *.gz)       gunzip $1       ;;
-            *.tar)      tar xf $1       ;;
-            *.tbz2)     tar xjf $1      ;;
-            *.tgz)      tar xzf $1      ;;
-            *.zip)      unzip $1        ;;
-            *.Z)        uncompress $1   ;;
-            *.7z)       7z x $1         ;;
-            *)          echo "'$1' cannot be extracted via extract()"
-                        mv $1 ../
-                        cd ..
-                        rm -rf ./$dName
-                        ;;
-        esac
-    else
-        echo "'$1' is not a valid file"
+  if [ -f $1 ]; then
+    dName="$1_dir"
+    if [ ! -d "$dName" ]; then
+      echo "Create directory $dName"
+      mkdir -p $dName
     fi
+
+    mv $1 ./$dName
+    cd ./$dName
+
+    case $1 in
+      *.tar.bz2)  tar xjf $1      ;;
+      *.tar.gz)   tar xzf $1      ;;
+      *.bz2)      bunzip2 $1      ;;
+      *.rar)      unrar e $1      ;;
+      *.gz)       gunzip $1       ;;
+      *.tar)      tar xf $1       ;;
+      *.tbz2)     tar xjf $1      ;;
+      *.tgz)      tar xzf $1      ;;
+      *.zip)      unzip $1        ;;
+      *.Z)        uncompress $1   ;;
+      *.7z)       7z x $1         ;;
+      *)          echo "'$1' cannot be extracted via extract()"
+                  mv $1 ../
+                  cd ..
+                  rm -rf ./$dName
+                  ;;
+      esac
+  else
+    echo "'$1' is not a valid file"
+  fi
 }
 
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick -- Louis 2015/0629
 # Add usage -- Louis 2020/0712
 smartresize() {
-    if [ "$#" -ne 3 ]; then
-        echo "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
-    else
-        mogrify -path $3 -filter Triangle -define filter:support=2 -thumbnail $2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
-    fi
+  if [ "$#" -ne 3 ]; then
+    echo "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
+  else
+    mogrify -path $3 -filter Triangle -define filter:support=2 -thumbnail $2 -unsharp 0.25x0.08+8.3+0.045 -dither None -posterize 136 -quality 82 -define jpeg:fancy-upsampling=off -define png:compression-filter=5 -define png:compression-level=9 -define png:compression-strategy=1 -define png:exclude-chunk=all -interlace none -colorspace sRGB $1
+  fi
 }
 
 # Replace default diff by piping to ydiff for better result rendering
@@ -124,36 +124,36 @@ smartresize() {
 # Replace 'ydiff' to 'delta'
 # -- Louis 2023-05-12 16:38
 function diff(){
-    args=()
-    for i in $@; do
-        args+=$i
-    done
-    # /usr/bin/diff -ur "${args[@]}" | ydiff
-    /usr/bin/diff -ur "${args[@]}" | delta -s --features nshiu_nordbase
+  args=()
+  for i in $@; do
+    args+=$i
+  done
+  # /usr/bin/diff -ur "${args[@]}" | ydiff
+  /usr/bin/diff -ur "${args[@]}" | delta -s --features nshiu_nordbase
 }
 
 # Open file selected from fzf -- Louis 2021/1125
 # TODO
 # How to handle review with different file type
 open_with_fzf() {
-#    fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
-    fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
+#  fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
+  fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
 }
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-    # Swith to exa for directory review in tree-structure
-    # And use fzf-tmux to utilize popup pane
-    # -- Louis 2023/0110
-    cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="exa -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+  # Swith to exa for directory review in tree-structure
+  # And use fzf-tmux to utilize popup pane
+  # -- Louis 2023/0110
+  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="exa -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
 # nvim the file selected from fzf -- Louis 2021/1125
 nvim_with_fzf() {
-    # Use fzf-tmux to utilize tmux popup pane
-    # -- Louis 2023/0110
-    nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
-    [[ ! -z "$nvim_file" ]] && nvim "$nvim_file"
+  # Use fzf-tmux to utilize tmux popup pane
+  # -- Louis 2023/0110
+  nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+  [[ ! -z "$nvim_file" ]] && nvim "$nvim_file"
 }
 
 # TODO -- Louis 2021/1130
@@ -168,7 +168,7 @@ exa_ls() {
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
 exa_ll() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
+  exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
 }
 
 # Simple tree view, ignore .git* folder/files as well -- Louis 2022/0118
@@ -177,7 +177,7 @@ exa_ll() {
 # But keep other .git* files
 # -- Louis 2023/0109
 exa_lt() {
-    exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
+  exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # Long tree view, ignore .git* folder/files as well -- Louis 2022/0118
@@ -186,7 +186,7 @@ exa_lt() {
 # -- Louis 2023/0223
 
 exa_llt() {
-    exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
+  exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # ---------------------- Obsolete

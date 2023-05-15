@@ -103,7 +103,7 @@ export MANPATH
 
 # ------------------------ Colors (exa/ag/grep)
 # For ls/exa -- Louis 2021/0523
-export LSCOLORS=exfxcxdxbxegedabagacad
+export LS_COLORS=exfxcxdxbxegedabagacad
 
 # tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 GREY_COLOR="38;5;248"
