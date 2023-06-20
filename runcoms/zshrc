@@ -54,7 +54,7 @@ precmd() {print ""}
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
 # ----------------------- Hack of command not found
-# Parse prefix 'tp' to enable tmux popup feature 
+# Parse prefix 'tp' to enable tmux popup feature
 # https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
 # -- Louis 2022/0916
 #

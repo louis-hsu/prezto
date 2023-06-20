@@ -176,6 +176,12 @@ exa_ll() {
 # Remove 'Icon?', '.DS_Store' and .git directory from result
 # But keep other .git* files
 # -- Louis 2023/0109
+#
+# TODO
+# 'exa -T' doesn't traverse/trace down symbolic link.
+# Might be able to check if target directory is a symbolic link, but no idea for softlinks
+# inside the target directory
+# -- Louis 2023-05-17 16:31
 exa_lt() {
   exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
