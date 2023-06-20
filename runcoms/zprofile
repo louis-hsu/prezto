@@ -64,12 +64,18 @@ export ANDROID_HOME=$HOME/Library/Android/sdk
 # New brew configuration -- Louis 2021/1226
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
+# Run/setup macOS default path value first
+# Refer to https://golangbyexample.com/understand-etc-paths-pathsd-mac/
+# -- Louis 2023-06-05 13:32
+eval "$(/usr/libexec/path_helper -s)"
+
 # Set the list of directories that Zsh searches for programs.
 path=(
     $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
+    $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
+    $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
     $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
     $ANDROID_HOME/platform-tools
-    ~/.gem/bin                                      # Export brew-version Ruby -- Louis 2021/1220
     $HOMEBREW_PREFIX/opt/ruby/bin
     $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
     $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
@@ -100,17 +106,22 @@ rationalize-path fpath
 
 export PATH
 export MANPATH
+export FPATH
 
 # ------------------------ Colors (exa/ag/grep)
 # For ls/exa -- Louis 2021/0523
-export LS_COLORS=exfxcxdxbxegedabagacad
+#export LS_COLORS=exfxcxdxbxegedabagacad
+# Use 'vivid' to generate customized LS-COLORS and filetype
+# -- Louis 2023-06-09 16:36
+export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"
 
 # tell "exa" to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
 GREY_COLOR_3="38;5;102"
 #export EXA_COLORS="reset:uu=${GREY_COLOR_2}:un=${GREY_COLOR_2}:gu=${GREY_COLOR_2}:gn=${GREY_COLOR_2}:ur=${GREY_COLOR}:uw=${GREY_COLOR}:ue=${GREY_COLOR}:ux=${GREY_COLOR}:gr=${GREY_COLOR}:gw=${GREY_COLOR}:gx=${GREY_COLOR}:tr=${GREY_COLOR}:tw=${GREY_COLOR}:tx=${GREY_COLOR}:da=38;5;102"
-export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33:lp=33"
+#export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}:ln=33:lp=33"
+export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}"
 
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
