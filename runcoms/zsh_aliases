@@ -195,6 +195,13 @@ exa_llt() {
   exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
+# Instead of prefix 'tp*' (as tmux popup/floating session), create function 'tp' to be more
+# intuitive and avoid zsh auto command correction behavior
+# -- Louis 2023-08-02 17:30
+tp() {
+  tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$@"
+}
+
 # ---------------------- Obsolete
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
 # Comment out cuz not that useful -- Louis 2021/1130
