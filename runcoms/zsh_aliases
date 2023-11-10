@@ -1,18 +1,18 @@
 # ------------------------ Alias
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
-alias ls="exa_ls"
-alias ll="exa_ll"
+# Change to 'eza' since exa is unmaintained -- Louis 2023/1109
+alias ls="eza_ls"
+alias ll="eza_ll"
 
-alias lt="exa_lt"
-alias llt="exa_llt"
+alias lt="eza_lt"
+alias llt="eza_llt"
 
 # Configure grep color -- Louis 2021/0119
 alias grep='grep -n -C 2 --color'
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
-#alias tree='tree -AC'
-# Change to exa -- Louis 2022/0903
-alias tree='exa --tree'
+# Change to eza -- Louis 2022/0903
+alias tree='eza --tree'
 # Add sorting by size to du -- Louis 2020/0424
 alias du='du -ch -d 1 | sort -hr'
 alias tag='/usr/local/bin/ctags'
@@ -37,7 +37,6 @@ alias projectinfo='~/.bin/projinfo'
 
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-#alias mvim='/Applications/Third_Party/Development/MacVim.app/Contents/bin/mvim &'
 alias brewdep='brew deps --tree --installed'
 
 # Move to nvim from vim -- Louis 2022/0207
@@ -75,39 +74,10 @@ getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
 
 # Add extract() function to facilitate extract action -- Louis 2015/0311
 # Modify script to unzip to specified direectory -- Louis 2020/0712
-extract() {
-  if [ -f $1 ]; then
-    dName="$1_dir"
-    if [ ! -d "$dName" ]; then
-      echo "Create directory $dName"
-      mkdir -p $dName
-    fi
-
-    mv $1 ./$dName
-    cd ./$dName
-
-    case $1 in
-      *.tar.bz2)  tar xjf $1      ;;
-      *.tar.gz)   tar xzf $1      ;;
-      *.bz2)      bunzip2 $1      ;;
-      *.rar)      unrar e $1      ;;
-      *.gz)       gunzip $1       ;;
-      *.tar)      tar xf $1       ;;
-      *.tbz2)     tar xjf $1      ;;
-      *.tgz)      tar xzf $1      ;;
-      *.zip)      unzip $1        ;;
-      *.Z)        uncompress $1   ;;
-      *.7z)       7z x $1         ;;
-      *)          echo "'$1' cannot be extracted via extract()"
-                  mv $1 ../
-                  cd ..
-                  rm -rf ./$dName
-                  ;;
-      esac
-  else
-    echo "'$1' is not a valid file"
-  fi
-}
+#
+# Borrow new extract/archieve function from ohmyzsh -- Louis 2023/1110
+source ~/.bin/extract.plugin.zsh
+source ~/.bin/universalarchive.plugin.zsh
 
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick -- Louis 2015/0629
 # Add usage -- Louis 2020/0712
@@ -142,10 +112,10 @@ open_with_fzf() {
 
 # cd to directory selected from fzf -- Louis 2021/1125
 cd_with_fzf() {
-  # Swith to exa for directory review in tree-structure
+  # Swith to eza for directory review in tree-structure
   # And use fzf-tmux to utilize popup pane
   # -- Louis 2023/0110
-  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="exa -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="eza -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
 }
 
 # nvim the file selected from fzf -- Louis 2021/1125
@@ -160,15 +130,15 @@ nvim_with_fzf() {
 # 1. Create function with ag/fzf to vim file which has keyword directly
 
 # TODO
-# prefix 'tpls' not working, seems exa color theme cannot be applied. -- Louis 2022/0916
-exa_ls() {
-  exa -F --color=always --group-directories-first --ignore-glob="Icon?" $@
+# prefix 'tpls' not working, seems eza color theme cannot be applied. -- Louis 2022/0916
+eza_ls() {
+  eza -F --color=always --group-directories-first --ignore-glob="Icon?" $@
 }
 
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
-exa_ll() {
-  exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
+eza_ll() {
+  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
 }
 
 # Simple tree view, ignore .git* folder/files as well -- Louis 2022/0118
@@ -178,12 +148,12 @@ exa_ll() {
 # -- Louis 2023/0109
 #
 # TODO
-# 'exa -T' doesn't traverse/trace down symbolic link.
+# 'eza -T' doesn't traverse/trace down symbolic link.
 # Might be able to check if target directory is a symbolic link, but no idea for softlinks
 # inside the target directory
 # -- Louis 2023-05-17 16:31
-exa_lt() {
-  exa -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
+eza_lt() {
+  eza -aF --group-directories-first --color=always --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # Long tree view, ignore .git* folder/files as well -- Louis 2022/0118
@@ -191,8 +161,8 @@ exa_lt() {
 # But keep other .git* files
 # -- Louis 2023/0223
 
-exa_llt() {
-  exa -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
+eza_llt() {
+  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # Instead of prefix 'tp*' (as tmux popup/floating session), create function 'tp' to be more
@@ -244,3 +214,37 @@ tp() {
 #    fi
 #}
 #
+#extract() {
+#  if [ -f $1 ]; then
+#    dName="$1_dir"
+#    if [ ! -d "$dName" ]; then
+#      echo "Create directory $dName"
+#      mkdir -p $dName
+#    fi
+#
+#    mv $1 ./$dName
+#    cd ./$dName
+#
+#    case $1 in
+#      *.tar.bz2)  tar xjf $1      ;;
+#      *.tar.gz)   tar xzf $1      ;;
+#      *.bz2)      bunzip2 $1      ;;
+#      *.rar)      unrar e $1      ;;
+#      *.gz)       gunzip $1       ;;
+#      *.tar)      tar xf $1       ;;
+#      *.tbz2)     tar xjf $1      ;;
+#      *.tgz)      tar xzf $1      ;;
+#      *.zip)      unzip $1        ;;
+#      *.Z)        uncompress $1   ;;
+#      *.7z)       7z x $1         ;;
+#      *)          echo "'$1' cannot be extracted via extract()"
+#                  mv $1 ../
+#                  cd ..
+#                  rm -rf ./$dName
+#                  ;;
+#      esac
+#  else
+#    echo "'$1' is not a valid file"
+#  fi
+#}
+
