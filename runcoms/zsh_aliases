@@ -138,7 +138,7 @@ eza_ls() {
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
 eza_ll() {
-  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
+  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale=size --color-scale-mode=fixed --ignore-glob="Icon?|.DS_Store" $@ | less -RFX
 }
 
 # Simple tree view, ignore .git* folder/files as well -- Louis 2022/0118
@@ -162,7 +162,7 @@ eza_lt() {
 # -- Louis 2023/0223
 
 eza_llt() {
-  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
+  eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale=size --color-scale-mode=fixed --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
 # Instead of prefix 'tp*' (as tmux popup/floating session), create function 'tp' to be more
