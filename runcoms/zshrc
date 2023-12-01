@@ -54,12 +54,6 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 # Perl 5 library location -- Louis 2022/1011
 eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
 
-# Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
-# -- Louis 2023/1108
-autoload -Uz compinit
-compinit
-
-
 # ----------------------- Hack of command not found
 # Parse prefix 'tp' to enable tmux popup feature
 # https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
@@ -116,3 +110,13 @@ command_not_found_handler() {
 #
 #test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 #
+
+zstyle ':completion:*' menu select
+fpath+=~/.zfunc
+
+# Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
+# Ensure all autocompletions are set in $FPATH before running autoload
+# -- Louis 2023/1108
+autoload -Uz compinit
+compinit
+

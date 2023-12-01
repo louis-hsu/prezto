@@ -75,7 +75,7 @@ getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
 # Add extract() function to facilitate extract action -- Louis 2015/0311
 # Modify script to unzip to specified direectory -- Louis 2020/0712
 #
-# Borrow new extract/archieve function from ohmyzsh -- Louis 2023/1110
+# Borrow new extract/archieve (alias 'ua') function from ohmyzsh -- Louis 2023/1110
 source ~/.bin/extract.plugin.zsh
 source ~/.bin/universalarchive.plugin.zsh
 
