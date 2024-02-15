@@ -15,6 +15,9 @@ alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='eza --tree'
 # Add sorting by size to du -- Louis 2020/0424
 alias du='du -ch -d 1 | sort -hr'
+# Add new tool 'dust' for better directory/volume size calculation
+# -- Louis 2024/0107
+alias dust='dust --depth 2'
 alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
 
@@ -26,7 +29,6 @@ alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --col
 alias fd="fd $FD_OPTIONS"
 
 alias jq='jq -C'
-alias gotop='gotop -p -s'
 
 # Taskwarror alias
 alias task='clear; task'
@@ -47,13 +49,17 @@ alias vim='nvim'
 # -- Louis 2022/0928
 alias duf="duf --hide-mp '*timemachine*'"
 
-# Add clear command before onefetch -- Louis 2022/1004
+# Add clear command before onefetch/neofetch -- Louis 2022/1004
 alias onefetch="clear; onefetch"
+alias neofetch="clear; neofetch"
 
 # 1. 'mygeoip' is added .sh file extension for better syntax highlight
 # 2. Add alias for no-sh extension
 # -- Louis 2023/0411
 alias mygeoip="~/.bin/mygeoip.sh"
+
+# For fun, to have typerwrite sound -- Louis 2023/1214
+alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"
 
 # ------------------------ Bind keys
 # Select file and open with nvim directly
@@ -171,6 +177,39 @@ eza_llt() {
 tp() {
   tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$@"
 }
+
+# Function to switch different neovim configurations
+# Refer to:
+# https://gist.github.com/elijahmanor/b279553c0132bfad7eae23e34ceb593b
+# https://michaeluloth.com/neovim-switch-configs/
+# -- Louis 2023/1213
+function nvims() {
+  #items=$(find -L $HOME/.config -maxdepth 2 -name "init.lua" -type f -execdir sh -c 'pwd | xargs basename' \;)
+  # Switch to 'fd'
+  items=$(fd --max-depth=1 --glob 'nvim*' ~/.config -x echo {/})
+
+  selected=$(printf "%s\n" "${items[@]}" | FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS-} --preview-window 'right:border-left:50%:<40(right:border-left:50%:hidden)' --preview 'eza -A -T -L 1 --color=always ~/.config/{} | head -200'" fzf --prompt="  Neovim Config 󰄾 ")
+  if [[ -z $selected ]]; then
+    return 0
+  elif [[ $selected == "nvim" ]]; then
+    selected=""
+  fi
+  NVIM_APPNAME=$selected nvim "$@"
+}
+
+alias nvs=nvims
+
+# Create aliases for different nvim distros dynamically -- Louis 2023/1213
+function create_nvimalias() {
+  items=("${(@f)$(fd --max-depth=1 --glob 'nvim*' ~/.config -x echo {/})}")
+
+  for na in $items; do
+    if [[ $na != "nvim" ]]; then
+      alias "$na"="NVIM_APPNAME=$na nvim"
+    fi
+  done
+}
+create_nvimalias
 
 # ---------------------- Obsolete
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
