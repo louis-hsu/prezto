@@ -61,6 +61,11 @@ alias mygeoip="~/.bin/mygeoip.sh"
 # For fun, to have typerwrite sound -- Louis 2023/1214
 alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"
 
+# 1. Chagne 'tp' to 'tf' to align the initial of 'tmuxfloat'
+# 2. Rewrite 'tmuxfloat'
+# -- Louis 2024/0311
+alias tf="tmuxfloat"
+
 # ------------------------ Bind keys
 # Select file and open with nvim directly
 bindkey -s '^v' 'nvim_with_fzf\n'
@@ -171,12 +176,6 @@ eza_llt() {
   eza -laF -g --git --header --group-directories-first --time-style long-iso --color=always --color-scale=size --color-scale-mode=gradient --ignore-glob="Icon?|.DS_Store|.git" -T -L 3 $@ | less -RFX
 }
 
-# Instead of prefix 'tp*' (as tmux popup/floating session), create function 'tp' to be more
-# intuitive and avoid zsh auto command correction behavior
-# -- Louis 2023-08-02 17:30
-tp() {
-  tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$@"
-}
 
 # Function to switch different neovim configurations
 # Refer to:
