@@ -38,8 +38,8 @@ source virtualenvwrapper.sh
 
 # ------------------------ Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
-if [ -f ~/.zsh_aliases ]; then
-    . ~/.zsh_aliases
+if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
+    . ${ZDOTDIR:-$HOME}/.zsh_aliases
 fi
 
 # Create new line after each prompt -- Louis 2023/1108

@@ -40,6 +40,7 @@ alias projectinfo='~/.bin/projinfo'
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 alias brewdep='brew deps --tree --installed'
+alias brewfile='brew bundle dump --force --file=~/.dotfiles/Brewfile'
 
 # Move to nvim from vim -- Louis 2022/0207
 alias vim='nvim'
