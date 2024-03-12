@@ -111,12 +111,16 @@ command_not_found_handler() {
 #test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 #
 
-zstyle ':completion:*' menu select
-fpath+=~/.zfunc
+# Move to zprofile for now (maybe zshenv later)
+# -- Louis 2024/0312
+#fpath+=~/.zfunc
 
 # Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
 # Ensure all autocompletions are set in $FPATH before running autoload
 # -- Louis 2023/1108
-autoload -Uz compinit
-compinit
+#
+# Remove it for now 'cause it seems prezto handle it already
+# -- Louis 2024/0312
+#autoload -Uz compinit
+#compinit
 

@@ -97,6 +97,11 @@ manpath=(
     $manpath
 )
 
+# Add private zsh function folder
+# (Triggered by git-sim)
+# -- Louis 2024/0312
+fpath+=~/.zfunc
+
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path manpath
 
