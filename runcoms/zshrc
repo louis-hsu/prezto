@@ -59,26 +59,26 @@ eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
 # https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
 # -- Louis 2022/0916
 #
-# TODO
-# prefix method doens't work with exa (ls/ll/lt alias) even after changing 'less' parameters
-# Need to find out if it's function call or exa itself
-# 'ydiff' works correctly, though
-# -- Louis 11/21/2022
+# 1. Change prefix from 'tp' to 'tf' to align 'tmuxfloat' initial
+# 2. Re-write 'tmuxfloat' to fix unexpected quitting issue
+# 3. However, need to think if keeping this hack or simpily using 'tf' or Ctrl+P
+#    to trigger floating display
+# -- Louis 2024/0312
 
 command_not_found_handler() {
   # read the "missing command" entered
   missingcmd="$1"
   # remove it from the argument list
   shift
-  # check if starts with "tp"
-  if [[ "${missingcmd:0:2}" == "tp" ]] ; then
-    # read part after "tp"
+  # check if starts with "tf"
+  if [[ "${missingcmd:0:2}" == "tf" ]] ; then
+    # read part after "tf"
     prefixedcmd="${missingcmd:2}"
     # check if it's a real command
     #echo "$(which ${prefixedcmd})"
     if which "$prefixedcmd" &> /dev/null ; then
-      # run sudo with the cmd and the rest of the argument list
-      tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$prefixedcmd" "$@"
+      #tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$prefixedcmd" "$@"
+      tmuxfloat $prefixedcmd $@
       return $?
     fi
   fi
