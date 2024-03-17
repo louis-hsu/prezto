@@ -135,6 +135,8 @@ brew () {
   fi
 }
 
+compdef _brew brew
+
 # Open file selected from fzf -- Louis 2021/1125
 # TODO
 # How to handle review with different file type
