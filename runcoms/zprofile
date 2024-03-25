@@ -152,9 +152,6 @@ export LESS='-F -i -M -R -W -X -z-4 -g -j4'
 # For lesspip preprocessor -- Louis 2021/1205
 export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
 
-# ------------------------ Homebrew
-export HOMEBREW_NO_INSTALL_CLEANUP=1
-
 # ------------------------ Fzf
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
