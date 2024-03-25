@@ -179,6 +179,9 @@ export FZF_TMUX_OPTS="-p -w 80% -h 80%"
 export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
 export MANROFFOPT="-c"
 
+# ------------------------ Ripgrep (better grep)
+export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
+
 # ------------------------ Others
 # Configure python virtualenvwrapper -- Louis 2017/0125
 # fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704

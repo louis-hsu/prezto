@@ -57,7 +57,7 @@ alias neofetch="clear; neofetch"
 # 1. 'mygeoip' is added .sh file extension for better syntax highlight
 # 2. Add alias for no-sh extension
 # -- Louis 2023/0411
-alias mygeoip="~/.bin/mygeoip.sh"
+#alias mygeoip="~/.bin/mygeoip.sh"
 
 # For fun, to have typerwrite sound -- Louis 2023/1214
 alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"
@@ -136,6 +136,20 @@ brew () {
 }
 
 compdef _brew brew
+
+# Replace default 'rg' command for pager 'delta' support
+# 1. Print out search result as JSON
+# 2. '--grep-*-style' of 'delta' to customize output theme
+# -- Louis 2024/0324
+rg () {
+  /opt/homebrew/bin/rg --json -p $* | delta \
+    --default-language sh \
+    --grep-file-style "magenta ul" \
+    --grep-line-number-style "grey" \
+    --grep-match-word-style "#000000 italic #ebbb5c"
+}
+
+compdef _rg rg
 
 # Open file selected from fzf -- Louis 2021/1125
 # TODO
