@@ -121,6 +121,9 @@ command_not_found_handler() {
 #
 # Remove it for now 'cause it seems prezto handle it already
 # -- Louis 2024/0312
-#autoload -Uz compinit
-#compinit
-
+#
+# It seems we still need it when adding new completetion in .config/zsh/.zfunc
+# (or other path)
+# -- Louis 2024/0318
+autoload -Uz compinit
+compinit
