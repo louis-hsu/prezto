@@ -114,24 +114,38 @@ function diff(){
   /usr/bin/diff -ur "${args[@]}" | delta -s --features nshiu_nordbase
 }
 
-# Replace default 'brew' command to add extra action for 'brew upgrade':
-# 1. If not 'brew upgrade', proceed as it is
-# 2. Otherwise, update Brewfile after 'brew upgrade'
-# -- Louis 2024/0316
+# Replace default 'brew' command to add extra action for 'brew install/uninstall':
+# If 'brew install/uninstall' then:
+# 1. Dump new Brewfile with current installations
+# 2. diff new and original Brewfile
+# 3. If different, 'brew bundle dump --force' Brewfile
+#
+# TODO
+# 1. Kind of stupid to create Brewfile and diff everytime, think about a smart way
+# 2. Auto check-in and commit with packages installed/uninstalled
+# -- Louis 2024/0325
 brew () {
-  if [[ $* == "upgrade" ]]; then
-    check=$(brew outdated)
+  origBrewfile="/Users/nshiu/.dotfiles/Brewfile"
+  newBrewfile="/tmp/Brewfile"
 
-    if [[ $check == "" ]]; then # Nothing to upgrade
-      echo "Nothing to upgrade"
-    else
-      /opt/homebrew/bin/brew upgrade
+  # Collect command and following parameter(s)
+  #args=()
+  #for i in $@; do
+  #  args+=$i
+  #done
 
+  /opt/homebrew/bin/brew $*
+
+  if [[ $* =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
+    /opt/homebrew/bin/brew bundle dump --force --file=${newBrewfile}
+
+    if [[ $(/usr/bin/diff -q ${origBrewfile} ${newBrewfile}) != "" ]] then    # Something change
       echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.dotfiles/Brewfile\033[0m"
-      /opt/homebrew/bin/brew bundle dump --force --file=~/.dotfiles/Brewfile
+      /opt/homebrew/bin/brew bundle dump --force --file=${origBrewfile}
+
+      rm -rf ${newBrewfile}
     fi
-  else
-    /opt/homebrew/bin/brew $*
+
   fi
 }
 
