@@ -69,9 +69,9 @@ alias tf="tmuxfloat"
 
 # ------------------------ Bind keys
 # Select file and open with nvim directly
-bindkey -s '^v' 'nvim_with_fzf\n'
-bindkey -s '^f' 'cd_with_fzf\n'
-bindkey -s '^o' 'open_with_fzf\n'
+#bindkey -s '^v' 'nvim_with_fzf\n'
+#bindkey -s '^f' 'cd_with_fzf\n'
+#bindkey -s '^o' 'open_with_fzf\n'
 
 # ------------------------ Functions
 # Useful adb commands
@@ -125,7 +125,7 @@ function diff(){
 # 2. Auto check-in and commit with packages installed/uninstalled
 # -- Louis 2024/0325
 brew () {
-  origBrewfile="/Users/nshiu/.dotfiles/Brewfile"
+  origBrewfile="$XDG_CONFIG_HOME/homebrew/Brewfile"
   newBrewfile="/tmp/Brewfile"
 
   # Collect command and following parameter(s)

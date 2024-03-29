@@ -139,7 +139,15 @@ export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"
 GREY_COLOR="38;5;248"
 GREY_COLOR_2="38;5;240"
 GREY_COLOR_3="38;5;243"
-export EXA_COLORS="uu=${GREY_COLOR_3}:un=${GREY_COLOR_3}:gu=${GREY_COLOR_3}:gn=${GREY_COLOR_3}:ur=33:uw=31:ue=32:ux=32:da=${GREY_COLOR_3}"
+export EXA_COLORS="uu=${GREY_COLOR_3}:\
+un=${GREY_COLOR_3}:\
+gu=${GREY_COLOR_3}:\
+gn=${GREY_COLOR_3}:\
+ur=33:\
+uw=31:\
+ue=32:\
+ux=32:\
+da=${GREY_COLOR_3}"
 
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
@@ -155,20 +163,42 @@ export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
 # ------------------------ Fzf
 # 'junegunn/fzf', command line fuzzy finder
 # Do do preview fisrt, need to think about it -- Louis 2021/0523
-export FZF_DEFAULT_OPTS="--no-mouse --height 80% --reverse --multi --border --info=inline"
-export FZF_DEFAULT_OPTS=$FZF_DEFAULT_OPTS'
---color fg:#D8DEE9,hl:#A3BE8C,fg+:#D8DEE9,bg+:#434C5E,hl+:#A3BE8C
---color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B
-'
-export FZF_DEFAULT_COMMAND="git ls-files --cached --others --exclude-standard 2>/dev/null || fd $FD_OPTIONS"
+FZF_COLORS="fg:#D8DEE9,\
+fg+:#D8DEE9,\
+bg+:#434C5E,\
+hl:#A3BE8C,\
+hl+:#A3BE8C,\
+pointer:#BF616A,\
+info:#4C566A,\
+spinner:#4C566A,\
+header:#4C566A,\
+prompt:#81A1C1,\
+marker:#EBCB8B"
+
+export FZF_DEFAULT_OPTS="--no-mouse\
+ --height 80%\
+ --reverse\
+ --color $FZF_COLORS\
+ --multi\
+ --border\
+ --info=inline"
+
+export FZF_DEFAULT_COMMAND="fd -t f -H -L"
+
 export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
-export FZF_ALT_C_COMMAND="fd --type d $FD_OPTIONS"
+export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
+ --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+
+export FZF_ALT_C_COMMAND="fd -t d -H -L"
+export FZF_ALT_C_OPTS="--preview 'eza -aF\
+ --group-directories-first\
+ --color=always\
+ --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}'\
+ --bind 'ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+
 export FZF_CTRL_R_OPTS="--reverse"
 
 export FZF_TMUX_OPTS="-p -w 80% -h 80%"
-
-#export FZF_TMUX_OPTS="-p"
-#export FZF_CTRL_R_OPTS="--reverse --preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview'"
 
 # ------------------------ Bat (better cat)
 # Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
