@@ -6,7 +6,7 @@ alias ll="eza_ll"
 alias lt="eza_lt"
 alias llt="eza_llt"
 
-alias grep='grep -n -C 2 --color'             # Configure grep color -- Louis 2021/0119
+alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
 alias tree='eza --tree'                       # Change to eza -- Louis 2022/0903
@@ -45,7 +45,7 @@ alias tf="tmuxfloat"                          # Script to create tmux popup disp
 
 # ------------------------ Functions
 # Useful adb commands
-getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
+function getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
   if [ -z "$1" ]; then
     set "1"
   fi
@@ -65,7 +65,7 @@ source ~/.bin/universalarchive.plugin.zsh
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick
 # Reference: https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
 # -- Louis 2015/0629
-smartresize() {
+function smartresize() {
   if [ "$#" -ne 3 ]; then
     echo "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
   else
@@ -94,20 +94,26 @@ function diff(){
   for i in $@; do
     args+=$i
   done
-  /usr/bin/diff -ur "${args[@]}" | delta -s --features nshiu_nordbase
+  command diff -ur "${args[@]}" | delta --side-by-side
 }
 
-# Replace default 'brew' command to add extra action for 'brew install/uninstall':
-# If 'brew install/uninstall' then:
-# 1. Dump new Brewfile with current installations
-# 2. diff new and original Brewfile
-# 3. If different, 'brew bundle dump --force' Brewfile
+# Replace default 'brew' command to add extra action for 'install/uninstall/search':
+# 1. If 'brew install/uninstall' successfully then:
+#    - Dump new Brewfile with current installations
+#    - diff new and original Brewfile as double check
+#    - If different, replace old Brewfile with the new one
+# 2. If 'brew search' then:
+#    - If followed by other parameters, execute directly
+#    - Otherwise
+#      - curl to retrieve all available formulas from 'homebrew' server
+#      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
+#      - 'brew info' if a formula is selected
 #
 # TODO
-# 1. Kind of stupid to create Brewfile and diff everytime, think about a smart way
-# 2. Auto check-in and commit with packages installed/uninstalled
+# 1. Auto check-in and commit with packages installed/uninstalled
+# 2. Preview window in 'fzf-tmux' doesn't preserve the original text style
 # -- Louis 2024/0325
-brew () {
+function brew () {
   origBrewfile="$XDG_CONFIG_HOME/homebrew/Brewfile"
   newBrewfile="/tmp/Brewfile"
 
@@ -117,17 +123,31 @@ brew () {
   #  args+=$i
   #done
 
-  /opt/homebrew/bin/brew $*
-
   if [[ $* =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
-    /opt/homebrew/bin/brew bundle dump --force --file=${newBrewfile}
+    command brew $*
+    if [[ $? != 0 ]]; then return 1; fi
 
-    if [[ $(/usr/bin/diff -q ${origBrewfile} ${newBrewfile}) != "" ]] then    # Something change
+    command brew bundle dump --force --file=${newBrewfile}
+
+    if [[ $(command diff -q ${origBrewfile} ${newBrewfile}) != "" ]]; then    # Something change
       echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.dotfiles/Brewfile\033[0m"
-      /opt/homebrew/bin/brew bundle dump --force --file=${origBrewfile}
-
-      rm -rf ${newBrewfile}
+      mv -f $newBrewfile $origBrewfile
     fi
+
+  elif [[ $* == "search" ]]; then         # Only intercept 'search' without parameters
+    local formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
+      \jq -r '.[].name' | \
+      fzf-tmux -p -w 80% -h 80% \
+      --no-multi \
+      --prompt="🍺 brew search 󰄾 " \
+      --preview="brew info {}" \
+      --preview-window=wrap)
+
+    if [[ $formula ]]; then command brew info $formula; fi
+
+  else
+
+    command brew $*
 
   fi
 }
@@ -138,8 +158,13 @@ compdef _brew brew
 # 1. Print out search result as JSON
 # 2. '--grep-*-style' of 'delta' to customize output theme
 # -- Louis 2024/0324
-rg () {
-  /opt/homebrew/bin/rg --json -p $* | delta \
+#
+# TODO
+# 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
+# 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
+function rg () {
+  command rg --json $* | delta \
+    --tabs=1 \
     --default-language sh \
     --grep-file-style "magenta ul" \
     --grep-line-number-style "grey" \
@@ -148,7 +173,7 @@ rg () {
 
 compdef _rg rg
 
-eza_ls() {
+function eza_ls() {
   eza -F \
     --color=always \
     --group-directories-first \
@@ -157,7 +182,7 @@ eza_ls() {
 
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
-eza_ll() {
+function eza_ll() {
   eza -laF \
     --group \
     --git \
@@ -178,7 +203,7 @@ eza_ll() {
 # TODO
 # 'eza -T' doesn't traverse/trace down symbolic link.
 # -- Louis 2023-05-17 16:31
-eza_lt() {
+function eza_lt() {
   eza -aF \
     --group-directories-first \
     --color=always \
@@ -191,7 +216,7 @@ eza_lt() {
 # Long tree view ignoring 'Icon?', '.DS_Store' and .git directory from
 # result, but keep other .git* files
 # -- Louis 2023/0223
-eza_llt() {
+function eza_llt() {
   eza -laF \
     --group \
     --git \
