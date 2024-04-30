@@ -90,11 +90,15 @@ function smartresize() {
 # Replace default 'diff' by piping to 'delta' for better result rendering
 # -- Louis 2023-05-12 16:38
 function diff(){
+  local COLS=$(tput col)
+
   args=()
   for i in $@; do
     args+=$i
   done
-  command diff -ur "${args[@]}" | delta --side-by-side
+
+  # Define side by side or not
+  command diff -ur "${args[@]}" | ([ "$COLS" -ge 110 ] && delta --side-by-side -w $COLS || delta)
 }
 
 # Replace default 'brew' command to add extra action for 'install/uninstall/search':
