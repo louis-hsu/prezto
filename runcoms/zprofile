@@ -206,6 +206,10 @@ export FZF_TMUX_OPTS="-p -w 80% -h 80%"
 export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
 export MANROFFOPT="-c"
 
+# ------------------------ Delta
+# Add for 'core.pager' setup in 'git/config' -- Louis 2024/0424
+export DELTA_FEATURES='nshiu_nordbase zebra-dark'
+
 # ------------------------ Ripgrep (better grep)
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
 
