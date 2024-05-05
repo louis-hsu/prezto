@@ -45,9 +45,10 @@ fi
 # Create new line after each prompt -- Louis 2023/1108
 precmd() {print ""}
 
-# fzf integration -- Louis 2021/0523
+# fzf integration -- Louis 2024/0505
+eval "$(fzf --zsh)"
+#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # Re-bind hotkeys for fzf widgets -- Louis 2024/0329
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 bindkey -v
 bindkey -M viins '^f' fzf-file-widget
 bindkey -M viins '^h' fzf-history-widget
