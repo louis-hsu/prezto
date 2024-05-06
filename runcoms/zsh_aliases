@@ -121,8 +121,9 @@ compdef _delta delta
 # 2. Preview window in 'fzf-tmux' doesn't preserve the original text style
 # -- Louis 2024/0325
 function brew () {
-  origBrewfile="$XDG_CONFIG_HOME/homebrew/Brewfile"
-  newBrewfile="/tmp/Brewfile"
+  local _origfile="$XDG_CONFIG_HOME/homebrew/Brewfile"
+  local _newfile="/tmp/Brewfile"
+  local _cmfile="/tmp/_commitMessage"
 
   # Collect command and following parameter(s)
   #args=()
@@ -130,15 +131,35 @@ function brew () {
   #  args+=$i
   #done
 
+  [ -f $_newfile ] && rm -rf $_newfile
+  [ -f $_cmfile ] && rm -rf $_cmfile
+
   if [[ $* =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
     command brew $*
     if [[ $? != 0 ]]; then return 1; fi
-    command brew bundle dump --force --file=${newBrewfile}
-    if [[ $(command diff -q ${origBrewfile} ${newBrewfile}) != "" ]]; then    # Something change
+    command brew bundle dump --force --file=${_newfile}
+    if [[ $(command diff -q ${_origfile} ${_newfile}) != "" ]]; then    # Something change
       echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.dotfiles/Brewfile\033[0m"
-      mv -f $newBrewfile $origBrewfile
+      mv -f $_newfile $_origfile
+
+      # Auto check-in to git to save hassels
+      #_commitMessage=$(echo "$1 following formula(s):" | sed 's/./\U&/')
+      # Create commit message to file for new line preservation
+      echo -e "Auto-commit for $1""ing following formula(s):" >! $_cmfile
+
+      for _t in "${@:2}"; do
+        if [[ ! "$_t" =~ "--" ]]; then
+          echo -e "$_t" >> $_cmfile
+        fi
+      done
+      #cat $_cmfile
+
+      cd ~/.config
+      git commit --file $_cmfile ./homebrew/Brewfile
+      rm -rf $_cmfile
+
     else
-      rm -rf $newBrewfile
+      rm -rf $_newfile
     fi
   elif [[ $* == "search" ]]; then         # Only intercept 'search' without parameters
     local formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
