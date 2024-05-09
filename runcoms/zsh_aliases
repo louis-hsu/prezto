@@ -57,7 +57,7 @@ function getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
     do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
     done; echo"
   IMEI=$(adb shell $cstring)
-  echo IMEI_$1: $IMEI
+  echo -e "IMEI_${1}: ${IMEI}"
 }
 
 # Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
@@ -69,7 +69,7 @@ source ~/.bin/universalarchive.plugin.zsh
 # -- Louis 2015/0629
 function smartresize() {
   if [ "$#" -ne 3 ]; then
-    echo "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
+    echo -e "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
   else
     mogrify -path $3 \
     -filter Triangle \
@@ -138,6 +138,12 @@ function brew () {
     command brew $*
     if [[ $? != 0 ]]; then return 1; fi
     command brew bundle dump --force --file=${_newfile}
+
+    if [ ! brew bundle check --file=${_newfile} ]; then
+      echo -e "Something wrong about Brewfile generation, no Brewfile update/check-in"
+      return 1
+    fi
+
     if [[ $(command diff -q ${_origfile} ${_newfile}) != "" ]]; then    # Something change
       echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.dotfiles/Brewfile\033[0m"
       mv -f $_newfile $_origfile
@@ -145,11 +151,11 @@ function brew () {
       # Auto check-in to git to save hassels
       #_commitMessage=$(echo "$1 following formula(s):" | sed 's/./\U&/')
       # Create commit message to file for new line preservation
-      echo -e "Auto-commit for $1""ing following formula(s):" >! $_cmfile
+      echo -e "Auto-commit for ${1}ing following formula(s):" >! $_cmfile
 
       for _t in "${@:2}"; do
-        if [[ ! "$_t" =~ "--" ]]; then
-          echo -e "$_t" >> $_cmfile
+        if [[ ! "${_t}" =~ "--" ]]; then
+          echo -e "${_t}" >> $_cmfile
         fi
       done
       #cat $_cmfile
