@@ -116,20 +116,10 @@ compdef _delta delta
 #      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
 #      - 'brew info' if a formula is selected
 #
-# TODO:
-# 1. Auto check-in and commit with packages installed/uninstalled
-# 2. Preview window in 'fzf-tmux' doesn't preserve the original text style
-# -- Louis 2024/0325
 function brew () {
   local _origfile="$XDG_CONFIG_HOME/homebrew/Brewfile"
   local _newfile="/tmp/Brewfile"
   local _cmfile="/tmp/_commitMessage"
-
-  # Collect command and following parameter(s)
-  #args=()
-  #for i in $@; do
-  #  args+=$i
-  #done
 
   [ -f $_newfile ] && rm -rf $_newfile
   [ -f $_cmfile ] && rm -rf $_cmfile
@@ -137,6 +127,7 @@ function brew () {
   if [[ $* =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
     command brew $*
     if [[ $? != 0 ]]; then return 1; fi
+
     command brew bundle dump --force --file=${_newfile}
 
     if [ ! brew bundle check --file=${_newfile} ]; then
@@ -149,7 +140,6 @@ function brew () {
       mv -f $_newfile $_origfile
 
       # Auto check-in to git to save hassels
-      #_commitMessage=$(echo "$1 following formula(s):" | sed 's/./\U&/')
       # Create commit message to file for new line preservation
       echo -e "Auto-commit for ${1}ing following formula(s):" >! $_cmfile
 
