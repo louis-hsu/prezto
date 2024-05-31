@@ -46,13 +46,40 @@ fi
 precmd() {print ""}
 
 # fzf integration -- Louis 2024/0505
-eval "$(fzf --zsh)"
+source <(fzf --zsh)
 #[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-# Re-bind hotkeys for fzf widgets -- Louis 2024/0329
+
+# Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
+bindkey -r vicmd '\ec'
+bindkey -r viins '\ec'
+bindkey -r vicmd '^R'
+bindkey -r viins '^R'
+bindkey -r vicmd '^T'
+bindkey -r viins '^T'
+
 bindkey -v
 bindkey -M viins '^f' fzf-file-widget
 bindkey -M viins '^h' fzf-history-widget
 bindkey -M viins '^j' fzf-cd-widget
+
+bindkey -M vicmd '^f' fzf-file-widget
+bindkey -M vicmd '^h' fzf-history-widget
+bindkey -M vicmd '^j' fzf-cd-widget
+
+# Create 'ctrl-v' to open file for nvim -- Louis 2024/0529
+function open_with_vim () {
+  local _temp
+  local _files
+
+  _temp="$(__fzf_select)"
+  _files=$(echo -n "${_temp}" | sed -E 's/[[:space:]]*$//')
+  if [[ -n $_files ]]; then
+    echo -n "${_files}" | xargs nvim
+  fi
+}
+zle -N open_with_vim_widget open_with_vim
+bindkey -M viins '^v' open_with_vim_widget
+bindkey -M vicmd '^v' open_with_vim_widget
 
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"

@@ -183,9 +183,7 @@ export FZF_DEFAULT_OPTS="--no-mouse\
  --border\
  --info=inline"
 
-export FZF_DEFAULT_COMMAND="fd -t f -H -L"
-
-export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_CTRL_T_COMMAND="fd -t f -H -L"
 export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
  --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
 
