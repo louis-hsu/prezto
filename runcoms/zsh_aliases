@@ -150,9 +150,11 @@ function brew () {
       done
       #cat $_cmfile
 
+      local _pwd="${PWD}"
       cd ~/.config
-      git commit --file $_cmfile ./homebrew/Brewfile
+      #git commit --file $_cmfile ./homebrew/Brewfile
       rm -rf $_cmfile
+      cd $_pwd
 
     else
       rm -rf $_newfile
@@ -287,6 +289,18 @@ function _create_nvimalias() {
   done
 }
 _create_nvimalias
+
+# Function to enable 'yazi'
+# (https://yazi-rs.github.io/docs/quick-start)
+# -- Louis 2024/0531
+function yy() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="$tmp"
+  if cwd="$(cat -- "$tmp")" && [ -n "$cwd" ] && [ "$cwd" != "$PWD" ]; then
+    cd -- "$cwd"
+  fi
+  rm -f -- "$tmp"
+}
 
 # ---------------------- Obsolete
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
