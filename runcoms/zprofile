@@ -71,6 +71,7 @@ fi
 
 # ------------------------ Android
 export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_USER_HOME=$XDG_CONFIG_HOME/.android
 
 # ------------------------ Path
 # New brew configuration -- Louis 2021/1226
