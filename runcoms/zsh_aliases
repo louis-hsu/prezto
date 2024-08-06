@@ -204,7 +204,7 @@ function _eza_ll() {
     --group-directories-first \
     --time-style long-iso \
     --color=always \
-    --color-scale=size \
+    --color-scale \
     --color-scale-mode=gradient \
     --ignore-glob="Icon?|.DS_Store" $@ | \
     less -RFX
