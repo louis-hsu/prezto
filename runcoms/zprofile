@@ -5,11 +5,6 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
-# Clean up zprofile by following '.zprezto/runcoms/README.md'
-# 1. Source before zshrc
-# 2. Export initial path/parameters
-# -- Louis 2024/0316
-
 # ------------------------ Script
 # rationalize-path()
 # Later we'll need to trim down the paths that follow because the ones
@@ -57,7 +52,7 @@ fi
 
 # ------------------------ Language
 if [[ -z "$LANG" ]]; then
-    export LANG='en_US.UTF-8'
+  export LANG='en_US.UTF-8'
 fi
 
 # ------------------------ Android
@@ -68,58 +63,46 @@ export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
 # New brew configuration -- Louis 2021/1226
 eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Run/setup macOS default path value first
-# Refer to https://golangbyexample.com/understand-etc-paths-pathsd-mac/
-# -- Louis 2023-06-05 13:32
-eval "$(/usr/libexec/path_helper -s)"
+# Ensure path arrays do not contain duplicates.
+typeset -gU cdpath fpath mailpath path
+
+# Set the list of directories that cd searches.
+# cdpath=(
+#   $cdpath
+# )
 
 # Set the list of directories that Zsh searches for programs.
 path=(
-    $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
-    $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
-    $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
-    $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
-    $ANDROID_HOME/platform-tools
-    $HOMEBREW_PREFIX/opt/ruby/bin
-    $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
-    $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
-    $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
-    $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
-    $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
-    $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
-    /opt/{homebrew,local}/{,s}bin(N)
-    /usr/local/{,s}bin(N)
-    $path
+  $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
+  $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
+  $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
+  $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
+  $ANDROID_HOME/platform-tools
+  $HOMEBREW_PREFIX/opt/ruby/bin
+  $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
+  $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
+  $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
+  $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
+  $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
+  $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
+  /opt/{homebrew,local}/{,s}bin(N)
+  /usr/local/{,s}bin(N)
+  $path
 )
 
-#manpath=(
-#    $HOMEBREW_PREFIX/opt/coreutils/libexec/gnuman   # Install brew-version coreutilis -- Louis 2015/0209
-#    $HOMEBREW_PREFIX/opt/gnu-getopt/share/man       # Install gnu getopt -- Louis 2020/1112
-#    $HOMEBREW_PREFIX/opt/grep/libexec/man           # Install brew-version grep -- Louis 2021/0119
-#    $HOMEBREW_PREFIX/share/man
-#    /usr/share/man
-#    /usr/local/share/man
-#    $manpath
-#)
+# ------------------------ Less
+# Set the default Less options.
+# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
+# Remove -X to enable it.
+if [[ -z "$LESS" ]]; then
+  export LESS='-F -g -i -M -R -j4 -w -X -z-4'
+fi
 
-# Add private zsh function folder
-# (Triggered by git-sim)
-# -- Louis 2024/0312
-#fpath+=~/.zfunc
-fpath+=$ZDOTDIR/.zfunc
-
-# Ensure path arrays do not contain duplicates.
-#typeset -gU cdpath fpath mailpath path manpath
-typeset -gU cdpath fpath mailpath path
-
-# Remove directories not existing
-rationalize-path path
-#rationalize-path manpath
-rationalize-path fpath
-
-#export PATH
-#export MANPATH
-#export FPATH
+# Set the Less input preprocessor.
+# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
+if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
+  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
+fi
 
 # ------------------------ Colors
 # Use 'vivid' to generate customized LS-COLORS and filetype
@@ -146,17 +129,7 @@ da=${GREY_COLOR_3}"
 # Configure grep color -- Louis 2021/0119
 export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
-# ------------------------ Less
-# Set the default Less options.
-# -- Louis 2022/0916
-export LESS='-F -i -M -R -W -X -z-4 -g -j4'
-
-# For lesspip preprocessor -- Louis 2021/1205
-export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
-
 # ------------------------ Fzf
-# 'junegunn/fzf', command line fuzzy finder
-# Do do preview fisrt, need to think about it -- Louis 2021/0523
 FZF_COLORS="fg:#D8DEE9,\
 fg+:#D8DEE9,\
 bg+:#434C5E,\
@@ -190,10 +163,9 @@ export FZF_ALT_C_OPTS="--preview 'eza -aF\
 
 export FZF_CTRL_R_OPTS="--reverse"
 
-export FZF_TMUX_OPTS="-p -w 80% -h 80%"
+export FZF_TMUX_OPTS="-p -w 85% -h 80%"
 
 # ------------------------ Bat (better cat)
-# Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
 # Use 'bat' to better colorize manpage -- Louis 2023-04-11 15:08
 export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
 export MANROFFOPT="-c"
@@ -205,45 +177,19 @@ export DELTA_FEATURES='nshiu_nordbase zebra-dark'
 # ------------------------ Ripgrep (better grep)
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
 
-# ------------------------ Others
-# Configure python virtualenvwrapper -- Louis 2017/0125
-# fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
+# ------------------------ Virtualenv
 export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/Development/PythonDev
 
+# ------------------------ Others
 # Remove jenv setup since I might not really need multiple Java version
 # Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
 #export PATH=/usr/local/opt/openjdk/bin:${PATH}
 #export JAVA_HOME=`/usr/libexec/java_home`
 
-# Configure zsh history behavior -- Louis 2021/0523
-export SAVEHIST=10000
-export HISTSIZE=10000
-export HISTFILE="${ZDOTDIR}/.zsh_history"
-export HISTCONTROL=ignorespace:ignoredups
-
 # Setup gem home/binary path -- Louis 2018/1220
 export GEM_HOME=~/.gem
 
 # Set turecolor terminal
-case $TERM in
-  iterm            |\
-  linux-truecolor  |\
-  screen-truecolor |\
-  tmux-truecolor   |\
-  xterm-truecolor  )    export COLORTERM=truecolor ;;
-  vte*)
-esac
-
-# pip zsh completion start
-function _pip_completion {
-  local words cword
-  read -Ac words
-  read -cn cword
-  reply=( $( COMP_WORDS="$words[*]" \
-    COMP_CWORD=$(( cword-1 )) \
-    PIP_AUTO_COMPLETE=1 $words[1] 2>/dev/null ))
-}
-compctl -K _pip_completion pip3
-# pip zsh completion end
+export COLORTERM=truecolor
