@@ -1,0 +1,170 @@
+#
+# A simple theme that displays relevant, contextual information.
+#
+# Authors:
+#   Louis Hsu <louis.shiu@gmail.com>
+#   Based on Sorin Ionescu theme
+#
+# Modify theme based on Carlos Hernandez theme to fix deleting line upward while hitting tab key
+# -- Louis 2017/0110
+#
+# Rollback to version without special newline print out which is the issue in zsh 5.3.1, after installing zsh 5.3.1 beta version
+# -- Louis 2017/0523
+#
+# 16 Terminal Colors
+# -- ---------------
+#  0 black
+#  1 red
+#  2 green
+#  3 yellow
+#  4 blue
+#  5 magenta
+#  6 cyan
+#  7 white
+#  8 bright black
+#  9 bright red
+# 10 bright green
+# 11 bright yellow
+# 12 bright blue
+# 13 bright magenta
+# 14 bright cyan
+# 15 bright white
+#
+
+# Load dependencies.
+pmodload 'helper'
+_prompt_paradox_start_time=$SECONDS
+
+function prompt_nshiu_pwd {
+    local pwd="${PWD/#$HOME/~}" #List pwd then substitute $HOEM with '~'
+
+    if [[ "$pwd" == (#m)[/~] ]]; then #(#m) is the matching in the following regx and populates to $MATCH
+        _prompt_nshiu_pwd="$MATCH"
+        unset MATCH
+    else
+        # _prompt_nshiu_pwd="${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
+        if [[ ${#${pwd}} -gt 40 ]]; then
+            _prompt_nshiu_pwd="..${pwd[((${#${pwd}}-38)),${#${pwd}}]}"
+        else
+            _prompt_nshiu_pwd="$pwd"
+        fi
+    fi
+}
+
+# Add code to calculate command execution time -- Louis 2022/0907
+function prompt_nshiu_preexec {
+  zmodload zsh/datetime
+  prompt_prexec_realtime=${EPOCHREALTIME}
+}
+
+function prompt_nshiu_precmd {
+    setopt LOCAL_OPTIONS
+    unsetopt XTRACE KSH_ARRAYS
+
+    # Format PWD.
+    prompt_nshiu_pwd
+
+    # Get Git repository information.
+    if (( $+functions[git-info] )); then
+        git-info
+    fi
+
+    # Get python info
+    if (( $+functions[python-info] )); then
+        python-info
+    fi
+
+    # Add code to calculate command execution time -- Louis 2022/0907
+    if (( prompt_prexec_realtime )); then
+      local -rF elapsed_realtime=$(( EPOCHREALTIME - prompt_prexec_realtime ))
+      local -rF s=$(( elapsed_realtime%60 ))
+      local -ri elapsed_s=${elapsed_realtime}
+      local -ri m=$(( (elapsed_s/60)%60 ))
+      local -ri h=$(( elapsed_s/3600 ))
+      if (( h > 0 )); then
+        printf -v prompt_elapsed_time '(%ih%im)' ${h} ${m}
+      elif (( m > 0 )); then
+        printf -v prompt_elapsed_time '(%im%is)' ${m} ${s}
+      elif (( s >= 10 )); then
+        printf -v prompt_elapsed_time '(%.2fs)' ${s} # 12.34s
+      elif (( s >= 1 )); then
+        printf -v prompt_elapsed_time '(%.3fs)' ${s} # 1.234s
+      else
+        printf -v prompt_elapsed_time '(%ims)' $(( s*1000 ))
+      fi
+      unset prompt_prexec_realtime
+    else
+      # Clear previous result when hitting ENTER with no command to execute
+      unset prompt_elapsed_time
+    fi
+}
+
+function prompt_nshiu_setup {
+    setopt LOCAL_OPTIONS
+    unsetopt XTRACE KSH_ARRAYS
+    prompt_opts=(cr percent subst)
+
+    # Load required functions.
+    autoload -Uz add-zsh-hook
+
+    # Add hook for calling git-info before each command.
+    add-zsh-hook preexec prompt_nshiu_preexec
+    add-zsh-hook precmd prompt_nshiu_precmd
+
+    # Tell prezto we can manage this prompt
+    # Add this line to fix new_line fails issue -- Louis 2019 1022
+    zstyle ':prezto:module:prompt' managed 'yes'
+
+    # Set editor-info parameters.
+    zstyle ':prezto:module:editor:info:completing' format '%B%F{red}...%f%b'
+    #zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{red}❯%F{yellow}❯%F{green}❯%f%b'
+    #zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{green}❮%F{yellow}❮%F{red}❮%f%b'
+    # Change prompt symbols to fit JetBrain Nerd font presentation
+    # -- Louis 2023-04-18 20:22
+    zstyle ':prezto:module:editor:info:keymap:primary' format '%B%F{red}▷%F{yellow}▷%F{green}▷%f%b'
+    zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{red}♺%f'
+    zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{green}◁%F{yellow}◁%F{red}◁%f%b'
+
+    # Set git-info parameters.
+    zstyle ':prezto:module:git:info' verbose 'yes'
+    zstyle ':prezto:module:git:info:action' format ' ⁝ %s'
+    zstyle ':prezto:module:git:info:added' format ' %F{gree}✚%f'
+    zstyle ':prezto:module:git:info:ahead' format ' %F{yellow}⬆%f'
+    zstyle ':prezto:module:git:info:behind' format ' %F{yellow}⬇%f'
+    zstyle ':prezto:module:git:info:branch' format '%F{green} %b%f'
+    zstyle ':prezto:module:git:info:commit' format '%F{green}➦ %.7c%f'
+    zstyle ':prezto:module:git:info:deleted' format ' %F{red}✖%f'
+    zstyle ':prezto:module:git:info:dirty' format ' ⁝'
+    zstyle ':prezto:module:git:info:modified' format ' %F{blue}✱%f'
+    zstyle ':prezto:module:git:info:position' format '%F{red}%p%f'
+    zstyle ':prezto:module:git:info:renamed' format ' %F{magenta}➙%f'
+    zstyle ':prezto:module:git:info:stashed' format ' %B%F{cyan}S%f%b'
+    zstyle ':prezto:module:git:info:unmerged' format ' %B%F{yellow}═%f%b'
+    zstyle ':prezto:module:git:info:untracked' format ' %B%F{yellow}?%f%b'
+    zstyle ':prezto:module:git:info:keys' format \
+      'status' '[$(coalesce "%b" "%p" "%c")' \
+      'indicator' '%s%D%A%B%S%a%d%m%r%U%u]'
+
+    # Set python-info parameters.
+    zstyle ':prezto:module:python:info:virtualenv' format '(%F{yellow}%v%f) '
+
+    # Define prompts.
+    # It seems XQuartz/X11 xterm cannot handle special characters (with either Powerline font or not),
+    # So remove the format requesting special unicode glyph -- Louis 2015/0211
+    if [[ $TERM == "rxvt" ]]; then
+        PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]%(!. %B%F{1}#%f%b.)$prompt_newline%B%F{3}>>> %f%b'
+        RPROMPT='%(?:: %F{1}✘%f)${VIM:+" %B%F{2}V%f%b"}${INSIDE_EMACS:+" %B%F{6}E%f%b"}'
+    else
+        #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
+        PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}${git_info[indicator]}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
+        #RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"}${git_info[indicator]}'
+        RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)${VIM:+" %B%F{6}V%f%b"} %F{1}${prompt_elapsed_time}%f%F{none}%f'
+    fi
+    SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
+    #PROMPT='[%(!.%B%F{1}%n@%m%f%b.%F{214}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}}%(!. %B%F{1}#%f%b.)$prompt_newline${(e)python_info[virtualenv]}${editor_info[keymap]} '
+}
+
+prompt_nshiu_setup "$@"
+
+# Add this line to change file type for vim -- Louis 2019 1022
+# vim: ft=zsh
