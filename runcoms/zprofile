@@ -5,69 +5,245 @@
 #   Sorin Ionescu <sorin.ionescu@gmail.com>
 #
 
-#
-# Browser
-#
+# Clean up zprofile by following '.zprezto/runcoms/README.md'
+# 1. Source before zshrc
+# 2. Export initial path/parameters
+# -- Louis 2024/0316
 
+# ------------------------ Script
+# rationalize-path()
+# Later we'll need to trim down the paths that follow because the ones
+# given here are for all my accounts, some of which have unusual
+# paths in them.  rationalize-path will remove
+# nonexistent directories from an array.
+#
+# To be honest, I don't know what exactly it does, but it works -- Louis 2021/0526
+rationalize-path () {
+    # Note that this works only on arrays, not colon-delimited strings.
+    # Not that this is a problem now that there is typeset -T.
+    local element
+    local build
+    build=()
+    # Evil quoting to survive an eval and to make sure that
+    # this works even with variables containing IFS characters, if I'm
+    # crazy enough to setopt shwordsplit.
+    eval '
+    foreach element in "$'"$1"'[@]"
+    do
+        if [[ -d "$element" ]]
+        then
+            build=("$build[@]" "$element")
+        fi
+    done
+    '"$1"'=( "$build[@]" )
+    '
+}
+
+# ------------------------ Browser
 if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
   export BROWSER='open'
 fi
 
-#
-# Editors
-#
-
+# ------------------------ Editors
 if [[ -z "$EDITOR" ]]; then
-  export EDITOR='nano'
+  export EDITOR='nvim'
 fi
 if [[ -z "$VISUAL" ]]; then
-  export VISUAL='nano'
+  export VISUAL='nvim'
 fi
 if [[ -z "$PAGER" ]]; then
   export PAGER='less'
 fi
 
-#
-# Language
-#
-
+# ------------------------ Language
 if [[ -z "$LANG" ]]; then
-  export LANG='en_US.UTF-8'
+    export LANG='en_US.UTF-8'
 fi
 
-#
-# Paths
-#
+# ------------------------ Android
+export ANDROID_HOME=$HOME/Library/Android/sdk
+export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
 
-# Ensure path arrays do not contain duplicates.
-typeset -gU cdpath fpath mailpath path
+# ------------------------ Path
+# New brew configuration -- Louis 2021/1226
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-# Set the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
+# Run/setup macOS default path value first
+# Refer to https://golangbyexample.com/understand-etc-paths-pathsd-mac/
+# -- Louis 2023-06-05 13:32
+eval "$(/usr/libexec/path_helper -s)"
 
 # Set the list of directories that Zsh searches for programs.
 path=(
-  $HOME/{,s}bin(N)
-  /opt/{homebrew,local}/{,s}bin(N)
-  /usr/local/{,s}bin(N)
-  $path
+    $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
+    $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
+    $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
+    $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
+    $ANDROID_HOME/platform-tools
+    $HOMEBREW_PREFIX/opt/ruby/bin
+    $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
+    $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
+    $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
+    $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
+    $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
+    $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
+    /opt/{homebrew,local}/{,s}bin(N)
+    /usr/local/{,s}bin(N)
+    $path
 )
 
-#
-# Less
-#
+#manpath=(
+#    $HOMEBREW_PREFIX/opt/coreutils/libexec/gnuman   # Install brew-version coreutilis -- Louis 2015/0209
+#    $HOMEBREW_PREFIX/opt/gnu-getopt/share/man       # Install gnu getopt -- Louis 2020/1112
+#    $HOMEBREW_PREFIX/opt/grep/libexec/man           # Install brew-version grep -- Louis 2021/0119
+#    $HOMEBREW_PREFIX/share/man
+#    /usr/share/man
+#    /usr/local/share/man
+#    $manpath
+#)
 
+# Add private zsh function folder
+# (Triggered by git-sim)
+# -- Louis 2024/0312
+#fpath+=~/.zfunc
+fpath+=$ZDOTDIR/.zfunc
+
+# Ensure path arrays do not contain duplicates.
+#typeset -gU cdpath fpath mailpath path manpath
+typeset -gU cdpath fpath mailpath path
+
+# Remove directories not existing
+rationalize-path path
+#rationalize-path manpath
+rationalize-path fpath
+
+#export PATH
+#export MANPATH
+#export FPATH
+
+# ------------------------ Colors
+# Use 'vivid' to generate customized LS-COLORS and filetype
+# -- Louis 2023-06-09 16:36
+export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"
+
+# Tell 'eza' to use LS_COLORS via 'reset' command and specify exa specific extra coloring
+# Reference:
+# https://the.exa.website/docs/colour-themes
+# https://www.ditig.com/publications/256-colors-cheat-sheet (256 color)
+GREY_COLOR="38;5;248"
+GREY_COLOR_2="38;5;240"
+GREY_COLOR_3="38;5;243"
+export EXA_COLORS="uu=${GREY_COLOR_3}:\
+un=${GREY_COLOR_3}:\
+gu=${GREY_COLOR_3}:\
+gn=${GREY_COLOR_3}:\
+ur=33:\
+uw=31:\
+ue=32:\
+ux=32:\
+da=${GREY_COLOR_3}"
+
+# Configure grep color -- Louis 2021/0119
+export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+
+# ------------------------ Less
 # Set the default Less options.
-# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
-# Remove -X to enable it.
-if [[ -z "$LESS" ]]; then
-  export LESS='-g -i -M -R -S -w -X -z-4'
-fi
+# -- Louis 2022/0916
+export LESS='-F -i -M -R -W -X -z-4 -g -j4'
 
-# Set the Less input preprocessor.
-# Try both `lesspipe` and `lesspipe.sh` as either might exist on a system.
-if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
-  export LESSOPEN="| /usr/bin/env $commands[(i)lesspipe(|.sh)] %s 2>&-"
-fi
+# For lesspip preprocessor -- Louis 2021/1205
+export LESSOPEN="|/opt/homebrew/bin/lesspipe.sh %s" LESS_ADVANCED_PREPROCESSOR=1
+
+# ------------------------ Fzf
+# 'junegunn/fzf', command line fuzzy finder
+# Do do preview fisrt, need to think about it -- Louis 2021/0523
+FZF_COLORS="fg:#D8DEE9,\
+fg+:#D8DEE9,\
+bg+:#434C5E,\
+hl:#A3BE8C,\
+hl+:#A3BE8C,\
+pointer:#BF616A,\
+info:#4C566A,\
+spinner:#4C566A,\
+header:#4C566A,\
+prompt:#81A1C1,\
+marker:#EBCB8B"
+
+export FZF_DEFAULT_OPTS="--no-mouse\
+ --height 80%\
+ --reverse\
+ --color $FZF_COLORS\
+ --multi\
+ --border\
+ --info=inline"
+
+export FZF_CTRL_T_COMMAND="fd -t f -H -L"
+export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
+ --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+
+export FZF_ALT_C_COMMAND="fd -t d -H -L"
+export FZF_ALT_C_OPTS="--preview 'eza -aF\
+ --group-directories-first\
+ --color=always\
+ --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}'\
+ --bind 'ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+
+export FZF_CTRL_R_OPTS="--reverse"
+
+export FZF_TMUX_OPTS="-p -w 80% -h 80%"
+
+# ------------------------ Bat (better cat)
+# Configure "sharkdp/bat", cat analogue with syntax highlighting -- Louis 2021/0523
+# Use 'bat' to better colorize manpage -- Louis 2023-04-11 15:08
+export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
+export MANROFFOPT="-c"
+
+# ------------------------ Delta
+# Add for 'core.pager' setup in 'git/config' -- Louis 2024/0424
+export DELTA_FEATURES='nshiu_nordbase zebra-dark'
+
+# ------------------------ Ripgrep (better grep)
+export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
+
+# ------------------------ Others
+# Configure python virtualenvwrapper -- Louis 2017/0125
+# fix "virtualenvwrapper_run_hook:12: permission denied" issue -- Louis 2018/0704
+export VIRTUALENVWRAPPER_PYTHON=$(which python3)
+export WORKON_HOME=$HOME/.virtualenvs
+export PROJECT_HOME=$HOME/Development/PythonDev
+
+# Remove jenv setup since I might not really need multiple Java version
+# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
+#export PATH=/usr/local/opt/openjdk/bin:${PATH}
+#export JAVA_HOME=`/usr/libexec/java_home`
+
+# Configure zsh history behavior -- Louis 2021/0523
+export SAVEHIST=10000
+export HISTSIZE=10000
+export HISTFILE="${ZDOTDIR}/.zsh_history"
+export HISTCONTROL=ignorespace:ignoredups
+
+# Setup gem home/binary path -- Louis 2018/1220
+export GEM_HOME=~/.gem
+
+# Set turecolor terminal
+case $TERM in
+  iterm            |\
+  linux-truecolor  |\
+  screen-truecolor |\
+  tmux-truecolor   |\
+  xterm-truecolor  )    export COLORTERM=truecolor ;;
+  vte*)
+esac
+
+# pip zsh completion start
+function _pip_completion {
+  local words cword
+  read -Ac words
+  read -cn cword
+  reply=( $( COMP_WORDS="$words[*]" \
+    COMP_CWORD=$(( cword-1 )) \
+    PIP_AUTO_COMPLETE=1 $words[1] 2>/dev/null ))
+}
+compctl -K _pip_completion pip3
+# pip zsh completion end
