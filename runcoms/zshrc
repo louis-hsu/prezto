@@ -42,12 +42,8 @@ if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
     . ${ZDOTDIR:-$HOME}/.zsh_aliases
 fi
 
-# Create new line after each prompt -- Louis 2023/1108
-precmd() {print ""}
-
 # fzf integration -- Louis 2024/0505
 source <(fzf --zsh)
-#[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
 bindkey -r vicmd '\ec'
