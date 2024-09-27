@@ -1,7 +1,7 @@
 # ------------------------ Alias
 # Another better look 'ls' alternative: exa -- Louis 2021/0523
 # Change to 'eza' since exa is unmaintained -- Louis 2023/1109
-alias ls='eza -F --color=always --group-directories-first --ignore-glob="Icon?"'
+alias ls='eza -F --color=always --group-directories-first --no-quotes --ignore-glob="Icon?"'
 alias ll="_eza_ll"
 alias lt="_eza_lt"
 alias llt="_eza_llt"
@@ -9,7 +9,7 @@ alias llt="_eza_llt"
 alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
-alias tree='eza --tree'                       # Change to eza -- Louis 2022/0903
+alias tree='eza --tree --no-quotes'                       # Change to eza -- Louis 2022/0903
 alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Louis 2020/0424
 alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
 alias tag='/usr/local/bin/ctags'
@@ -221,6 +221,7 @@ function _eza_ll() {
     --color=always \
     --color-scale \
     --color-scale-mode=gradient \
+    --no-quotes \
     --ignore-glob="Icon?|.DS_Store" "$@" | \
     less -RFX
 }
@@ -238,6 +239,7 @@ function _eza_lt() {
   eza -aF \
     --group-directories-first \
     --color=always \
+    --no-quotes \
     --ignore-glob="Icon?|.DS_Store|.git" \
     -T \
     -L 3 "$@" | \
@@ -257,6 +259,7 @@ function _eza_llt() {
     --color=always \
     --color-scale=size \
     --color-scale-mode=gradient \
+    --no-quotes \
     --ignore-glob="Icon?|.DS_Store|.git" \
     -T \
     -L 3 "$@" | \
@@ -287,6 +290,7 @@ function _nvims() {
       --preview="eza -aF \
       --group-directories-first \
       --color=always \
+      --no-quotes \
       --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 ~/.config/{}")
 
   if [[ -z "${_selected}" ]]; then

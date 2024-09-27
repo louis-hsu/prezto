@@ -124,13 +124,12 @@ command_not_found_handler() {
 # Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
 # Ensure all autocompletions are set in $FPATH before running autoload
 # -- Louis 2023/1108
-#
-# Remove it for now 'cause it seems prezto handle it already
-# -- Louis 2024/0312
-#
-# It seems we still need it when adding new completetion in .config/zsh/.zfunc
-# (or other path)
-# -- Louis 2024/0318
+if type brew &>/dev/null
+then
+  FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
+
+fi
+
 autoload -Uz compinit
 compinit
 

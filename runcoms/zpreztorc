@@ -216,7 +216,7 @@ zstyle ':prezto:module:prompt' theme 'nshiu'
 #
 # Set syntax pattern styles.
  zstyle ':prezto:module:syntax-highlighting' pattern \
-   'rm*-rf*' 'fg=white,bold,bg=red'
+   'rm*-*f*' 'fg=white,bold,bg=red'
 
 #
 # Terminal
