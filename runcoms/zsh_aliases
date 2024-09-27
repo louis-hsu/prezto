@@ -1,0 +1,448 @@
+# ------------------------ Alias
+# Another better look 'ls' alternative: exa -- Louis 2021/0523
+# Change to 'eza' since exa is unmaintained -- Louis 2023/1109
+alias ls='eza -F --color=always --group-directories-first --no-quotes --ignore-glob="Icon?"'
+alias ll="_eza_ll"
+alias lt="_eza_lt"
+alias llt="_eza_llt"
+
+alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
+alias ssh='ssh -Y'
+alias top='top -ocpu -R -F -s 2 -n30'
+alias tree='eza --tree --no-quotes'                       # Change to eza -- Louis 2022/0903
+alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Louis 2020/0424
+alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
+alias tag='/usr/local/bin/ctags'
+alias mux='tmuxinator'
+alias fd="fd --hidden --follow"
+alias jq='jq -C'
+alias diff='diff -ur --color=always'
+
+# Taskwarror alias
+alias task='clear; task'
+alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
+alias projectinfo='~/.bin/projinfo'
+
+alias updatedb='sudo /usr/libexec/locate.updatedb'
+alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+
+alias brewdep='/opt/homebrew/bin/brew deps --tree --installed'
+
+alias vim='nvim'                              # Move to nvim from vim -- Louis 2022/0207
+alias nvs='_nvims'
+
+alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility -- Louis 2022/0928
+
+# Add clear command before onefetch/neofetch -- Louis 2022/1004
+alias onefetch="clear; onefetch"
+alias neofetch="clear; neofetch"
+
+# For fun, to have typerwrite sound -- Louis 2023/1214
+alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"
+
+alias tf="tmuxfloat"                          # Script to create tmux popup display -- Louis 2024/0311
+
+# ------------------------ Bind keys
+
+
+# ------------------------ Functions
+# Useful adb commands
+function getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
+  if [ -z "${1}" ]; then
+    set "1"
+  fi
+  cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
+    command grep -oE \"[0-9a-f]{8} \" | \
+    while read hex; \
+    do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
+    done; echo"
+  IMEI=$(adb shell "${cstring}")
+  echo -e "IMEI_${1}: ${IMEI}"
+}
+
+# Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
+source "${HOME}"/.bin/extract.plugin.zsh
+source "${HOME}"/.bin/universalarchive.plugin.zsh
+
+# Add smartresize() function to resize image file(s) by utilizing ImageMagick
+# Reference: https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
+# -- Louis 2015/0629
+function smartresize() {
+  if [ "$#" -ne 3 ]; then
+    echo -e "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
+  else
+    mogrify -path "${3}" \
+    -filter Triangle \
+    -define filter:support=2 \
+    -thumbnail "${2}" \
+    -unsharp 0.25x0.08+8.3+0.045 \
+    -dither None \
+    -posterize 136 \
+    -quality 82 \
+    -define jpeg:fancy-upsampling=off \
+    -define png:compression-level=9 \
+    -define png:compression-strategy=1 \
+    -define png:exclude-chunk=all \
+    -interlace none \
+    -colorspace sRGB "${1}"
+    #-define png:compression-filter=5 \
+  fi
+}
+
+# Remove 'diff ()' 'cuz autocompletion 'diff <TAB>' doesn't work
+# Change to 'delta' directly or 'diff | delta'
+# -- Louis 2024/0501
+function delta () {
+  local _COLS=$(tput col)
+
+  if [ "${_COLS}" -ge 160 ]; then
+    command delta --side-by-side --width "${_COLS}" "$@"
+  else
+    command delta "$@"
+  fi
+}
+
+compdef _delta delta
+
+# Replace default 'brew' command to add extra action for 'install/uninstall/search':
+# 1. If 'brew install/uninstall' successfully then:
+#    - Dump new Brewfile with current installations
+#    - diff new and original Brewfile as double check
+#    - If different, replace old Brewfile with the new one
+# 2. If 'brew search' then:
+#    - If followed by other parameters, execute directly
+#    - Otherwise
+#      - curl to retrieve all available formulas from 'homebrew' server
+#      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
+#      - 'brew info' if a formula is selected
+#
+function brew () {
+  local _origfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+  local _newfile="/tmp/Brewfile"
+  local _cmfile="/tmp/_commitMessage"
+
+  [ -f "${_newfile}" ] && rm -rf "${_newfile}"
+  [ -f "${_cmfile}" ] && rm -rf "${_cmfile}"
+
+  if [[ "$@" =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
+    command brew "$@"
+
+    if [[ $? != 0 ]]; then return 1; fi
+    command brew bundle dump --force --file="${_newfile}"
+
+    if [ ! -f "${_newfile}" ]; then
+      echo -e "Something wrong about Brewfile generation, no Brewfile update/check-in"
+      return 1
+    fi
+
+    if [[ $(command diff -q "${_origfile}" "${_newfile}") != "" ]]; then    # Something change
+      echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.config/homebrew/Brewfile\033[0m"
+      mv -f "${_newfile}" "${_origfile}"
+      # Auto check-in to git to save hassels
+      # Create commit message to file for new line preservation
+      echo -e "<feat> Brew package(s) update\n" >! "${_cmfile}"
+      echo -e "Auto-commit for ${1}ing following formula(s):" >>! "${_cmfile}"
+
+      for _t in "${@:2}"; do
+
+        if [[ ! "${_t}" =~ "--" ]]; then echo -e "${_t}" >>! "${_cmfile}"; fi
+
+      done
+
+      local _pwd="${PWD}"
+      cd "${XDG_CONFIG_HOME}/homebrew"
+      # Commit out temporarily for z* files clean up
+      # -- Louis 2024/0918
+      cat "${_cmfile}"
+      #git commit --file "${_cmfile}" Brewfile
+      rm -rf "${_cmfile}"
+      cd "${_pwd}"
+    else
+      rm -rf "${_newfile}"
+    fi
+
+  elif [[ "$*" == "search" ]]; then         # Only intercept 'search' without parameters
+    local _COLS=$(tput col);
+
+    if [ "${_COLS}" -ge 160 ]; then
+      # Popup tmux window
+      local _fp="--tmux=center,50%,80%"
+    else
+      # No popup window
+      local _fp="--wrap"
+    fi
+
+    local _formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
+      \jq -r '.[].name' | \
+      fzf "${_fp}" \
+      --cycle \
+      --no-multi \
+      --prompt="🍺 brew search 󰄾 " \
+      --preview="command brew info {}" \
+      --preview-window=wrap)
+
+    if [[ "${_formula}" ]]; then command brew info "${_formula}"; fi
+
+  else
+    command brew "$@"
+  fi
+}
+
+compdef _brew brew
+
+# Replace default 'rg' command for pager 'delta' support
+# 1. Print out search result as JSON
+# 2. '--grep-*-style' of 'delta' to customize output theme
+# -- Louis 2024/0324
+#
+# TODO:
+# 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
+# 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
+function rg () {
+  command rg --json "$*" | delta \
+    --tabs=1 \
+    --default-language sh \
+    --grep-file-style "magenta ul" \
+    --grep-line-number-style "grey" \
+    --grep-match-word-style "#000000 italic #ebbb5c"
+}
+
+compdef _rg rg
+
+# Remove 'Icon?' and '.DS_Store' from result
+# -- Louis 2023/0109
+function _eza_ll() {
+  eza -laF \
+    --group \
+    --git \
+    --header \
+    --group-directories-first \
+    --time-style long-iso \
+    --color=always \
+    --color-scale \
+    --color-scale-mode=gradient \
+    --no-quotes \
+    --ignore-glob="Icon?|.DS_Store" "$@" | \
+    less -RFX
+}
+
+compdef _eza _eza_ll
+
+# Simple tree view ignoring 'Icon?', '.DS_Store' and .git directory from
+# result, but keep other .git* files
+# -- Louis 2023/0109
+#
+# TODO
+# 'eza -T' doesn't traverse/trace down symbolic link.
+# -- Louis 2023-05-17 16:31
+function _eza_lt() {
+  eza -aF \
+    --group-directories-first \
+    --color=always \
+    --no-quotes \
+    --ignore-glob="Icon?|.DS_Store|.git" \
+    -T \
+    -L 3 "$@" | \
+    less -RFX
+}
+
+# Long tree view ignoring 'Icon?', '.DS_Store' and .git directory from
+# result, but keep other .git* files
+# -- Louis 2023/0223
+function _eza_llt() {
+  eza -laF \
+    --group \
+    --git \
+    --header \
+    --group-directories-first \
+    --time-style long-iso \
+    --color=always \
+    --color-scale=size \
+    --color-scale-mode=gradient \
+    --no-quotes \
+    --ignore-glob="Icon?|.DS_Store|.git" \
+    -T \
+    -L 3 "$@" | \
+    less -RFX
+}
+
+# Function to switch different neovim configurations
+# Reference:
+# https://gist.github.com/elijahmanor/b279553c0132bfad7eae23e34ceb593b
+# https://michaeluloth.com/neovim-switch-configs/
+# -- Louis 2023/1213
+function _nvims() {
+  local _items=$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})
+  local _COLS=$(tput col)
+
+  if [ "${_COLS}" -ge 160 ]; then
+    #popup tmux window
+    local _fp="--tmux=center,50%,80%"
+  else
+    #no popup window
+    local _fp="--wrap"
+  fi
+
+  local _selected=$(printf "%s\n" "${_items[@]}" | \
+    fzf "${_fp}" \
+      --cycle \
+      --prompt="  Neovim Config 󰄾 " \
+      --preview="eza -aF \
+      --group-directories-first \
+      --color=always \
+      --no-quotes \
+      --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 ~/.config/{}")
+
+  if [[ -z "${_selected}" ]]; then
+    return 0
+  elif [[ "${_selected}" == "nvim" ]]; then
+    _selected=""
+  fi
+  NVIM_APPNAME="${_selected}" nvim "$@"
+}
+
+# Create aliases for different nvim distros dynamically
+# -- Louis 2023/1213
+function _create_nvimalias() {
+  local _items=("${(@f)$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})}")
+
+  for _na in ${_items}; do
+    if [[ "${_na}" != "nvim" ]]; then
+      alias "${_na}"="NVIM_APPNAME=\"${_na}\" nvim"
+    fi
+  done
+}
+_create_nvimalias
+
+# Function to enable 'yazi'
+# (https://yazi-rs.github.io/docs/quick-start)
+# -- Louis 2024/0531
+function yy() {
+  local _tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
+  yazi "$@" --cwd-file="${_tmp}"
+  if _cwd="$(cat -- "${_tmp}")" && [ -n "${_cwd}" ] && [ "${_cwd}" != "${PWD}" ]; then
+    cd -- "${_cwd}"
+  fi
+  rm -f -- "${_tmp}"
+}
+
+# ---------------------- Obsolete
+# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
+# Comment out cuz not that useful -- Louis 2021/1130
+# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
+
+# 'ag' is uninstalled and replaced by 'rg' -- Louis 2024/0329
+#alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
+
+# Replace vim with this function to force vim opens 'real' files instead of symbolic link
+# -- Louis 2018/0731
+# Make function more generic to different OS platform -- Louis 2018/0813
+# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
+#VIM_PATH=`which vim`
+#
+# Select file and open with nvim directly
+# Comment 'fzf' related key-bindings, which are handled in '.zshenrc' by
+# altering default key-binding
+# Reference: https://github.com/junegunn/fzf/issues/546
+# -- Louis 2024/0329
+#bindkey -s '^v' 'nvim_with_fzf\n'
+#bindkey -s '^f' 'cd_with_fzf\n'
+#bindkey -s '^o' 'open_with_fzf\n'
+
+
+#function vim(){
+#    args=()
+#    for i in $@; do
+#        if [[ -h $1 ]]; then
+#            args+=`readlink $i`
+#        else
+#            args+=$i
+#        fi
+#    done
+#    /usr/local/bin/vim -p "${args[@]}"
+#    $VIM_PATH -p "${args[@]}"
+#}
+#
+# Show project info from Taskwarrior -- Louis 2021/1126
+# Remove the aliases, which is covered by script in .bin -- Louis 2022/1024
+#task_project_info() {
+#    re="\+."
+#    if [[ $# -eq 0 ]]; then
+#      task project:OnePage priority != L
+#    else
+#      if [[ $1 =~ $re ]]; then
+#        str="$1"
+#      else
+#        str="+$1"
+#      fi
+#      str=`echo $str | tr '[a-z]' '[A-Z]'`
+##   Fix issue with extra leading white spaces -- Louis 2022/0705
+#      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
+#    fi
+#}
+#
+#extract() {
+#  if [ -f $1 ]; then
+#    dName="$1_dir"
+#    if [ ! -d "$dName" ]; then
+#      echo "Create directory $dName"
+#      mkdir -p $dName
+#    fi
+#
+#    mv $1 ./$dName
+#    cd ./$dName
+#
+#    case $1 in
+#      *.tar.bz2)  tar xjf $1      ;;
+#      *.tar.gz)   tar xzf $1      ;;
+#      *.bz2)      bunzip2 $1      ;;
+#      *.rar)      unrar e $1      ;;
+#      *.gz)       gunzip $1       ;;
+#      *.tar)      tar xf $1       ;;
+#      *.tbz2)     tar xjf $1      ;;
+#      *.tgz)      tar xzf $1      ;;
+#      *.zip)      unzip $1        ;;
+#      *.Z)        uncompress $1   ;;
+#      *.7z)       7z x $1         ;;
+#      *)          echo "'$1' cannot be extracted via extract()"
+#                  mv $1 ../
+#                  cd ..
+#                  rm -rf ./$dName
+#                  ;;
+#      esac
+#  else
+#    echo "'$1' is not a valid file"
+#  fi
+#}
+#
+# Comment out 'fzf' related functions since default key-bindings are
+# altered as expected
+# -- Louis 2024/0329
+# Open file selected from fzf -- Louis 2021/1125
+#open_with_fzf() {
+#  fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
+#  fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
+#}
+
+# cd to directory selected from fzf -- Louis 2021/1125
+#cd_with_fzf() {
+#  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="eza -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+#}
+
+# nvim the file selected from fzf -- Louis 2021/1125
+#nvim_with_fzf() {
+#  nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
+#  [[ ! -z "$nvim_file" ]] && nvim "$nvim_file"
+#}
+#
+#function diff () {
+#  local COLS=$(tput col)
+#
+#  args=()
+#  for i in $@; do
+#    args+=$i
+#  done
+#
+#  # Define side by side or not
+#  /opt/homebrew/bin/diff -ur "${args[@]}" | ([ "$COLS" -ge 110 ] && delta --side-by-side -w $COLS || delta)
+#}

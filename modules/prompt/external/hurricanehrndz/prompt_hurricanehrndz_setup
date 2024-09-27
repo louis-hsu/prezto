@@ -1,0 +1,201 @@
+#
+# A simple theme that displays relevant, contextual information.
+#
+# Authors:
+#   Carlos Hernandez <carlos@techbyte.ca>
+#   based on Sorin Ionescu theme
+#
+
+#
+# 16 Terminal Colors
+# -- ---------------
+#  0 black
+#  1 red
+#  2 green
+#  3 yellow
+#  4 blue
+#  5 magenta
+#  6 cyan
+#  7 white
+#  8 bright black
+#  9 bright red
+# 10 bright green
+# 11 bright yellow
+# 12 bright blue
+# 13 bright magenta
+# 14 bright cyan
+# 15 bright white
+#
+
+# Load dependencies.
+pmodload 'helper'
+newline=$'\n'
+
+function prompt_hurricanehrndz_pwd {
+  local pwd="${PWD/#$HOME/~}"
+
+  if [[ "$pwd" == (#m)[/~] ]]; then
+    _prompt_hurricanehrndz_pwd="$MATCH"
+    unset MATCH
+  else
+    _prompt_hurricanehrndz_pwd="${${${${(@j:/:M)${(@s:/:)pwd}##.#?}:h}%/}//\%/%%}/${${pwd:t}//\%/%%}"
+  fi
+}
+
+function prompt_hurricanehrndz_git_info {
+  if (( _prompt_hurricanehrndz_precmd_async_pid > 0 )); then
+    # Append Git status.
+    if [[ -s "$_prompt_hurricanehrndz_precmd_async_data" ]]; then
+      alias typeset='typeset -g'
+      source "$_prompt_hurricanehrndz_precmd_async_data"
+      # re-render preprompt
+      preprompt_suffix='${git_info:+"%F{7} on %f${(e)git_info[status]}"}${git_info[indicator]:+"%F{4} [${git_info[indicator]}%f%F{4}]%f"}'
+      preprompt_hurricanehrndz_render ${preprompt_suffix}
+      unalias typeset
+    fi
+
+    # Reset PID.
+    _prompt_hurricanehrndz_precmd_async_pid=0
+
+    # Redisplay prompt.
+    zle && zle reset-prompt
+  fi
+}
+
+function prompt_hurricanehrndz_precmd_async {
+  # Get Git repository information.
+  if (( $+functions[git-info] )); then
+    git-info
+    typeset -p git_info >! "$_prompt_hurricanehrndz_precmd_async_data"
+  fi
+
+  # Signal completion to parent process.
+  kill -WINCH $$
+}
+
+if [ -n "$TMUX" ]; then
+  function refresh {
+    sshauth=$(tmux show-environment | grep "^SSH_AUTH_SOCK")
+    if [ $sshauth ]; then
+        export $sshauth
+    fi
+    display=$(tmux show-environment | grep "^DISPLAY")
+    if [ $display ]; then
+        export $display
+    fi
+  }
+else
+  function refresh { }
+fi
+
+function preexec {
+    # Refresh environment if inside tmux
+    refresh
+}
+
+function prompt_hurricanehrndz_precmd {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+
+  # Format PWD.
+  prompt_hurricanehrndz_pwd
+  prompt_hurricanehrndz_set_title ${_prompt_hurricanehrndz_pwd}
+
+  # python info
+  if (( $+functions[python-info] )); then
+    python-info
+  fi
+
+  # Kill the old process of slow commands if it is still running.
+  if (( _prompt_hurricanehrndz_precmd_async_pid > 0 )); then
+    kill -KILL "$_prompt_hurricanehrndz_precmd_async_pid" &>/dev/null
+  fi
+
+  # render preprompt
+  preprompt_hurricanehrndz_render "precmd"
+
+  # Compute slow commands in the background.
+  trap prompt_hurricanehrndz_git_info WINCH
+  prompt_hurricanehrndz_precmd_async &!
+  _prompt_hurricanehrndz_precmd_async_pid=$!
+}
+
+function preprompt_hurricanehrndz_render {
+  clr_prev_preprompt='\e[1A\e[2K\e[2D'
+  preprompt='$python_info[virtualenv]%B%F{9}%n%f%b%F{7} at %f%F{3}%m%f%F{7} in %f%F{2}${_prompt_hurricanehrndz_pwd}%f'
+
+  if [[ "$1" == "precmd" ]]; then
+    print -P "${newline}${preprompt}"
+  else
+    # modify previous preprompt
+    print -Pn "${clr_prev_preprompt}${preprompt}${1}${newline}"
+  fi
+}
+
+prompt_hurricanehrndz_set_title() {
+  # tell the terminal we are setting the title
+  print -n '\e]0;'
+  # show hostname if connected through ssh
+  [[ -n $SSH_CONNECTION ]] && print -Pn '(%m) '
+  print -rn $1
+  # end set title
+  print -n '\a'
+}
+
+function prompt_hurricanehrndz_setup {
+  setopt LOCAL_OPTIONS
+  unsetopt XTRACE KSH_ARRAYS
+  prompt_opts=(cr percent subst)
+  _prompt_hurricanehrndz_precmd_async_pid=0
+  _prompt_hurricanehrndz_precmd_async_data="${TMPPREFIX}-prompt_hurricanehrndz_data"
+
+  # Load required functions.
+  autoload -Uz add-zsh-hook
+
+  # Add hook for calling git-info before each command.
+  add-zsh-hook precmd prompt_hurricanehrndz_precmd
+
+  # Set editor-info parameters.
+  zstyle ':prezto:module:editor:info:completing' format '%B%F{7}...%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary' format '%B%(?;%{%F{7}%};%{%F{1}%})»%f%b'
+  zstyle ':prezto:module:editor:info:keymap:primary:overwrite' format '%F{3}♺%f'
+  zstyle ':prezto:module:editor:info:keymap:alternate' format '%B%F{7}«%f%b'
+
+  # Set git-info parameters.
+  zstyle ':prezto:module:git:info' verbose 'yes'
+  zstyle ':prezto:module:git:info:action' format '%F{7}:%f%%B%F{9}%s%f%%b'
+  zstyle ':prezto:module:git:info:added' format '%%B%F{2}✚%f%%b'
+  zstyle ':prezto:module:git:info:ahead' format '%%B%F{13}⬆%f%%b'
+  zstyle ':prezto:module:git:info:behind' format '%%B%F{13}⬇%f%%b'
+  zstyle ':prezto:module:git:info:branch' format '%%B%F{13}%b%f%%b'
+  zstyle ':prezto:module:git:info:commit' format '%%B%F{13}%.7c%f%%b'
+  zstyle ':prezto:module:git:info:deleted' format '%%B%F{1}✖%f%%b'
+  zstyle ':prezto:module:git:info:modified' format '%%B%F{4}✱%f%%b'
+  zstyle ':prezto:module:git:info:position' format '%%B%F{13}%p%f%%b'
+  zstyle ':prezto:module:git:info:renamed' format '%%B%F{5}➜%f%%b'
+  zstyle ':prezto:module:git:info:stashed' format '%%B%F{6}✭%f%%b'
+  zstyle ':prezto:module:git:info:unmerged' format '%%B%F{3}═%f%%b'
+  zstyle ':prezto:module:git:info:untracked' format '%%B%F{7}◼%f%%b'
+  zstyle ':prezto:module:git:info:keys' format \
+    'status' '$(coalesce "%b" "%p" "%c")%s' \
+    'indicator' '%A%B%S%a%d%m%r%U%u'
+
+  # Set python-info parameters.
+  zstyle ':prezto:module:python:info:virtualenv' format '(%v) '
+
+  # Define prompts.
+  PROMPT='${editor_info[keymap]} '
+  RPROMPT='${editor_info[overwrite]}%(?:: %F{1}⏎%f)${VIM:+" %B%F{6}V%f%b"}'
+  SPROMPT='zsh: correct %F{1}%R%f to %F{2}%r%f [nyae]? '
+}
+
+function prompt_hurricanehrndz_preview {
+  local +h PROMPT=''
+  local +h RPROMPT=''
+  local +h SPROMPT=''
+
+  editor-info 2>/dev/null
+  prompt_preview_theme 'hurricanehrndz'
+}
+
+prompt_hurricanehrndz_setup "$@"
