@@ -2,3 +2,7 @@
 *.zwc.old
 modules/*/cache.zsh
 contrib
+*.swp
+.DS_Store
+.Icon*
+

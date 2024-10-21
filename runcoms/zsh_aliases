@@ -9,7 +9,7 @@ alias llt="_eza_llt"
 alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
 alias ssh='ssh -Y'
 alias top='top -ocpu -R -F -s 2 -n30'
-alias tree='eza --tree --no-quotes'                       # Change to eza -- Louis 2022/0903
+alias tree='eza --tree --no-quotes'           # Change to eza -- Louis 2022/0903
 alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Louis 2020/0424
 alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
 alias tag='/usr/local/bin/ctags'
@@ -47,7 +47,8 @@ alias tf="tmuxfloat"                          # Script to create tmux popup disp
 
 # ------------------------ Functions
 # Useful adb commands
-function getIMEI() { # Get IMEI with parameter to identify IMEI 1 or 2
+# Get IMEI with parameter to identify IMEI 1 or 2
+function getIMEI() {
   if [ -z "${1}" ]; then
     set "1"
   fi
@@ -124,7 +125,7 @@ function brew () {
   [ -f "${_newfile}" ] && rm -rf "${_newfile}"
   [ -f "${_cmfile}" ] && rm -rf "${_cmfile}"
 
-  if [[ "$@" =~ ".*install.*" ]]; then      # Either 'install' or 'uninstall'
+  if [[ "$@" =~ ".*install.*" ]]; then        # Either 'install' or 'uninstall'
     command brew "$@"
 
     if [[ $? != 0 ]]; then return 1; fi
@@ -161,7 +162,7 @@ function brew () {
       rm -rf "${_newfile}"
     fi
 
-  elif [[ "$*" == "search" ]]; then         # Only intercept 'search' without parameters
+  elif [[ "$*" == "search" ]]; then           # Only intercept 'search' without parameters
     local _COLS=$(tput col);
 
     if [ "${_COLS}" -ge 160 ]; then
