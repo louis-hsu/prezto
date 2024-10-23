@@ -133,6 +133,10 @@ fi
 autoload -Uz compinit
 compinit
 
+# Solve 'fzf-tab' doesn't show dot-file/directory issue
+# https://github.com/Aloxaf/fzf-tab/issues/476
+_comp_options+=(globdots)
+
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
