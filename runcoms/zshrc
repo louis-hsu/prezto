@@ -81,7 +81,10 @@ bindkey -M vicmd '^v' open_with_vim_widget
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
 # Perl 5 library location -- Louis 2022/1011
-eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
+# Uninstall brew version 'perl' and comment out related setup since cannot
+# resolve lib location customization.
+# -- Louis 2024/1028
+#eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
 
 # Install and configure 'zoxide' to replace 'cd'
 # -- Louis 2024/0423
