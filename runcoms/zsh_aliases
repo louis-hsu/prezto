@@ -327,6 +327,13 @@ function yy() {
   rm -f -- "${_tmp}"
 }
 
+# Function to designate project root directory when createing a python virtual
+# environment
+# -- Louis 2024/1028
+function mkvirenvhere() {
+  mkvirtualenv -a "${PWD}" "$1"
+}
+
 # ---------------------- Obsolete
 # Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
 # Comment out cuz not that useful -- Louis 2021/1130

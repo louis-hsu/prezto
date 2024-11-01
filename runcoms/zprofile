@@ -6,33 +6,6 @@
 #
 
 # ------------------------ Script
-# rationalize-path()
-# Later we'll need to trim down the paths that follow because the ones
-# given here are for all my accounts, some of which have unusual
-# paths in them.  rationalize-path will remove
-# nonexistent directories from an array.
-#
-# To be honest, I don't know what exactly it does, but it works -- Louis 2021/0526
-rationalize-path () {
-    # Note that this works only on arrays, not colon-delimited strings.
-    # Not that this is a problem now that there is typeset -T.
-    local element
-    local build
-    build=()
-    # Evil quoting to survive an eval and to make sure that
-    # this works even with variables containing IFS characters, if I'm
-    # crazy enough to setopt shwordsplit.
-    eval '
-    foreach element in "$'"$1"'[@]"
-    do
-        if [[ -d "$element" ]]
-        then
-            build=("$build[@]" "$element")
-        fi
-    done
-    '"$1"'=( "$build[@]" )
-    '
-}
 
 # ------------------------ Browser
 if [[ -z "$BROWSER" && "$OSTYPE" == darwin* ]]; then
@@ -86,6 +59,7 @@ path=(
   $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
   $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
   /opt/{homebrew,local}/{,s}bin(N)
+  $HOME/.dotfiles/dot-local/bin                   #Created by `pipx` on 2024-11-01 07:30:06
   /usr/local/{,s}bin(N)
   $path
 )
@@ -181,6 +155,7 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
 export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/Development/PythonDev
+export VIRTUALENVWRAPPER_WORKON_CD=1
 
 # ------------------------ Others
 # Remove jenv setup since I might not really need multiple Java version
@@ -193,3 +168,32 @@ export GEM_HOME=~/.gem
 
 # Set turecolor terminal
 export COLORTERM=truecolor
+
+# ------------------------ Obsolete
+# rationalize-path()
+# Later we'll need to trim down the paths that follow because the ones
+# given here are for all my accounts, some of which have unusual
+# paths in them.  rationalize-path will remove
+# nonexistent directories from an array.
+#
+# To be honest, I don't know what exactly it does, but it works -- Louis 2021/0526
+#rationalize-path () {
+#    # Note that this works only on arrays, not colon-delimited strings.
+#    # Not that this is a problem now that there is typeset -T.
+#    local element
+#    local build
+#    build=()
+#    # Evil quoting to survive an eval and to make sure that
+#    # this works even with variables containing IFS characters, if I'm
+#    # crazy enough to setopt shwordsplit.
+#    eval '
+#    foreach element in "$'"$1"'[@]"
+#    do
+#        if [[ -d "$element" ]]
+#        then
+#            build=("$build[@]" "$element")
+#        fi
+#    done
+#    '"$1"'=( "$build[@]" )
+#    '
+#}
