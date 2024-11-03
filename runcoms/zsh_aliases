@@ -332,6 +332,9 @@ function yy() {
 # -- Louis 2024/1028
 function mkvirenvhere() {
   mkvirtualenv -a "${PWD}" "$1"
+
+  # Initiate 'poetry'
+  poetry init
 }
 
 # ---------------------- Obsolete

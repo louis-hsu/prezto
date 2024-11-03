@@ -133,6 +133,9 @@ then
 
 fi
 
+# Also add '.zfunc' in $fpath -- Louis 2024/1103
+fpath+=~/.config/zsh/.zfunc
+
 autoload -Uz compinit
 compinit
 
