@@ -14,6 +14,9 @@ fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
 source virtualenvwrapper.sh
+# Export $PYTHONPATH
+pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")
+export PYTHONPATH="${pythonPath}"
 
 # Move all "export" commands to 'zprofile'
 # But keep some comments in case needing to restore them in future -- Louis 2021/0526
@@ -145,6 +148,9 @@ compinit
 #_comp_options+=(globdots)
 setopt glob_dots
 zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
+
+# Hook 'direnv' to zsh -- Louis 2024/1103
+eval "$(direnv hook zsh)"
 
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it
