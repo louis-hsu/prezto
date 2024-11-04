@@ -247,6 +247,8 @@ function _eza_lt() {
     less -RFX
 }
 
+compdef _eza _eza_lt
+
 # Long tree view ignoring 'Icon?', '.DS_Store' and .git directory from
 # result, but keep other .git* files
 # -- Louis 2023/0223
@@ -266,6 +268,8 @@ function _eza_llt() {
     -L 3 "$@" | \
     less -RFX
 }
+
+compdef _eza _eza_llt
 
 # Function to switch different neovim configurations
 # Reference:

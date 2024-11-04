@@ -140,8 +140,11 @@ autoload -Uz compinit
 compinit
 
 # Solve 'fzf-tab' doesn't show dot-file/directory issue
+# and ignore specific files or folders
 # https://github.com/Aloxaf/fzf-tab/issues/476
-_comp_options+=(globdots)
+#_comp_options+=(globdots)
+setopt glob_dots
+zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
 
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it

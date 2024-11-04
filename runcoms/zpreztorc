@@ -278,16 +278,25 @@ zstyle ':fzf-tab:*' switch-group '<' '>'
 # custom fzf flags
 # NOTE: fzf-tab does not follow FZF_DEFAULT_OPTS
 zstyle ':fzf-tab:*' fzf-flags --color=$FZF_COLORS
+
 # preview directory's content with eza when completing cd
-zstyle ':fzf-tab:complete:cd:*' fzf-preview \
-  'eza -1aF \
-    --group-directories-first -T -L 2 \
-    --no-quotes \
-    --color=always \
-    --ignore-glob=".git|.DS_Store|Icon?" \
-    $realpath'
-zstyle ':fzf-tab:complete:*' fzf-bindings \
-  'tab:accept' \
+#zstyle ':fzf-tab:complete:cd:*' fzf-preview \
+#  'eza -1aF \
+#    --group-directories-first -T -L 2 \
+#    --follow-symlinks \
+#    --icons \
+#    --no-quotes \
+#    --color=always \
+#    --ignore-glob=".git|.DS_Store|Icon?" \
+#    $realpath'
+
+# Refer to https://github.com/Aloxaf/fzf-tab/wiki/Preview
+# -- Louis 2024/1104
+zstyle ':fzf-tab:complete:(cd|bat|eza|_eza_*|nvim):*' fzf-preview 'less ${(Q)realpath}'
+
+zstyle ':fzf-tab:*' fzf-bindings \
+  'tab:down' \
+  'enter:accept' \
   'ctrl-h:preview-page-down' \
   'ctrl-l:preview-page-up'
 zstyle ':fzf-tab:*' fzf-min-height 25
