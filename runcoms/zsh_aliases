@@ -333,10 +333,10 @@ function yy() {
 
 # https://github.com/direnv/direnv/wiki/Tmux
 # Avoid issues with 'direnv' environment loading
-function tmux() {
-  direnv exec / tmux
-}
-compdef _tmux tmux
+#function tmux() {
+#  direnv exec / tmux
+#}
+#compdef _tmux tmux
 
 
 # Function to designate project root directory when createing a python virtual
