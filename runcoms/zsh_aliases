@@ -14,9 +14,10 @@ alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Lou
 alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
 alias tag='/usr/local/bin/ctags'
 alias mux='tmuxinator'
-alias fd="fd --hidden --follow"
+alias fd="fdfind --hidden --follow"
 alias jq='jq -C'
 alias diff='diff -ur --color=always'
+alias bat='batcat'
 
 # Taskwarror alias
 alias task='clear; task'
@@ -46,21 +47,21 @@ alias tf="tmuxfloat"                          # Script to create tmux popup disp
 
 
 # ------------------------ Functions
-# Useful adb commands
-# Get IMEI with parameter to identify IMEI 1 or 2
-function getIMEI() {
-  if [ -z "${1}" ]; then
-    set "1"
-  fi
-  cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
-    command grep -oE \"[0-9a-f]{8} \" | \
-    while read hex; \
-    do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
-    done; echo"
-  IMEI=$(adb shell "${cstring}")
-  echo -e "IMEI_${1}: ${IMEI}"
-}
-
+# # Useful adb commands
+# # Get IMEI with parameter to identify IMEI 1 or 2
+# function getIMEI() {
+#   if [ -z "${1}" ]; then
+#     set "1"
+#   fi
+#   cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
+#     command grep -oE \"[0-9a-f]{8} \" | \
+#     while read hex; \
+#     do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
+#     done; echo"
+#   IMEI=$(adb shell "${cstring}")
+#   echo -e "IMEI_${1}: ${IMEI}"
+# }
+#
 # Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
 source "${HOME}"/.bin/extract.plugin.zsh
 source "${HOME}"/.bin/universalarchive.plugin.zsh
@@ -105,92 +106,92 @@ function delta () {
 
 compdef _delta delta
 
-# Replace default 'brew' command to add extra action for 'install/uninstall/search':
-# 1. If 'brew install/uninstall' successfully then:
-#    - Dump new Brewfile with current installations
-#    - diff new and original Brewfile as double check
-#    - If different, replace old Brewfile with the new one
-# 2. If 'brew search' then:
-#    - If followed by other parameters, execute directly
-#    - Otherwise
-#      - curl to retrieve all available formulas from 'homebrew' server
-#      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
-#      - 'brew info' if a formula is selected
+# # Replace default 'brew' command to add extra action for 'install/uninstall/search':
+# # 1. If 'brew install/uninstall' successfully then:
+# #    - Dump new Brewfile with current installations
+# #    - diff new and original Brewfile as double check
+# #    - If different, replace old Brewfile with the new one
+# # 2. If 'brew search' then:
+# #    - If followed by other parameters, execute directly
+# #    - Otherwise
+# #      - curl to retrieve all available formulas from 'homebrew' server
+# #      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
+# #      - 'brew info' if a formula is selected
+# #
+# function brew () {
+#   local _origfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
+#   local _newfile="/tmp/Brewfile"
+#   local _cmfile="/tmp/_commitMessage"
 #
-function brew () {
-  local _origfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
-  local _newfile="/tmp/Brewfile"
-  local _cmfile="/tmp/_commitMessage"
-
-  [ -f "${_newfile}" ] && rm -rf "${_newfile}"
-  [ -f "${_cmfile}" ] && rm -rf "${_cmfile}"
-
-  if [[ "$@" =~ ".*install.*" ]]; then        # Either 'install' or 'uninstall'
-    command brew "$@"
-
-    if [[ $? != 0 ]]; then return 1; fi
-    command brew bundle dump --force --file="${_newfile}"
-
-    if [ ! -f "${_newfile}" ]; then
-      echo -e "Something wrong about Brewfile generation, no Brewfile update/check-in"
-      return 1
-    fi
-
-    if [[ $(command diff -q "${_origfile}" "${_newfile}") != "" ]]; then    # Something change
-      echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.config/homebrew/Brewfile\033[0m"
-      mv -f "${_newfile}" "${_origfile}"
-      # Auto check-in to git to save hassels
-      # Create commit message to file for new line preservation
-      echo -e "<feat> Brew package(s) update\n" >! "${_cmfile}"
-      echo -e "Auto-commit for ${1}ing following formula(s):" >>! "${_cmfile}"
-
-      for _t in "${@:2}"; do
-
-        if [[ ! "${_t}" =~ "--" ]]; then echo -e "${_t}" >>! "${_cmfile}"; fi
-
-      done
-
-      local _pwd="${PWD}"
-      cd "${XDG_CONFIG_HOME}/homebrew"
-      # Commit out temporarily for z* files clean up
-      # -- Louis 2024/0918
-      cat "${_cmfile}"
-      #git commit --file "${_cmfile}" Brewfile
-      rm -rf "${_cmfile}"
-      cd "${_pwd}"
-    else
-      rm -rf "${_newfile}"
-    fi
-
-  elif [[ "$*" == "search" ]]; then           # Only intercept 'search' without parameters
-    local _COLS=$(tput col);
-
-    if [ "${_COLS}" -ge 160 ]; then
-      # Popup tmux window
-      local _fp="--tmux=center,50%,80%"
-    else
-      # No popup window
-      local _fp="--wrap"
-    fi
-
-    local _formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
-      \jq -r '.[].name' | \
-      fzf "${_fp}" \
-      --cycle \
-      --no-multi \
-      --prompt="🍺 brew search 󰄾 " \
-      --preview="command brew info {}" \
-      --preview-window=wrap)
-
-    if [[ "${_formula}" ]]; then command brew info "${_formula}"; fi
-
-  else
-    command brew "$@"
-  fi
-}
-
-compdef _brew brew
-
+#   [ -f "${_newfile}" ] && rm -rf "${_newfile}"
+#   [ -f "${_cmfile}" ] && rm -rf "${_cmfile}"
+#
+#   if [[ "$@" =~ ".*install.*" ]]; then        # Either 'install' or 'uninstall'
+#     command brew "$@"
+#
+#     if [[ $? != 0 ]]; then return 1; fi
+#     command brew bundle dump --force --file="${_newfile}"
+#
+#     if [ ! -f "${_newfile}" ]; then
+#       echo -e "Something wrong about Brewfile generation, no Brewfile update/check-in"
+#       return 1
+#     fi
+#
+#     if [[ $(command diff -q "${_origfile}" "${_newfile}") != "" ]]; then    # Something change
+#       echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.config/homebrew/Brewfile\033[0m"
+#       mv -f "${_newfile}" "${_origfile}"
+#       # Auto check-in to git to save hassels
+#       # Create commit message to file for new line preservation
+#       echo -e "<feat> Brew package(s) update\n" >! "${_cmfile}"
+#       echo -e "Auto-commit for ${1}ing following formula(s):" >>! "${_cmfile}"
+#
+#       for _t in "${@:2}"; do
+#
+#         if [[ ! "${_t}" =~ "--" ]]; then echo -e "${_t}" >>! "${_cmfile}"; fi
+#
+#       done
+#
+#       local _pwd="${PWD}"
+#       cd "${XDG_CONFIG_HOME}/homebrew"
+#       # Commit out temporarily for z* files clean up
+#       # -- Louis 2024/0918
+#       cat "${_cmfile}"
+#       #git commit --file "${_cmfile}" Brewfile
+#       rm -rf "${_cmfile}"
+#       cd "${_pwd}"
+#     else
+#       rm -rf "${_newfile}"
+#     fi
+#
+#   elif [[ "$*" == "search" ]]; then           # Only intercept 'search' without parameters
+#     local _COLS=$(tput col);
+#
+#     if [ "${_COLS}" -ge 160 ]; then
+#       # Popup tmux window
+#       local _fp="--tmux=center,50%,80%"
+#     else
+#       # No popup window
+#       local _fp="--wrap"
+#     fi
+#
+#     local _formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
+#       \jq -r '.[].name' | \
+#       fzf "${_fp}" \
+#       --cycle \
+#       --no-multi \
+#       --prompt="🍺 brew search 󰄾 " \
+#       --preview="command brew info {}" \
+#       --preview-window=wrap)
+#
+#     if [[ "${_formula}" ]]; then command brew info "${_formula}"; fi
+#
+#   else
+#     command brew "$@"
+#   fi
+# }
+#
+# compdef _brew brew
+#
 # Replace default 'rg' command for pager 'delta' support
 # 1. Print out search result as JSON
 # 2. '--grep-*-style' of 'delta' to customize output theme
@@ -271,54 +272,54 @@ function _eza_llt() {
 
 compdef _eza _eza_llt
 
-# Function to switch different neovim configurations
-# Reference:
-# https://gist.github.com/elijahmanor/b279553c0132bfad7eae23e34ceb593b
-# https://michaeluloth.com/neovim-switch-configs/
-# -- Louis 2023/1213
-function _nvims() {
-  local _items=$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})
-  local _COLS=$(tput col)
-
-  if [ "${_COLS}" -ge 160 ]; then
-    #popup tmux window
-    local _fp="--tmux=center,50%,80%"
-  else
-    #no popup window
-    local _fp="--wrap"
-  fi
-
-  local _selected=$(printf "%s\n" "${_items[@]}" | \
-    fzf "${_fp}" \
-      --cycle \
-      --prompt="  Neovim Config 󰄾 " \
-      --preview="eza -aF \
-      --group-directories-first \
-      --color=always \
-      --no-quotes \
-      --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 ~/.config/{}")
-
-  if [[ -z "${_selected}" ]]; then
-    return 0
-  elif [[ "${_selected}" == "nvim" ]]; then
-    _selected=""
-  fi
-  NVIM_APPNAME="${_selected}" nvim "$@"
-}
-
-# Create aliases for different nvim distros dynamically
-# -- Louis 2023/1213
-function _create_nvimalias() {
-  local _items=("${(@f)$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})}")
-
-  for _na in ${_items}; do
-    if [[ "${_na}" != "nvim" ]]; then
-      alias "${_na}"="NVIM_APPNAME=\"${_na}\" nvim"
-    fi
-  done
-}
-_create_nvimalias
-
+# # Function to switch different neovim configurations
+# # Reference:
+# # https://gist.github.com/elijahmanor/b279553c0132bfad7eae23e34ceb593b
+# # https://michaeluloth.com/neovim-switch-configs/
+# # -- Louis 2023/1213
+# function _nvims() {
+#   local _items=$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})
+#   local _COLS=$(tput col)
+#
+#   if [ "${_COLS}" -ge 160 ]; then
+#     #popup tmux window
+#     local _fp="--tmux=center,50%,80%"
+#   else
+#     #no popup window
+#     local _fp="--wrap"
+#   fi
+#
+#   local _selected=$(printf "%s\n" "${_items[@]}" | \
+#     fzf "${_fp}" \
+#       --cycle \
+#       --prompt="  Neovim Config 󰄾 " \
+#       --preview="eza -aF \
+#       --group-directories-first \
+#       --color=always \
+#       --no-quotes \
+#       --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 ~/.config/{}")
+#
+#   if [[ -z "${_selected}" ]]; then
+#     return 0
+#   elif [[ "${_selected}" == "nvim" ]]; then
+#     _selected=""
+#   fi
+#   NVIM_APPNAME="${_selected}" nvim "$@"
+# }
+#
+# # Create aliases for different nvim distros dynamically
+# # -- Louis 2023/1213
+# function _create_nvimalias() {
+#   local _items=("${(@f)$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})}")
+#
+#   for _na in ${_items}; do
+#     if [[ "${_na}" != "nvim" ]]; then
+#       alias "${_na}"="NVIM_APPNAME=\"${_na}\" nvim"
+#     fi
+#   done
+# }
+# _create_nvimalias
+#
 # Function to enable 'yazi'
 # (https://yazi-rs.github.io/docs/quick-start)
 # -- Louis 2024/0531

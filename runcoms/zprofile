@@ -29,12 +29,12 @@ if [[ -z "$LANG" ]]; then
 fi
 
 # ------------------------ Android
-export ANDROID_HOME=$HOME/Library/Android/sdk
-export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
-
+# export ANDROID_HOME=$HOME/Library/Android/sdk
+# export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
+#
 # ------------------------ Path
 # New brew configuration -- Louis 2021/1226
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # Ensure path arrays do not contain duplicates.
 typeset -gU cdpath fpath mailpath path
@@ -49,16 +49,16 @@ path=(
   $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
   $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
   $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
-  $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
-  $ANDROID_HOME/platform-tools
-  $HOMEBREW_PREFIX/opt/ruby/bin
-  $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
-  $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
-  $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
-  $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
-  $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
-  $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
-  /opt/{homebrew,local}/{,s}bin(N)
+  # $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
+  # $ANDROID_HOME/platform-tools
+  # $HOMEBREW_PREFIX/opt/ruby/bin
+  # $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
+  # $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
+  # $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
+  # $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
+  # $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
+  # $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
+  # /opt/{homebrew,local}/{,s}bin(N)
   $HOME/.dotfiles/dot-local/bin                   #Created by `pipx` on 2024-11-01 07:30:06
   /usr/local/{,s}bin(N)
   $path
@@ -141,8 +141,8 @@ export FZF_TMUX_OPTS="-p -w 85% -h 80%"
 
 # ------------------------ Bat (better cat)
 # Use 'bat' to better colorize manpage -- Louis 2023-04-11 15:08
-export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
-export MANROFFOPT="-c"
+# export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
+# export MANROFFOPT="-c"
 
 # ------------------------ Delta
 # Add for 'core.pager' setup in 'git/config' -- Louis 2024/0424

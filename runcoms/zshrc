@@ -13,7 +13,7 @@ if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
 fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
-source virtualenvwrapper.sh
+source /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 # Export $PYTHONPATH
 pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")
 export PYTHONPATH="${pythonPath}"
@@ -46,7 +46,8 @@ if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
 fi
 
 # fzf integration -- Louis 2024/0505
-source <(fzf --zsh)
+# source <(fzf --zsh)
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 # Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
 bindkey -r vicmd '\ec'
@@ -127,15 +128,15 @@ command_not_found_handler() {
 }
 
 # ------------------------ Must be run in the end
-# Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
-# Ensure all autocompletions are set in $FPATH before running autoload
-# -- Louis 2023/1108
-if type brew &>/dev/null
-then
-  FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
-
-fi
-
+# # Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
+# # Ensure all autocompletions are set in $FPATH before running autoload
+# # -- Louis 2023/1108
+# if type brew &>/dev/null
+# then
+#   FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
+#
+# fi
+#
 # Also add '.zfunc' in $fpath -- Louis 2024/1103
 fpath+=~/.config/zsh/.zfunc
 
@@ -149,9 +150,9 @@ compinit
 setopt glob_dots
 zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
 
-# Hook 'direnv' to zsh -- Louis 2024/1103
-eval "$(direnv hook zsh)"
-
+# # Hook 'direnv' to zsh -- Louis 2024/1103
+# eval "$(direnv hook zsh)"
+#
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
@@ -168,5 +169,3 @@ eval "$(direnv hook zsh)"
 #    export LSCOLORS=exfxcxdxbxegedabagacad
 #    ;;
 #esac
-
-
