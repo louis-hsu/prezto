@@ -58,6 +58,7 @@ path=(
   $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
   $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
   $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
+  $HOMEBREW_PREFIX/opt/ncurses/bin                # Install gnu version text-based UI library -- Louis 2024/1119
   /opt/{homebrew,local}/{,s}bin(N)
   $HOME/.dotfiles/dot-local/bin                   #Created by `pipx` on 2024-11-01 07:30:06
   /usr/local/{,s}bin(N)
