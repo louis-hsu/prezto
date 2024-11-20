@@ -17,7 +17,6 @@ alias mux='tmuxinator'
 alias fd="fdfind --hidden --follow"
 alias jq='jq -C'
 alias diff='diff -ur --color=always'
-alias bat='batcat'
 
 # Taskwarror alias
 alias task='clear; task'
@@ -95,7 +94,7 @@ function smartresize() {
 # Change to 'delta' directly or 'diff | delta'
 # -- Louis 2024/0501
 function delta () {
-  local _COLS=$(tput col)
+  local _COLS=$(tput cols)
 
   if [ "${_COLS}" -ge 160 ]; then
     command delta --side-by-side --width "${_COLS}" "$@"
@@ -164,7 +163,7 @@ compdef _delta delta
 #     fi
 #
 #   elif [[ "$*" == "search" ]]; then           # Only intercept 'search' without parameters
-#     local _COLS=$(tput col);
+#     local _COLS=$(tput cols);
 #
 #     if [ "${_COLS}" -ge 160 ]; then
 #       # Popup tmux window
@@ -201,7 +200,7 @@ compdef _delta delta
 # 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
 # 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
 function rg () {
-  command rg --json "$*" | delta \
+  command rg --json "$@" | delta \
     --tabs=1 \
     --default-language sh \
     --grep-file-style "magenta ul" \
@@ -279,7 +278,7 @@ compdef _eza _eza_llt
 # # -- Louis 2023/1213
 # function _nvims() {
 #   local _items=$(fd --max-depth=1 --no-ignore 'nvim*' ~/.config -x echo {/})
-#   local _COLS=$(tput col)
+#   local _COLS=$(tput cols)
 #
 #   if [ "${_COLS}" -ge 160 ]; then
 #     #popup tmux window
@@ -461,7 +460,7 @@ function mkvirenvhere() {
 #}
 #
 #function diff () {
-#  local COLS=$(tput col)
+#  local COLS=$(tput cols)
 #
 #  args=()
 #  for i in $@; do

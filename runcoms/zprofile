@@ -48,6 +48,7 @@ typeset -gU cdpath fpath mailpath path
 path=(
   $HOME/.{,s}bin(N)                               # My utility tools -- Louis 2022/1011
   $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
+  $HOME/.gem/bin                                	# Ruby app
   $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
   # $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
   # $ANDROID_HOME/platform-tools
@@ -124,11 +125,11 @@ export FZF_DEFAULT_OPTS="--no-mouse\
  --border\
  --info=inline"
 
-export FZF_CTRL_T_COMMAND="fd -t f -H -L"
+export FZF_CTRL_T_COMMAND="fdfind -t f -H -L"
 export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
  --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
 
-export FZF_ALT_C_COMMAND="fd -t d -H -L"
+export FZF_ALT_C_COMMAND="fdfind -t d -H -L"
 export FZF_ALT_C_OPTS="--preview 'eza -aF\
  --group-directories-first\
  --color=always\
@@ -154,7 +155,7 @@ export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
 # ------------------------ Virtualenv
 export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export WORKON_HOME=$HOME/.virtualenvs
-export PROJECT_HOME=$HOME/Development/PythonDev
+export PROJECT_HOME=$HOME/PythonDev
 export VIRTUALENVWRAPPER_WORKON_CD=1
 
 # ------------------------ Others

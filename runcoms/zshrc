@@ -46,8 +46,7 @@ if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
 fi
 
 # fzf integration -- Louis 2024/0505
-# source <(fzf --zsh)
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+source <(fzf --zsh)
 
 # Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
 bindkey -r vicmd '\ec'
@@ -92,7 +91,10 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
 # Install and configure 'zoxide' to replace 'cd'
 # -- Louis 2024/0423
-eval "$(zoxide init --cmd cd zsh)"
+# Ubuntu has issue with 'eval "$(zoxide init --cmd cd zsh)"'
+# Change to below workaround
+eval "$(zoxide init zsh)"
+alias cd='z'
 
 # ----------------------- Hack of command not found
 # Parse prefix 'tp' to enable tmux popup feature
