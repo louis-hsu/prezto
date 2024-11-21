@@ -29,7 +29,8 @@ alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status
 alias brewdep='/opt/homebrew/bin/brew deps --tree --installed'
 
 alias vim='nvim'                              # Move to nvim from vim -- Louis 2022/0207
-alias nvs='_nvims'
+# alias nvs='_nvims'
+alias bat='batcat'
 
 alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility -- Louis 2022/0928
 
