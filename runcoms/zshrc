@@ -77,8 +77,9 @@ function open_with_vim () {
   fi
 }
 zle -N open_with_vim_widget open_with_vim
-bindkey -M viins '^v' open_with_vim_widget
-bindkey -M vicmd '^v' open_with_vim_widget
+# Change to '^e' to fit Voyager layout -- Louis 2025/0210
+bindkey -M viins '^e' open_with_vim_widget
+bindkey -M vicmd '^e' open_with_vim_widget
 
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
