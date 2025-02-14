@@ -196,16 +196,33 @@ compdef _brew brew
 # 2. '--grep-*-style' of 'delta' to customize output theme
 # -- Louis 2024/0324
 #
+# In order to fix unexpected ANSI color escape code:
+# 1. Check if input is from a terminal to decide --default-language
+# 2. Add --no-gitconfig
+# -- Louis 2025/0214
+#
 # TODO:
 # 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
 # 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
 function rg () {
-  command rg --json "$@" | delta \
-    --tabs=1 \
-    --default-language sh \
-    --grep-file-style "magenta ul" \
-    --grep-line-number-style "grey" \
-    --grep-match-word-style "#000000 italic #ebbb5c"
+	if [[ -t 0 ]]; then
+		# Input from a terminal 
+    command rg --json "$@" | delta \
+	  	--no-gitconfig \
+      --tabs=1 \
+      --default-language sh \
+      --grep-file-style "magenta ul" \
+      --grep-line-number-style "grey" \
+      --grep-match-word-style "#000000 italic #ebbb5c"
+	else
+		# Input from pipe (|) 
+    command rg --json "$@" | delta \
+	  	--no-gitconfig \
+      --tabs=1 \
+      --grep-file-style "magenta ul" \
+      --grep-line-number-style "grey" \
+      --grep-match-word-style "#000000 italic #ebbb5c"
+	fi
 }
 
 compdef _rg rg
