@@ -105,17 +105,31 @@ da=${GREY_COLOR_3}"
 export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
 # ------------------------ Fzf
-FZF_COLORS="fg:#D8DEE9,\
-fg+:#D8DEE9,\
-bg+:#434C5E,\
-hl:#A3BE8C,\
-hl+:#A3BE8C,\
-pointer:#BF616A,\
-info:#4C566A,\
-spinner:#4C566A,\
-header:#4C566A,\
-prompt:#81A1C1,\
-marker:#EBCB8B"
+# FZF_COLORS="fg:#D8DEE9,\
+# fg+:#D8DEE9,\
+# bg+:#434C5E,\
+# hl:#A3BE8C,\
+# hl+:#A3BE8C,\
+# pointer:#BF616A,\
+# info:#4C566A,\
+# spinner:#4C566A,\
+# header:#4C566A,\
+# prompt:#81A1C1,\
+# marker:#EBCB8B"
+#
+# Catppuccin Mocha colortheme
+FZF_COLORS="fg:#cdd6f4,\
+fg+:#cdd6f4,\
+bg+:#313244,\
+hl:#f38ba8,\
+hl+:#f38ba8,\
+pointer:#f5e0dc,\
+info:#cba6f7,\
+spinner:#f5e0dc,\
+header:#f38ba8,\
+prompt:#cba6f7,\
+marker:#b4befe,\
+selected-bg:#45475a" 
 
 export FZF_DEFAULT_OPTS="--no-mouse\
  --height 80%\
