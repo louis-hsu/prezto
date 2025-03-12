@@ -26,8 +26,6 @@ alias projectinfo='~/.bin/projinfo'
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 
-alias brewdep='/opt/homebrew/bin/brew deps --tree --installed'
-
 alias vim='nvim'                              # Move to nvim from vim -- Louis 2022/0207
 alias nvs='_nvims'
 
@@ -152,10 +150,8 @@ function brew () {
 
       local _pwd="${PWD}"
       cd "${XDG_CONFIG_HOME}/homebrew"
-      # Commit out temporarily for z* files clean up
-      # -- Louis 2024/0918
-      cat "${_cmfile}"
-      #git commit --file "${_cmfile}" Brewfile
+      # cat "${_cmfile}"
+      git commit --file "${_cmfile}" Brewfile
       rm -rf "${_cmfile}"
       cd "${_pwd}"
     else
@@ -191,6 +187,23 @@ function brew () {
 
 compdef _brew brew
 
+# Find and list the formulas which depend on the giving package
+function brewdep () {
+    if [ -z "$1" ]; then
+        echo "Usage: brewdep <package>"
+        return 1
+    fi
+
+    package="$1"
+
+    # List all installed packages and filter those that depend on $package
+    brew list | while read -r formula; do
+        if brew deps --installed "$formula" | rg -wq "$package"; then
+            echo "$formula"
+        fi
+    done
+}
+
 # Replace default 'rg' command for pager 'delta' support
 # 1. Print out search result as JSON
 # 2. '--grep-*-style' of 'delta' to customize output theme
@@ -206,7 +219,7 @@ compdef _brew brew
 # 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
 function rg () {
 	if [[ -t 0 ]]; then
-		# Input from a terminal 
+		# Input from a terminal
     command rg --json "$@" | delta \
 	  	--no-gitconfig \
       --tabs=1 \
@@ -215,7 +228,7 @@ function rg () {
       --grep-line-number-style "grey" \
       --grep-match-word-style "#000000 italic #ebbb5c"
 	else
-		# Input from pipe (|) 
+		# Input from pipe (|)
     command rg --json "$@" | delta \
 	  	--no-gitconfig \
       --tabs=1 \
@@ -368,59 +381,6 @@ function mkvirenvhere() {
 }
 
 # ---------------------- Obsolete
-# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-# Comment out cuz not that useful -- Louis 2021/1130
-# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
-
-# 'ag' is uninstalled and replaced by 'rg' -- Louis 2024/0329
-#alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
-
-# Replace vim with this function to force vim opens 'real' files instead of symbolic link
-# -- Louis 2018/0731
-# Make function more generic to different OS platform -- Louis 2018/0813
-# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
-#VIM_PATH=`which vim`
-#
-# Select file and open with nvim directly
-# Comment 'fzf' related key-bindings, which are handled in '.zshenrc' by
-# altering default key-binding
-# Reference: https://github.com/junegunn/fzf/issues/546
-# -- Louis 2024/0329
-#bindkey -s '^v' 'nvim_with_fzf\n'
-#bindkey -s '^f' 'cd_with_fzf\n'
-#bindkey -s '^o' 'open_with_fzf\n'
-
-
-#function vim(){
-#    args=()
-#    for i in $@; do
-#        if [[ -h $1 ]]; then
-#            args+=`readlink $i`
-#        else
-#            args+=$i
-#        fi
-#    done
-#    /usr/local/bin/vim -p "${args[@]}"
-#    $VIM_PATH -p "${args[@]}"
-#}
-#
-# Show project info from Taskwarrior -- Louis 2021/1126
-# Remove the aliases, which is covered by script in .bin -- Louis 2022/1024
-#task_project_info() {
-#    re="\+."
-#    if [[ $# -eq 0 ]]; then
-#      task project:OnePage priority != L
-#    else
-#      if [[ $1 =~ $re ]]; then
-#        str="$1"
-#      else
-#        str="+$1"
-#      fi
-#      str=`echo $str | tr '[a-z]' '[A-Z]'`
-##   Fix issue with extra leading white spaces -- Louis 2022/0705
-#      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
-#    fi
-#}
 #
 #extract() {
 #  if [ -f $1 ]; then
@@ -456,20 +416,6 @@ function mkvirenvhere() {
 #  fi
 #}
 #
-# Comment out 'fzf' related functions since default key-bindings are
-# altered as expected
-# -- Louis 2024/0329
-# Open file selected from fzf -- Louis 2021/1125
-#open_with_fzf() {
-#  fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
-#  fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
-#}
-
-# cd to directory selected from fzf -- Louis 2021/1125
-#cd_with_fzf() {
-#  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="eza -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
-#}
-
 # nvim the file selected from fzf -- Louis 2021/1125
 #nvim_with_fzf() {
 #  nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
