@@ -135,7 +135,7 @@ function prompt_nshiu_setup {
     zstyle ':prezto:module:git:info:renamed' format ' %F{magenta}󰁕%f'
     zstyle ':prezto:module:git:info:stashed' format ' %B%F{cyan}$%f%b'
     zstyle ':prezto:module:git:info:unmerged' format ' %B%F{yellow}═%f%b'
-    zstyle ':prezto:module:git:info:untracked' format ' %B%F{yellow}？%f%b'
+    zstyle ':prezto:module:git:info:untracked' format ' %B%F{yellow}%f%b'
     zstyle ':prezto:module:git:info:keys' format \
       'status' '[$(coalesce "%b" "%p" "%c")' \
       'indicator' '%s%D%A%B%S%a%d%m%r%U%u]'
