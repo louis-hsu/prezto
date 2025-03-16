@@ -28,7 +28,7 @@ export PYTHONPATH="${pythonPath}"
 # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
 # with my own account unless run 'sudo', which is a bad idea
 # Install rbenv instead to create private Ruby environment to fix this issue
-#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
 
 # TODO
 #  1. If multiple Java environment is required
