@@ -1,44 +1,43 @@
 # ------------------------ Alias
-# Another better look 'ls' alternative: exa -- Louis 2021/0523
-# Change to 'eza' since exa is unmaintained -- Louis 2023/1109
+# File preview & search
 alias ls='eza -F --color=always --group-directories-first --no-quotes --ignore-glob="Icon?"'
 alias ll="_eza_ll"
 alias lt="_eza_lt"
 alias llt="_eza_llt"
-
-alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
-alias ssh='ssh -Y'
-alias top='top -ocpu -R -F -s 2 -n30'
-alias tree='eza --tree --no-quotes'           # Change to eza -- Louis 2022/0903
-alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Louis 2020/0424
-alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
-alias tag='/usr/local/bin/ctags'
-alias mux='tmuxinator'
+alias tree='eza --tree --no-quotes'
 alias fd="fd --hidden --follow"
+alias grep='grep --line-number -C 2 --color'  # Configure grep color
+
+# System
+alias top='top -ocpu -R -F -s 2 -n30'
+alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du
+alias dust='dust --depth 2'                   # New tool for file/directory size calculation
+alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility
+alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+alias updatedb='sudo /usr/libexec/locate.updatedb'
+
+# Dev setup
+alias mux='tmuxinator'
 alias jq='jq -C'
 alias diff='diff -ur --color=always'
+alias vim='nvim'                              # Move to nvim from vim
+alias nvs='_nvims'
 
-# Taskwarror alias
+# Networking
+alias ssh='ssh -Y'
+alias ports='lsof -i -P -n | command rg -C=0 LISTEN'
+alias myip='ipconfig getifaddr en0'
+
+# Gimmick
+alias onefetch="clear; onefetch"
+alias neofetch="clear; neofetch"
+alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"		#Typerwrite sound
+alias tf="tmuxfloat"                          # Create tmux popup display
+
+# Taskwarror related
 alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias projectinfo='~/.bin/projinfo'
-
-alias updatedb='sudo /usr/libexec/locate.updatedb'
-alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-
-alias vim='nvim'                              # Move to nvim from vim -- Louis 2022/0207
-alias nvs='_nvims'
-
-alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility -- Louis 2022/0928
-
-# Add clear command before onefetch/neofetch -- Louis 2022/1004
-alias onefetch="clear; onefetch"
-alias neofetch="clear; neofetch"
-
-# For fun, to have typerwrite sound -- Louis 2023/1214
-alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"
-
-alias tf="tmuxfloat"                          # Script to create tmux popup display -- Louis 2024/0311
 
 # ------------------------ Bind keys
 
@@ -382,6 +381,7 @@ function mkvirenvhere() {
 
 # ---------------------- Obsolete
 #
+#alias tag='/usr/local/bin/ctags'
 #extract() {
 #  if [ -f $1 ]; then
 #    dName="$1_dir"
