@@ -217,9 +217,26 @@ function brewdep () {
 # 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
 # 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
 function rg () {
+	# It seems '-C' conflicts with '--invert-match'
+	# Add condition check to add '-C' dynamically
+	# -- Louis 2025/0603
+  local has_invert_match=0
+  local args=()
+
+  for arg in "$@"; do
+    if [[ "$arg" == "--invert-match" ]]; then
+      has_invert_match=1
+    fi
+    args+=("$arg")
+  done
+
+  if [[ $has_invert_match -eq 0 ]]; then
+    args+=("-C1")
+  fi
+
 	if [[ -t 0 ]]; then
 		# Input from a terminal
-    command rg --json "$@" | delta \
+    command rg --json "${args[@]}" | delta \
 	  	--no-gitconfig \
       --tabs=1 \
       --default-language sh \
@@ -228,7 +245,7 @@ function rg () {
       --grep-match-word-style "#000000 italic #ebbb5c"
 	else
 		# Input from pipe (|)
-    command rg --json "$@" | delta \
+    command rg --json "${args[@]}" | delta \
 	  	--no-gitconfig \
       --tabs=1 \
       --grep-file-style "magenta ul" \
