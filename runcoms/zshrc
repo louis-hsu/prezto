@@ -1,8 +1,5 @@
-#
 # Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
 # -- Louis 2018/0603
-# Separate 2 versions for macOS(darwin) and Ubuntu(linux) -- Louis 2021/0529
-# Use git branch to manage .z* files for different platform -- Louis 2022/0203
 
 # Set default zsh options (setopt) -- Louis 2018/1224
 setopt cdablevars
@@ -18,27 +15,6 @@ source virtualenvwrapper.sh
 pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")
 export PYTHONPATH="${pythonPath}"
 
-# Move all "export" commands to 'zprofile'
-# But keep some comments in case needing to restore them in future -- Louis 2021/0526
-# TODO
-# 1. If Ruby/Gem rbenv is required and how to install/configure
-# 2. If jenv is required/configured for multiple Java version
-
-# Ruby/gem configuration -- Louis 2015/0203
-# Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
-# with my own account unless run 'sudo', which is a bad idea
-# Install rbenv instead to create private Ruby environment to fix this issue
-#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
-
-# TODO
-#  1. If multiple Java environment is required
-#  2. If yes, if jenv is the one for multi-java management
-# Install jenv for Java version control -- Louis 2016/0905
-# Remove jenv setup since I might not really need multiple Java version
-# export PATH="$HOME/.jenv/bin:$PATH"
-# export JENV_ROOT=/usr/local/opt/jenv
-# if which jenv > /dev/null; then eval "$(jenv init -)"; fi
-
 # ------------------------ Alias/Function
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
@@ -51,18 +27,14 @@ source <(fzf --zsh)
 # Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
 bindkey -r vicmd '\ec'
 bindkey -r viins '\ec'
-bindkey -r vicmd '^R'
-bindkey -r viins '^R'
 bindkey -r vicmd '^T'
 bindkey -r viins '^T'
 
 bindkey -v
 bindkey -M viins '^f' fzf-file-widget
-bindkey -M viins '^r' fzf-history-widget  #Original '^h' is occupied by moving to left pane
 bindkey -M viins '^t' fzf-cd-widget       #Original '^j' is occupied by moving to down pane
 
 bindkey -M vicmd '^f' fzf-file-widget
-bindkey -M vicmd '^r' fzf-history-widget  #Original '^h' is occupied by moving to left pane
 bindkey -M vicmd '^t' fzf-cd-widget       #Original '^j' is occupied by moving to down pane
 
 # Create 'ctrl-v' to open file for nvim -- Louis 2024/0529
@@ -84,48 +56,9 @@ bindkey -M vicmd '^e' open_with_vim_widget
 # Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 
-# Perl 5 library location -- Louis 2022/1011
-# Uninstall brew version 'perl' and comment out related setup since cannot
-# resolve lib location customization.
-# -- Louis 2024/1028
-#eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
-
 # Install and configure 'zoxide' to replace 'cd'
 # -- Louis 2024/0423
 eval "$(zoxide init --cmd cd zsh)"
-
-# ----------------------- Hack of command not found
-# Parse prefix 'tp' to enable tmux popup feature
-# https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
-# -- Louis 2022/0916
-#
-# 1. Change prefix from 'tp' to 'tf' to align 'tmuxfloat' initial
-# 2. Re-write 'tmuxfloat' to fix unexpected quitting issue
-# 3. However, need to think if keeping this hack or simpily using 'tf' or Ctrl+P
-#    to trigger floating display
-# -- Louis 2024/0312
-
-command_not_found_handler() {
-  # read the "missing command" entered
-  missingcmd="$1"
-  # remove it from the argument list
-  shift
-  # check if starts with "tf"
-  if [[ "${missingcmd:0:2}" == "tf" ]] ; then
-    # read part after "tf"
-    prefixedcmd="${missingcmd:2}"
-    # check if it's a real command
-    #echo "$(which ${prefixedcmd})"
-    if which "$prefixedcmd" &> /dev/null ; then
-      #tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$prefixedcmd" "$@"
-      tmuxfloat $prefixedcmd $@
-      return $?
-    fi
-  fi
-  # default command not found behavior
-  echo "zsh: command not found: $missingcmd" >&2
-  return 127
-}
 
 # ------------------------ Must be run in the end
 # Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
@@ -153,6 +86,28 @@ zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
 # Hook 'direnv' to zsh -- Louis 2024/1103
 eval "$(direnv hook zsh)"
 
+# ------------------------ TODO
+# Move all "export" commands to 'zprofile'
+# But keep some comments in case needing to restore them in future -- Louis 2021/0526
+# TODO
+# 1. If Ruby/Gem rbenv is required and how to install/configure
+# 2. If jenv is required/configured for multiple Java version
+
+# Ruby/gem configuration -- Louis 2015/0203
+# Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
+# with my own account unless run 'sudo', which is a bad idea
+# Install rbenv instead to create private Ruby environment to fix this issue
+#if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+
+# TODO
+#  1. If multiple Java environment is required
+#  2. If yes, if jenv is the one for multi-java management
+# Install jenv for Java version control -- Louis 2016/0905
+# Remove jenv setup since I might not really need multiple Java version
+# export PATH="$HOME/.jenv/bin:$PATH"
+# export JENV_ROOT=/usr/local/opt/jenv
+# if which jenv > /dev/null; then eval "$(jenv init -)"; fi
+
 # ------------------------ Obsolete
 # append to the history file, don't overwrite it
 #shopt -s histappend
@@ -170,4 +125,41 @@ eval "$(direnv hook zsh)"
 #    ;;
 #esac
 
+# Perl 5 library location -- Louis 2022/1011
+# Uninstall brew version 'perl' and comment out related setup since cannot
+# resolve lib location customization.
+# -- Louis 2024/1028
+#eval "$(perl -I$HOME/.perl5lib/lib/perl5 -Mlocal::lib=$HOME/.perl5lib)"
 
+# # ----------------------- Hack of command not found
+# # Parse prefix 'tp' to enable tmux popup feature
+# # https://unix.stackexchange.com/questions/697465/how-do-i-create-a-command-prefix-for-bash-with-an-alias
+# # -- Louis 2022/0916
+# #
+# # 1. Change prefix from 'tp' to 'tf' to align 'tmuxfloat' initial
+# # 2. Re-write 'tmuxfloat' to fix unexpected quitting issue
+# # 3. However, need to think if keeping this hack or simpily using 'tf' or Ctrl+P
+# #    to trigger floating display
+# # -- Louis 2024/0312
+#
+# command_not_found_handler() {
+#   # read the "missing command" entered
+#   missingcmd="$1"
+#   # remove it from the argument list
+#   shift
+#   # check if starts with "tf"
+#   if [[ "${missingcmd:0:2}" == "tf" ]] ; then
+#     # read part after "tf"
+#     prefixedcmd="${missingcmd:2}"
+#     # check if it's a real command
+#     #echo "$(which ${prefixedcmd})"
+#     if which "$prefixedcmd" &> /dev/null ; then
+#       #tmux popup -d "#{pane_current_path}" -h 80% -w 80% -e LESS='-i -M -R -W -X -z-4 -g -j4' -e BAT_PAGER='less -R' -E "$prefixedcmd" "$@"
+#       tmuxfloat $prefixedcmd $@
+#       return $?
+#     fi
+#   fi
+#   # default command not found behavior
+#   echo "zsh: command not found: $missingcmd" >&2
+#   return 127
+# }
