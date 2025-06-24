@@ -181,8 +181,10 @@ export VIRTUALENVWRAPPER_WORKON_CD=1
 # Setup gem home/binary path -- Louis 2018/1220
 export GEM_HOME=~/.gem
 
-# Set turecolor terminal
+# Set terminal parameter
 export COLORTERM=truecolor
+export TERMINFO_DIRS="$XDG_CONFIG_HOME/terminfo:/opt/homebrew/Cellar/ncurses/6.5/share/terminfo:/usr/share/terminfo"
+export TERM=screen-256color-italic
 
 # ------------------------ Obsolete
 # rationalize-path()
