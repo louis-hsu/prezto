@@ -39,6 +39,9 @@ alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias projectinfo='~/.bin/projinfo'
 
+# Others
+alias gdu='gdu-go'                            # Originally alias to git command by 'prezto'
+
 # ------------------------ Bind keys
 
 
