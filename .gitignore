@@ -1,7 +1,7 @@
 *.zwc
 *.zwc.old
 modules/*/cache.zsh
-contrib
+#contrib
 *.swp
 .DS_Store
 .Icon*
