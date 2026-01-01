@@ -39,28 +39,10 @@ alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias projectinfo='~/.bin/projinfo'
 
-# Others
-alias gdu='gdu-go'                            # Originally alias to git command by 'prezto'
-
 # ------------------------ Bind keys
-
+# (Moved to 'zshrc')
 
 # ------------------------ Functions
-# Useful adb commands
-# Get IMEI with parameter to identify IMEI 1 or 2
-function getIMEI() {
-  if [ -z "${1}" ]; then
-    set "1"
-  fi
-  cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
-    command grep -oE \"[0-9a-f]{8} \" | \
-    while read hex; \
-    do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
-    done; echo"
-  IMEI=$(adb shell "${cstring}")
-  echo -e "IMEI_${1}: ${IMEI}"
-}
-
 # Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
 source "${HOME}"/.bin/extract.plugin.zsh
 source "${HOME}"/.bin/universalarchive.plugin.zsh
@@ -102,109 +84,149 @@ function delta () {
     command delta "$@"
   fi
 }
-
+# For zsh completion
 compdef _delta delta
 
-# Replace default 'brew' command to add extra action for 'install/uninstall/search':
-# 1. If 'brew install/uninstall' successfully then:
-#    - Dump new Brewfile with current installations
-#    - diff new and original Brewfile as double check
-#    - If different, replace old Brewfile with the new one
-# 2. If 'brew search' then:
-#    - If followed by other parameters, execute directly
-#    - Otherwise
-#      - curl to retrieve all available formulas from 'homebrew' server
-#      - Utilize 'fzf-tmux' to show 'brew info' correspondingly
-#      - 'brew info' if a formula is selected
-#
+# Add extra 'flavors' to default 'brew' command:
+# 1. 'install/uninstall/remove':
+#    - Automatically create/update 'Brewfile' and commit
+#    (Disable this feature for now -- Louis 2025/1230)
+# 2. 'brew search':
+#    - Execute directly if followed by other parameters, or
+#    - Retrieve all formulas and show info (formatted by 'fzf-tmux')
+# 3. 'leaves':
+#    - Add '--sort' options to sort leaves by size
+# -- Louis 2025/1230
 function brew () {
-  local _origfile="${XDG_CONFIG_HOME}/homebrew/Brewfile"
-  local _newfile="/tmp/Brewfile"
-  local _cmfile="/tmp/_commitMessage"
+  # No args? just call original brew
+  if [[ $# -eq 0 ]]; then
+    command brew
+    return
+  fi
 
-  [ -f "${_newfile}" ] && rm -rf "${_newfile}"
-  [ -f "${_cmfile}" ] && rm -rf "${_cmfile}"
+  local _action="$1"
 
-  if [[ "$@" =~ ".*install.*" ]]; then        # Either 'install' or 'uninstall'
-    command brew "$@"
+  case "$_action" in
+    install|uninstall|remove)
+      # Intercept install / uninstall / remove
+      # Disable auto_commit for now (not that meaningful)
+      command brew "$@"
+      ;;
 
-    if [[ $? != 0 ]]; then return 1; fi
-    command brew bundle dump --force --file="${_newfile}"
+    search)
+      # Only intercept *plain* `brew search` with no extra args
+	    if [[ $# -eq 1 ]]; then
+        local _COLS _fp _selection _kind _name
 
-    if [ ! -f "${_newfile}" ]; then
-      echo -e "Something wrong about Brewfile generation, no Brewfile update/check-in"
-      return 1
-    fi
+        _COLS=$(tput cols)
 
-    if [[ $(command diff -q "${_origfile}" "${_newfile}") != "" ]]; then    # Something change
-      echo -e "\n\033[32m==>\033[0m \033[1mUpdate ~/.config/homebrew/Brewfile\033[0m"
-      mv -f "${_newfile}" "${_origfile}"
-      # Auto check-in to git to save hassels
-      # Create commit message to file for new line preservation
-      echo -e "<feat> Brew package(s) update\n" >! "${_cmfile}"
-      echo -e "Auto-commit for ${1}ing following formula(s):" >>! "${_cmfile}"
+        if [ "${_COLS}" -ge 160 ]; then
+          _fp="--tmux=center,50%,80%"
+        else
+          _fp="--wrap"
+        fi
 
-      for _t in "${@:2}"; do
+        # Fetch BOTH formula + cask json, combine via jq, then fzf
+        _selection=$(
+          curl -s https://formulae.brew.sh/api/formula.json \
+                  https://formulae.brew.sh/api/cask.json \
+          | jq -s -r '
+              # .[0] = formula.json (array), .[1] = cask.json (array)
+              [.[0][] | {type:"formula", name:.name}] +
+              [.[1][] | {type:"cask",    name:.token}] |
+              .[] | "\(.type)\t\(.name)"
+            ' \
+          | fzf "${_fp}" \
+              --cycle \
+              --no-multi \
+              --prompt="🍺 brew search 󰄾 " \
+              --with-nth=2 \
+              --preview='
+                kind=$(echo {} | cut -f1)
+                name=$(echo {} | cut -f2)
+                if [ "$kind" = "formula" ]; then
+                  command brew info "$name"
+                else
+                  command brew info --cask "$name"
+                fi
+              ' \
+              --preview-window=wrap
+        )
 
-        if [[ ! "${_t}" =~ "--" ]]; then echo -e "${_t}" >>! "${_cmfile}"; fi
+        if [[ -n "${_selection}" ]]; then
+          # Split "<type>\t<name>"
+          _kind=${_selection%%$'\t'*}
+          _name=${_selection#*$'\t'}
 
+          if [[ "$_kind" == "formula" ]]; then
+            command brew info "${_name}"
+          else
+            command brew info --cask "${_name}"
+          fi
+        fi
+      else
+        # `brew search something` → pass through
+        command brew "$@"
+      fi
+		  ;;
+
+    leaves)
+      local sort_flag=false
+      local pass_args=()
+      local invalid_for_sort=false
+
+      # Loop through arguments (starting from the second one)
+      for arg in "${@:2}"; do
+        case "$arg" in
+          -s|--sort)
+            sort_flag=true
+            ;;
+
+          -r|--installed-on-request|-p|--installed-as-dependency)
+            pass_args+=("$arg")
+            ;;
+
+          *)
+            # Any other flag (like --help) triggers standard behavior
+            invalid_for_sort=true
+            pass_args+=("$arg")
+            ;;
+        esac
       done
 
-      local _pwd="${PWD}"
-      cd "${XDG_CONFIG_HOME}/homebrew"
-      # cat "${_cmfile}"
-      git commit --file "${_cmfile}" Brewfile
-      rm -rf "${_cmfile}"
-      cd "${_pwd}"
-    else
-      rm -rf "${_newfile}"
-    fi
+      # echo $sort_flat
+      # echo $pass_args
+      # echo $invalid_for_sort
 
-  elif [[ "$*" == "search" ]]; then           # Only intercept 'search' without parameters
-    local _COLS=$(tput cols);
+      # Condition: Use our script only if --sort is present AND no invalid flags were found
+      if [[ "$sort_flag" == true && "$invalid_for_sort" == false ]]; then
+        echo "List independent formulas with size sorting..."
+        local CELLAR=$(command brew --cellar)
 
-    if [ "${_COLS}" -ge 160 ]; then
-      # Popup tmux window
-      local _fp="--tmux=center,50%,80%"
-    else
-      # No popup window
-      local _fp="--wrap"
-    fi
+        # Call brew leaves with the valid pass_args (-r or -p if present)
+        # Wrap in the subshell
+        {
+          command brew leaves "${pass_args[@]}" | while read -r formula; do
+            if [ -d "$CELLAR/$formula" ]; then
+              local size_kb=$(command du -sk "$CELLAR/$formula" | cut -f1)
+              local size_human=$(command du -sh "$CELLAR/$formula" | cut -f1)
+              echo -e "$size_kb\t$size_human\t$formula"
+            fi
+          done | sort -rn | cut -f2,3
+        } | less -FX
+      else
+        command brew "$@"
+      fi
+      ;;
 
-    local _formula=$(curl -s https://formulae.brew.sh/api/formula.json | \
-      \jq -r '.[].name' | \
-      fzf "${_fp}" \
-      --cycle \
-      --no-multi \
-      --prompt="🍺 brew search 󰄾 " \
-      --preview="command brew info {}" \
-      --preview-window=wrap)
-
-    if [[ "${_formula}" ]]; then command brew info "${_formula}"; fi
-
-  else
-    command brew "$@"
-  fi
+    *)
+      # Everything else → real brew
+      command brew "$@"
+      ;;
+  esac
 }
-
+# For zsh completion
 compdef _brew brew
-
-# Find and list the formulas which depend on the giving package
-function brewdep () {
-    if [ -z "$1" ]; then
-        echo "Usage: brewdep <package>"
-        return 1
-    fi
-
-    package="$1"
-
-    # List all installed packages and filter those that depend on $package
-    brew list | while read -r formula; do
-        if brew deps --installed "$formula" | rg -wq "$package"; then
-            echo "$formula"
-        fi
-    done
-}
 
 # Replace default 'rg' command for pager 'delta' support
 # 1. Print out search result as JSON
@@ -256,8 +278,25 @@ function rg () {
       --grep-match-word-style "#000000 italic #ebbb5c"
 	fi
 }
-
+# For zsh completion
 compdef _rg rg
+
+# Replace default 'bat' commmand for better '--map-syntax' support
+# 1. Expand target file with absolute path
+# 2. Absolute path is better for '--map-syntax' interpretation
+function bat() {
+  local args=()
+  for arg in "$@"; do
+    if [[ -f "$arg" ]]; then
+      args+=("$(realpath "$arg")")
+    else
+      args+=("$arg")
+    fi
+  done
+  # echo -e "${args[@]}"
+  command bat "${args[@]}"
+}
+compdef _bat bat
 
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
@@ -275,7 +314,7 @@ function _eza_ll() {
     --ignore-glob="Icon?|.DS_Store" "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_ll
 
 # Simple tree view ignoring 'Icon?', '.DS_Store' and .git directory from
@@ -295,7 +334,7 @@ function _eza_lt() {
     -L 3 "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_lt
 
 # Long tree view ignoring 'Icon?', '.DS_Store' and .git directory from
@@ -317,7 +356,7 @@ function _eza_llt() {
     -L 3 "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_llt
 
 # Function to switch to neovim variants (except default nvim)
@@ -370,14 +409,13 @@ _create_nvimalias
 
 # Function to enable 'yazi'
 # (https://yazi-rs.github.io/docs/quick-start)
-# -- Louis 2024/0531
+# -- Louis 2025/1230
 function yy() {
-  local _tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-  yazi "$@" --cwd-file="${_tmp}"
-  if _cwd="$(cat -- "${_tmp}")" && [ -n "${_cwd}" ] && [ "${_cwd}" != "${PWD}" ]; then
-    cd -- "${_cwd}"
-  fi
-  rm -f -- "${_tmp}"
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
 }
 
 # https://github.com/direnv/direnv/wiki/Tmux
@@ -386,7 +424,6 @@ function yy() {
 #  direnv exec / tmux
 #}
 #compdef _tmux tmux
-
 
 # Function to designate project root directory when createing a python virtual
 # environment
@@ -453,3 +490,38 @@ function mkvirenvhere() {
 #  # Define side by side or not
 #  /opt/homebrew/bin/diff -ur "${args[@]}" | ([ "$COLS" -ge 110 ] && delta --side-by-side -w $COLS || delta)
 #}
+#
+# # Useful adb commands
+# # Get IMEI with parameter to identify IMEI 1 or 2
+# # Phase out for now -- Louis 2025/1231
+# function getIMEI() {
+#   if [ -z "${1}" ]; then
+#     set "1"
+#   fi
+#   cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
+#     command grep -oE \"[0-9a-f]{8} \" | \
+#     while read hex; \
+#     do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
+#     done; echo"
+#   IMEI=$(adb shell "${cstring}")
+#   echo -e "IMEI_${1}: ${IMEI}"
+# }
+#
+# # Find and list the formulas which depend on the giving package
+# # Replaced by native command 'brew uses --installed --recursive' -- Louis 2025/1230
+# function brewdep () {
+#     if [ -z "$1" ]; then
+#         echo "Usage: brewdep <package>"
+#         return 1
+#     fi
+#
+#     package="$1"
+#
+#     # List all installed packages and filter those that depend on $package
+#     brew list | while read -r formula; do
+#         if brew deps --installed "$formula" | rg -wq "$package"; then
+#             echo "$formula"
+#         fi
+#     done
+# }
+#
