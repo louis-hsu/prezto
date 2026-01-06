@@ -183,7 +183,7 @@ export GEM_HOME=~/.gem
 
 # Set terminal parameter
 export COLORTERM=truecolor
-export TERMINFO_DIRS="$XDG_CONFIG_HOME/terminfo:/opt/homebrew/Cellar/ncurses/6.5/share/terminfo:/usr/share/terminfo"
+# export TERMINFO_DIRS="$XDG_CONFIG_HOME/terminfo:/opt/homebrew/Cellar/ncurses/6.5/share/terminfo:/usr/share/terminfo"
 export TERM=screen-256color-italic
 
 # ------------------------ Obsolete
