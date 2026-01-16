@@ -145,8 +145,8 @@ function prompt_nshiu_setup {
 
     # Define prompts.
   PROMPT='
-[%(!.%B%F{1}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}${(e)git_info[indicator]}}%(!. %B%F{1}#%f%b.)
-${python_info:+${(e)python_info[virtualenv]}}${editor_info[keymap]} '
+[%(!.%B%F{9}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}${(e)git_info[indicator]}}
+${python_info:+${(e)python_info[virtualenv]}}%(!. %B%F{9}#%f%b.) ${editor_info[keymap]} '
 
   RPROMPT='${editor_info[overwrite]}%(?:: %F{1}✘%f)%F{1}${prompt_elapsed_time}%f'
 
