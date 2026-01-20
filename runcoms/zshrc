@@ -15,7 +15,7 @@ source virtualenvwrapper.sh
 pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")
 export PYTHONPATH="${pythonPath}"
 
-# ------------------------ Alias/Function
+# ------------------------ Alias/Function/Others
 # Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
 if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
     . ${ZDOTDIR:-$HOME}/.zsh_aliases
@@ -60,6 +60,31 @@ ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
 # -- Louis 2024/0423
 eval "$(zoxide init --cmd cd zsh)"
 
+# Solve 'fzf-tab' doesn't show dot-file/directory issue
+# and ignore specific files or folders
+# https://github.com/Aloxaf/fzf-tab/issues/476
+#_comp_options+=(globdots)
+setopt glob_dots
+zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
+
+# Hook 'direnv' to zsh -- Louis 2024/1103
+eval "$(direnv hook zsh)"
+
+# Hightlight dnagerous 'rm -f' command -- Louis 2026/0120
+# 1. Enable PCRE (Perl Compatible Regular Expressions)
+# This is required for \b (word boundaries) and complex groups to work
+zmodload zsh/pcre
+setopt RE_MATCH_PCRE
+
+# 2. Define the Highlighter Rules
+typeset -A ZSH_HIGHLIGHT_REGEXP
+
+# 3. Add the Rule
+# Logic: "rm" -> space -> optional other flags -> flag containing "f"
+# Style: White text on Red background (danger!)
+# Add '[^|;&]*' at the end to match anything EXCEPT separators
+ZSH_HIGHLIGHT_REGEXP+=('\brm\s+(?:-[a-zA-Z]+\s+)*-[a-zA-Z]*f[^|;&]*' 'fg=white,bold,bg=red')
+
 # ------------------------ Must be run in the end
 # Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
 # Ensure all autocompletions are set in $FPATH before running autoload
@@ -76,19 +101,7 @@ fpath+=~/.config/zsh/.zfunc
 autoload -Uz compinit
 compinit
 
-# Solve 'fzf-tab' doesn't show dot-file/directory issue
-# and ignore specific files or folders
-# https://github.com/Aloxaf/fzf-tab/issues/476
-#_comp_options+=(globdots)
-setopt glob_dots
-zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
-
-# Hook 'direnv' to zsh -- Louis 2024/1103
-eval "$(direnv hook zsh)"
-
 # ------------------------ TODO
-# Move all "export" commands to 'zprofile'
-# But keep some comments in case needing to restore them in future -- Louis 2021/0526
 # TODO
 # 1. If Ruby/Gem rbenv is required and how to install/configure
 # 2. If jenv is required/configured for multiple Java version

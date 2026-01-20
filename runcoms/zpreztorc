@@ -208,7 +208,8 @@ zstyle ':prezto:module:prompt' theme 'nshiu'
    'pattern' \
    'line' \
    'cursor' \
-   'root'
+   'root' \
+	 'regexp'
 #
 # Set syntax highlighting styles.
 # zstyle ':prezto:module:syntax-highlighting' styles \
@@ -217,8 +218,8 @@ zstyle ':prezto:module:prompt' theme 'nshiu'
 #   'function' 'bg=blue'
 #
 # Set syntax pattern styles.
- zstyle ':prezto:module:syntax-highlighting' pattern \
-   'rm*-*f*' 'fg=white,bold,bg=red'
+ # zstyle ':prezto:module:syntax-highlighting' pattern \
+   # 'rm*-*f*' 'fg=white,bold,bg=red'
 
 #
 # Terminal
