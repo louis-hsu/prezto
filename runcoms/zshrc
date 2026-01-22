@@ -101,6 +101,9 @@ fpath+=~/.config/zsh/zfunc
 autoload -Uz compinit
 compinit
 
+# Autocompletion for 'pipx'
+eval "$(register-python-argcomplete pipx)"
+
 # ------------------------ TODO
 # TODO
 # 1. If Ruby/Gem rbenv is required and how to install/configure
