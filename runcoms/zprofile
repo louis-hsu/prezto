@@ -70,7 +70,7 @@ path=(
 # Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
 # Remove -X to enable it.
 if [[ -z "$LESS" ]]; then
-  export LESS='-F -g -i -M -R -j4 -w -X -z-4'
+  export LESS='-F -g -i -M -R -j4 -w -X'
 fi
 
 # Set the Less input preprocessor.
@@ -129,7 +129,7 @@ spinner:#f5e0dc,\
 header:#f38ba8,\
 prompt:#cba6f7,\
 marker:#b4befe,\
-selected-bg:#45475a" 
+selected-bg:#45475a"
 
 export FZF_DEFAULT_OPTS="--no-mouse\
  --height 80%\
