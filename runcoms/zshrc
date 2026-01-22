@@ -104,6 +104,15 @@ compinit
 # Autocompletion for 'pipx'
 eval "$(register-python-argcomplete pipx)"
 
+# Prompt indicator of subshell triggered by 'yazi'
+YAZI_TERM='
+[%(!.%B%F{9}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}${(e)git_info[indicator]}}
+${python_info:+${(e)python_info[virtualenv]}}%(!. %B%F{9}# %f%b.)%F{12}[ yazi]%f ${editor_info[keymap]} '
+
+if [ -n "$YAZI_LEVEL" ]; then
+  PS1="$YAZI_TERM"
+fi
+
 # ------------------------ TODO
 # TODO
 # 1. If Ruby/Gem rbenv is required and how to install/configure
