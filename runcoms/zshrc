@@ -67,9 +67,6 @@ eval "$(zoxide init --cmd cd zsh)"
 setopt glob_dots
 zstyle ':completion:*' ignored-patterns '.DS_Store' '.git' "Icon$'\r'"
 
-# Hook 'direnv' to zsh -- Louis 2024/1103
-eval "$(direnv hook zsh)"
-
 # Hightlight dnagerous 'rm -f' command -- Louis 2026/0120
 # 1. Enable PCRE (Perl Compatible Regular Expressions)
 # This is required for \b (word boundaries) and complex groups to work
@@ -114,10 +111,12 @@ if [ -n "$YAZI_LEVEL" ]; then
 fi
 
 # ------------------------ TODO
+# # Hook 'direnv' to zsh -- Louis 2024/1103
+# # Remove 'direnv' due to possible conflict with 'mice' -- Louis 2026/0126
+# eval "$(direnv hook zsh)"
+
 # TODO
 # 1. If Ruby/Gem rbenv is required and how to install/configure
-# 2. If jenv is required/configured for multiple Java version
-
 # Ruby/gem configuration -- Louis 2015/0203
 # Since OS X 'locks' gem packages in /Library/Ruby/Gems with root privilege, I cannot install gem packages
 # with my own account unless run 'sudo', which is a bad idea
