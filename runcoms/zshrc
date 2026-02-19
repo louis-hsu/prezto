@@ -110,6 +110,26 @@ if [ -n "$YAZI_LEVEL" ]; then
   PS1="$YAZI_TERM"
 fi
 
+# Add 'onefetch' to zsh hook:
+# 1. Define 'onefetch' logic
+function check_directory_for_new_repository() {
+  current_repository=$(git rev-parse --show-toplevel 2> /dev/null)
+  
+  if [ "$current_repository" ] && \
+     [ "$current_repository" != "$last_repository" ]; then
+    # -d: Disable fields that take up space
+    # --no-color-palette: Keep it sleek
+    # --nerd-fonts: Use icons instead of text blocks
+    onefetch -d license churn url head --no-color-palette --nerd-fonts
+  fi
+  last_repository=$current_repository
+}
+# 2. Use zsh 'chpwd' hook to trigger 'check_directory_for_new_repository'
+autoload -U add-zsh-hook
+add-zsh-hook chpwd check_directory_for_new_repository
+# 3. Initial check while a shell is startup
+check_directory_for_new_repository
+
 # ------------------------ TODO
 # # Hook 'direnv' to zsh -- Louis 2024/1103
 # # Remove 'direnv' due to possible conflict with 'mice' -- Louis 2026/0126
