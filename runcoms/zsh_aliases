@@ -365,8 +365,7 @@ compdef _eza _eza_llt
 # https://michaeluloth.com/neovim-switch-configs/
 # -- Louis 2023/1213
 function _nvims() {
-  local _items=$(fd --max-depth=1 --no-ignore 'nvim-' ~/.config -x echo {/})
-  local _COLS=$(tput cols)
+  local _items=$(fd --max-depth=1 --no-ignore 'nvim-' $XDG_CONFIG_HOME -x echo {/}) local _COLS=$(tput cols)
 
   if [ "${_COLS}" -ge 160 ]; then
     #popup tmux window
@@ -384,7 +383,7 @@ function _nvims() {
       --group-directories-first \
       --color=always \
       --no-quotes \
-      --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 ~/.config/{}")
+      --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 $XDG_CONFIG_HOME/{}")
 
   if [[ -z "${_selected}" ]]; then
     return 0
@@ -397,7 +396,7 @@ function _nvims() {
 # Create aliases for different nvim distros dynamically
 # -- Louis 2023/1213
 function _create_nvimalias() {
-  local _items=("${(@f)$(fd --max-depth=1 --no-ignore 'nvim-' ~/.config -x echo {/})}")
+  local _items=("${(@f)$(fd --max-depth=1 --no-ignore 'nvim-' $XDG_CONFIG_HOME -x echo {/})}")
 
   for _na in ${_items}; do
     if [[ "${_na}" != "nvim" ]]; then

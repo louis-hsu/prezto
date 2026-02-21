@@ -82,7 +82,7 @@ fi
 # ------------------------ Colors
 # Use 'vivid' to generate customized LS-COLORS and filetype
 # -- Louis 2023-06-09 16:36
-export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"
+export LS_COLORS="$(vivid generate $XDG_CONFIG_HOME/vivid/catppuccin-flatwhite)"
 
 # Tell 'eza' to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 # Reference:
