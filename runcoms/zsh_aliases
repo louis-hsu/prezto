@@ -16,12 +16,13 @@ alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free 
 alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
 alias updatedb='sudo /usr/libexec/locate.updatedb'
 
-# Dev setup
+# Setup & tools
 alias mux='tmuxinator'
 alias jq='jq -C'
 alias diff='diff -ur --color=always'
 alias vim='nvim'                              # Move to nvim from vim
 alias nvs='_nvims'
+alias extract="unarchive"                     # Alias to prezto module 'archive'
 
 # Networking
 alias ssh='ssh -Y'
@@ -46,10 +47,6 @@ alias chafa="img"															# Show images in CLI
 # (Moved to 'zshrc')
 
 # ------------------------ Functions
-# Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
-source "${HOME}"/.bin/extract.plugin.zsh
-source "${HOME}"/.bin/universalarchive.plugin.zsh
-
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick
 # Reference: https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
 # -- Louis 2015/0629
