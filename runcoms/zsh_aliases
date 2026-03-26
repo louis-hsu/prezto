@@ -406,6 +406,84 @@ function _create_nvimalias() {
 }
 _create_nvimalias
 
+# Sync 'package_delta.toml' from 'package.toml' in the yazi config dir.
+# Strips all fields except section headers and 'use', producing a
+# version-trackable file that captures intent without volatile rev/hash data.
+# -- Louis 2026/0325
+function _ya_sync_delta() {
+  local _cfg="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+  local _src="$_cfg/package.toml"
+  local _dst="$_cfg/package_delta.toml"
+
+  if [[ ! -f "$_src" ]]; then
+    echo "ya: warning: $_src not found, skipping delta sync" >&2
+    return 1
+  fi
+
+  awk '
+    /^\[\[plugin\.deps\]\]/ { if (need_blank) printf "\n"; print; need_blank=0; in_block=1; next }
+    /^\[\[flavor\.deps\]\]/ { if (need_blank) printf "\n"; print; need_blank=0; in_block=1; next }
+    in_block && /^use[[:space:]]*=/ { print; need_blank=1; next }
+    in_block && /^(rev|hash)[[:space:]]*=/ { next }
+  ' "$_src" >| "$_dst"
+}
+
+# Wrapper for 'ya' (yazi CLI) that keeps 'package_delta.toml' in sync.
+#
+# For mutating subcommands (pkg add/delete/upgrade/install), after the real
+# 'ya' succeeds, package_delta.toml is regenerated from package.toml,
+# preserving only 'use' fields — suitable for version tracking.
+#
+# Bootstrap flow (pkg install, package.toml absent, package_delta.toml present):
+#   1. Clear plugins/ and flavors/ dirs
+#   2. Copy package_delta.toml → package.toml
+#   3. Run 'ya pkg install' (ya populates rev/hash)
+#   4. Sync delta from the updated package.toml
+#
+# -- Louis 2026/0325
+function ya() {
+  local _cfg="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+  local _pkg="$_cfg/package.toml"
+  local _delta="$_cfg/package_delta.toml"
+
+  # Identify if this is a mutating pkg subcommand
+  local _mutating=0
+  if [[ "$1" == "pkg" ]]; then
+    case "$2" in
+      add|delete|upgrade|install) _mutating=1 ;;
+    esac
+  fi
+
+  # Bootstrap: pkg install with no package.toml but package_delta.toml exists
+  if [[ "$1" == "pkg" && "$2" == "install" && ! -f "$_pkg" ]]; then
+    if [[ ! -f "$_delta" ]]; then
+      echo "ya: error: neither package.toml nor package_delta.toml found in $_cfg" >&2
+      return 1
+    fi
+
+    echo "ya: package.toml absent — bootstrapping from package_delta.toml" >&2
+
+    # Clear stale plugin/flavor dirs
+    [[ -d "$_cfg/plugins" ]] && rm -rf "$_cfg/plugins"
+    [[ -d "$_cfg/flavors" ]] && rm -rf "$_cfg/flavors"
+
+    # Seed package.toml from delta (ya will fill in rev/hash on install)
+    cp "$_delta" "$_pkg"
+  fi
+
+  command ya "$@"
+  local _exit=$?
+
+  # Post-step: sync delta on success of any mutating command
+  if [[ $_mutating -eq 1 && $_exit -eq 0 ]]; then
+    _ya_sync_delta
+  fi
+
+  return $_exit
+}
+# For zsh completion
+compdef _ya ya
+
 # Function to enable 'yazi'
 # (https://yazi-rs.github.io/docs/quick-start)
 # -- Louis 2025/1230
