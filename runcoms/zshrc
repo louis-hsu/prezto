@@ -8,8 +8,8 @@
 setopt cdablevars
 
 # Source Prezto.
-if [[ -s "${ZDOTDIR:-$HOME}/.zprezto/init.zsh" ]]; then
-    source "${ZDOTDIR:-$HOME}/.zprezto/init.zsh"
+if [[ -s "${ZDOTDIR:-$HOME}/zprezto/init.zsh" ]]; then
+    source "${ZDOTDIR:-$HOME}/zprezto/init.zsh"
 fi
 
 # Configure python virtualenvwrapper -- Louis 2017/0125
@@ -137,7 +137,7 @@ command_not_found_handler() {
 # fi
 #
 # Also add '.zfunc' in $fpath -- Louis 2024/1103
-fpath+=~/.config/zsh/.zfunc
+fpath+="${XDG_CONFIG_HOME}"/zsh/zfunc
 
 autoload -Uz compinit
 compinit
