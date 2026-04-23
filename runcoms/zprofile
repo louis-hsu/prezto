@@ -105,50 +105,50 @@ da=${GREY_COLOR_3}"
 export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
 
 # ------------------------ Fzf
-# FZF_COLORS="fg:#D8DEE9,\
-# fg+:#D8DEE9,\
-# bg+:#434C5E,\
-# hl:#A3BE8C,\
-# hl+:#A3BE8C,\
-# pointer:#BF616A,\
-# info:#4C566A,\
-# spinner:#4C566A,\
-# header:#4C566A,\
-# prompt:#81A1C1,\
-# marker:#EBCB8B"
-#
+FZF_COLORS="fg:#D8DEE9,\
+fg+:#D8DEE9,\
+bg+:#434C5E,\
+hl:#EBCB8B,\
+hl+:#EBCB8B,\
+pointer:#BF616A,\
+info:#B48EAD,\
+spinner:#4C566A,\
+header:#4C566A,\
+prompt:#81A1C1,\
+marker:#A3BE8C"
+
 # Catppuccin Mocha colortheme
-FZF_COLORS="fg:#cdd6f4,\
-fg+:#cdd6f4,\
-bg+:#313244,\
-hl:#f38ba8,\
-hl+:#f38ba8,\
-pointer:#f5e0dc,\
-info:#cba6f7,\
-spinner:#f5e0dc,\
-header:#f38ba8,\
-prompt:#cba6f7,\
-marker:#b4befe,\
-selected-bg:#45475a"
+# FZF_COLORS="fg:#cdd6f4,\
+# fg+:#cdd6f4,\
+# bg+:#313244,\
+# hl:#f38ba8,\
+# hl+:#f38ba8,\
+# pointer:#f5e0dc,\
+# info:#cba6f7,\
+# spinner:#f5e0dc,\
+# header:#f38ba8,\
+# prompt:#cba6f7,\
+# marker:#b4befe,\
 
 export FZF_DEFAULT_OPTS="--no-mouse\
  --height 80%\
  --reverse\
- --color $FZF_COLORS\
  --multi\
  --border\
- --info=inline"
+ --color $FZF_COLORS"
+ # --marker="⏵"\
+ # --info=inline\
 
 export FZF_CTRL_T_COMMAND="fd -t f -H -L"
 export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
- --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+ --bind='ctrl-up:preview-page-up,ctrl-down:preview-page-down'"
 
 export FZF_ALT_C_COMMAND="fd -t d -H -L"
 export FZF_ALT_C_OPTS="--preview 'eza -aF\
  --group-directories-first\
  --color=always\
  --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}'\
- --bind 'ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+ --bind 'ctrl-up:preview-page-up,ctrl-down:preview-page-down'"
 
 export FZF_CTRL_R_OPTS="--reverse"
 
