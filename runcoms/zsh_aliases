@@ -33,7 +33,6 @@ alias myip='ipconfig getifaddr en0'
 alias onefetch="clear; onefetch"
 alias neofetch="clear; neofetch"
 alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"		#Typerwrite sound
-alias tf="tmuxfloat"                          # Create tmux popup display
 
 # Taskwarror related
 alias task='clear; task'
@@ -49,15 +48,32 @@ alias chafa="img"															# Show images in CLI
 # ------------------------ Functions
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick
 # Reference: https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
-# -- Louis 2015/0629
 function smartresize() {
   if [ "$#" -ne 3 ]; then
-    echo -e "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
+    printf "Usage: smartresize INPUT_FILE EXPECTED_WIDTH OUTPUT_PATH\n"
+    return 1
+  fi
+
+  local input="$1" width="$2" outdir="$3"
+
+  # ImageMagick 6 vs 7
+  local mogrify_cmd
+  if command -v magick &>/dev/null; then
+    mogrify_cmd="magick mogrify"
+  elif command -v mogrify &>/dev/null; then
+    mogrify_cmd="mogrify"
   else
-    mogrify -path "${3}" \
+    echo "ImageMagick not found"; return 1
+  fi
+
+  mkdir -p "$outdir" || { echo "Cannot create output dir: $outdir"; return 1; }
+
+  $mogrify_cmd \
+    -path "$outdir" \
+    -auto-orient \
     -filter Triangle \
     -define filter:support=2 \
-    -thumbnail "${2}" \
+    -thumbnail "${width}>" \
     -unsharp 0.25x0.08+8.3+0.045 \
     -dither None \
     -posterize 136 \
@@ -66,10 +82,9 @@ function smartresize() {
     -define png:compression-level=9 \
     -define png:compression-strategy=1 \
     -define png:exclude-chunk=all \
-    -interlace none \
-    -colorspace sRGB "${1}"
-    #-define png:compression-filter=5 \
-  fi
+    -interlace Plane \
+    -colorspace sRGB \
+    "$input"
 }
 
 # Remove 'diff ()' 'cuz autocompletion 'diff <TAB>' doesn't work
@@ -494,13 +509,6 @@ function yy() {
 	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
 	rm -f -- "$tmp"
 }
-
-# https://github.com/direnv/direnv/wiki/Tmux
-# Avoid issues with 'direnv' environment loading
-#function tmux() {
-#  direnv exec / tmux
-#}
-#compdef _tmux tmux
 
 # Function to designate project root directory when createing a python virtual
 # environment
