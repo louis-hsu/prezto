@@ -1,64 +1,113 @@
-# Zsh setup adapted from sorin/prezto (Sorin Ionescu <sorin.ionescu@gmail.com>)
-# -- Louis 2018/0603
-
-# Set default zsh options (setopt) -- Louis 2018/1224
-setopt cdablevars
+# ------------------------ General/System
+setopt cdablevars                           # Set default zsh options (setopt)
 
 # Source Prezto.
 if [[ -s "${ZDOTDIR:-$HOME}/zprezto/init.zsh" ]]; then
     source "${ZDOTDIR:-$HOME}/zprezto/init.zsh"
 fi
 
-# Configure python virtualenvwrapper -- Louis 2017/0125
-source virtualenvwrapper.sh
-# Export $PYTHONPATH
-pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")
+source virtualenvwrapper.sh                 # Configure python virtualenvwrapper
+pythonPath=$(python3 -c "import site; print(site.getsitepackages()[0])")  # Export 'site-package' path
 export PYTHONPATH="${pythonPath}"
 
-# ------------------------ Alias/Function/Others
-# Move alias definitions to separted file (.zsh_aliases) -- Louis 2018/0830
+eval "$(zoxide init --cmd cd zsh)"          # Configure 'zoxide' to replace 'cd'
+
+# Add 'brew' path in $FPATH before running autoload for autocompletion
+if type brew &>/dev/null
+then
+  FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
+
+fi
+fpath+=$XDG_CONFIG_HOME/zsh/zfunc           # Also add 'zfunc' in $FPATH
+
+
+# ------------------------ Alias/Keybindings/Functions
+# Move alias definitions to separted file (.zsh_aliases)
 if [ -f ${ZDOTDIR:-$HOME}/.zsh_aliases ]; then
     . ${ZDOTDIR:-$HOME}/.zsh_aliases
 fi
 
-# fzf integration -- Louis 2024/0505
-source <(fzf --zsh)
+source <(fzf --zsh)													# 'fzf' integration
+# source ~/.config/zsh/fzf-bindings.zsh				# Remove 'fzf' keybindings and apply mine
 
-# Remove original and re-bind hotkeys for fzf widgets -- Louis 2024/0329
-bindkey -r vicmd '\ec'
-bindkey -r viins '\ec'
-bindkey -r vicmd '^T'
-bindkey -r viins '^T'
+# # Remove original and re-bind hotkeys for fzf widgets
+# bindkey -r vicmd '\ec'
+# bindkey -r viins '\ec'
+# bindkey -r vicmd '^T'
+# bindkey -r viins '^T'
+# bindkey -M viins '^f' fzf-file-widget       # 'Ctrl-f' to list files
+# bindkey -M vicmd '^f' fzf-file-widget
+# bindkey -M viins '^t' fzf-cd-widget         # 'Ctrl-t' to move into directory
+# bindkey -M vicmd '^t' fzf-cd-widget
 
-bindkey -v
-bindkey -M viins '^f' fzf-file-widget
-bindkey -M viins '^t' fzf-cd-widget       #Original '^j' is occupied by moving to down pane
+# function open_with_vim_widget() {
+#   local _files
+#
+#   zle -I
+#
+#   _files=$(~/.bin/fzf-nvim | sed 's/\x1b\[[0-9;]*m//g' | sed 's/[[:space:]]*$//')
+#
+#   if [[ -n $_files ]]; then
+#     echo -n "$_files" | xargs nvim
+#   fi
+#
+#   zle reset-prompt
+# }
+# zle -N open_with_vim_widget
+# bindkey -M viins '^e' open_with_vim_widget
+# bindkey -M vicmd '^e' open_with_vim_widget
+#
+# # Create 'ctrl-e' to open file in 'nvim'
+# function open_with_vim_widget() {
+#   local _files
+#
+#   zle -I
+#
+#   _files=$(
+#     fd --type f --color=always --hidden 2>/dev/null \
+#     | if [[ -n $TMUX ]]; then
+#         fzf-tmux ${=FZF_TMUX_OPTS} --ansi \
+#           --preview 'bat --color=always --line-range :200 {} 2>/dev/null || cat {}'
+#       else
+#         fzf ${=FZF_DEFAULT_OPTS} --ansi \
+#           --preview 'bat --color=always --line-range :200 {} 2>/dev/null || cat {}'
+#       fi \
+#     | sed 's/\x1b\[[0-9;]*m//g' \
+#     | sed 's/[[:space:]]*$//'
+#   )
+#
+#   if [[ -n $_files ]]; then
+#     echo -n "$_files" | xargs nvim
+#   fi
+#
+#   zle reset-prompt
+# }
+# zle -N open_with_vim_widget
+# bindkey -M viins '^e' open_with_vim_widget
+# bindkey -M vicmd '^e' open_with_vim_widget
+#
+# # Create 'ctrl-e' to open file in 'nvim'
+# function open_with_vim_widget() {
+#   local _temp _files
+#
+#   zle -I  # tell ZLE we're about to do terminal I/O
+#   _temp="$(__fzf_select)"
+#   _files="${_temp%[[:space:]]}"  # strip trailing whitespace (pure zsh, no sed)
+#
+#   if [[ -n $_files ]]; then
+#     echo -n "$_files" | xargs nvim
+#   fi
+#
+#   zle reset-prompt  # always redraw prompt, even on <Esc> / empty selection
+# }
+# zle -N open_with_vim_widget
+# bindkey -M viins '^e' open_with_vim_widget
+# bindkey -M vicmd '^e' open_with_vim_widget
 
-bindkey -M vicmd '^f' fzf-file-widget
-bindkey -M vicmd '^t' fzf-cd-widget       #Original '^j' is occupied by moving to down pane
+# ------------------------ Others
+eval "$(register-python-argcomplete pipx)"  # Autocompletion for 'pipx'
 
-# Create 'ctrl-v' to open file for nvim -- Louis 2024/0529
-function open_with_vim () {
-  local _temp
-  local _files
-
-  _temp="$(__fzf_select)"
-  _files=$(echo -n "${_temp}" | sed -E 's/[[:space:]]*$//')
-  if [[ -n $_files ]]; then
-    echo -n "${_files}" | xargs nvim
-  fi
-}
-zle -N open_with_vim_widget open_with_vim
-# Change to '^e' to fit Voyager layout -- Louis 2025/0210
-bindkey -M viins '^e' open_with_vim_widget
-bindkey -M vicmd '^e' open_with_vim_widget
-
-# Color setup of auto suggestions. No work if setup in zprofile -- Louis 2022/0109
-ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"
-
-# Install and configure 'zoxide' to replace 'cd'
-# -- Louis 2024/0423
-eval "$(zoxide init --cmd cd zsh)"
+# 'fzf-tab' integration and configurations
 
 # Solve 'fzf-tab' doesn't show dot-file/directory issue
 # and ignore specific files or folders
@@ -82,30 +131,11 @@ typeset -A ZSH_HIGHLIGHT_REGEXP
 # Add '[^|;&]*' at the end to match anything EXCEPT separators
 ZSH_HIGHLIGHT_REGEXP+=('\brm\s+(?:-[a-zA-Z]+\s+)*-[a-zA-Z]*f[^|;&]*' 'fg=white,bold,bg=red')
 
-# ------------------------ Must be run in the end
-# Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
-# Ensure all autocompletions are set in $FPATH before running autoload
-# -- Louis 2023/1108
-if type brew &>/dev/null
-then
-  FPATH="${FPATH}:$(brew --prefix)/share/zsh/site-functions"
-
-fi
-
-# Also add 'zfunc' in $fpath -- Louis 2024/1103
-fpath+=$XDG_CONFIG_HOME/zsh/zfunc
-
-autoload -Uz compinit
-compinit
-
-# Autocompletion for 'pipx'
-eval "$(register-python-argcomplete pipx)"
-
+# ------------------------ Hacks/Hooks
 # Prompt indicator of subshell triggered by 'yazi'
 YAZI_TERM='
 [%(!.%B%F{9}%n@%m%f%b.%F{yellow}%n@%m%f):%F{4}${_prompt_nshiu_pwd}%f]${git_info:+${(e)git_info[status]}${(e)git_info[indicator]}}
 ${python_info:+${(e)python_info[virtualenv]}}%(!. %B%F{9}# %f%b.)%F{12}[ yazi]%f ${editor_info[keymap]} '
-
 if [ -n "$YAZI_LEVEL" ]; then
   PS1="$YAZI_TERM"
 fi
@@ -130,6 +160,11 @@ add-zsh-hook chpwd check_directory_for_new_repository
 # 3. Initial check while a shell is startup
 check_directory_for_new_repository
 
+# ------------------------ Must be run in the end
+# Run compinit to enable autocmopletion defined in /opt/homebrew/share/zsh/site-functions
+autoload -Uz compinit
+compinit
+
 # ------------------------ TODO
 # # Hook 'direnv' to zsh -- Louis 2024/1103
 # # Remove 'direnv' due to possible conflict with 'mice' -- Louis 2026/0126
@@ -153,8 +188,9 @@ check_directory_for_new_repository
 # if which jenv > /dev/null; then eval "$(jenv init -)"; fi
 
 # ------------------------ Obsolete
-# append to the history file, don't overwrite it
-#shopt -s histappend
+# bindkey -v                                    # done in prezto already
+# shopt -s histappend                           # append to the history file, don't overwrite it
+# ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#878787"  # done in prezto already
 
 # Customize to your needs...
 #case "$TERM" in
