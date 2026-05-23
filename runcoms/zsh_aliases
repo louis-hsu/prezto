@@ -31,7 +31,7 @@ alias myip='ipconfig getifaddr en0'
 
 # Gimmick
 alias onefetch="clear; onefetch"
-alias neofetch="clear; neofetch"
+alias fastfetch="clear; fastfetch"
 alias typewriter="daktilo --variate-tempo 0.9,0.4 --variate-volume 0.1,0.5"		#Typerwrite sound
 
 # Taskwarror related
@@ -40,7 +40,7 @@ alias tasktoday='task scheduled.before:today status.is:pending or due.before:tod
 alias projectinfo='~/.bin/projinfo'
 
 # Multimedia
-alias chafa="img"															# Show images in CLI
+alias img="chafa"															# Show images in CLI
 
 # ------------------------ Bind keys
 # (Moved to 'zshrc')
