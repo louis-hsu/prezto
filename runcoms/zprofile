@@ -1,10 +1,6 @@
 #
 # Executes commands at login pre-zshrc.
 #
-# Authors:
-#   Sorin Ionescu <sorin.ionescu@gmail.com>
-#
-
 # ------------------------ Script
 
 # ------------------------ Browser
@@ -28,21 +24,8 @@ if [[ -z "$LANG" ]]; then
   export LANG='en_US.UTF-8'
 fi
 
-# ------------------------ Android
-# export ANDROID_HOME=$HOME/Library/Android/sdk
-# export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
-#
 # ------------------------ Path
-# New brew configuration -- Louis 2021/1226
-# eval "$(/opt/homebrew/bin/brew shellenv)"
-
-# Ensure path arrays do not contain duplicates.
-typeset -gU cdpath fpath mailpath path
-
-# Set the list of directories that cd searches.
-# cdpath=(
-#   $cdpath
-# )
+typeset -gU cdpath fpath mailpath path            # Ensure path arrays do not contain duplicates
 
 # Set the list of directories that Zsh searches for programs.
 path=(
@@ -50,16 +33,6 @@ path=(
   $HOME/.cargo/bin                                # Moved from zshenv -- Louis 2023-06-05 14:19
   $HOME/.gem/bin                                	# Ruby app
   $HOME/.docker/bin                               # Docker CLI folder -- Louis 2023/0620
-  # $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
-  # $ANDROID_HOME/platform-tools
-  # $HOMEBREW_PREFIX/opt/ruby/bin
-  # $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
-  # $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
-  # $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
-  # $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
-  # $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
-  # $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
-  # /opt/{homebrew,local}/{,s}bin(N)
   $HOME/.dotfiles/dot-local/bin                   #Created by `pipx` on 2024-11-01 07:30:06
   /usr/local/{,s}bin(N)
   $path
@@ -67,8 +40,6 @@ path=(
 
 # ------------------------ Less
 # Set the default Less options.
-# Mouse-wheel scrolling has been disabled by -X (disable screen clearing).
-# Remove -X to enable it.
 if [[ -z "$LESS" ]]; then
   export LESS='-F -g -i -M -R -j4 -w -X -z-4'
 fi
@@ -80,17 +51,15 @@ if [[ -z "$LESSOPEN" ]] && (( $#commands[(i)lesspipe(|.sh)] )); then
 fi
 
 # ------------------------ Colors
-# Use 'vivid' to generate customized LS-COLORS and filetype
-# -- Louis 2023-06-09 16:36
-export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"
+export LS_COLORS="$(vivid generate ~/.config/vivid/catppuccin-flatwhite)"   # Use 'vivid' to generate customized LS-COLORS and filetype
 
 # Tell 'eza' to use LS_COLORS via 'reset' command and specify exa specific extra coloring
 # Reference:
 # https://the.exa.website/docs/colour-themes
 # https://www.ditig.com/publications/256-colors-cheat-sheet (256 color)
-GREY_COLOR="38;5;248"
-GREY_COLOR_2="38;5;240"
-GREY_COLOR_3="38;5;243"
+GREY_COLOR='38;5;248'
+GREY_COLOR_2='38;5;240'
+GREY_COLOR_3='38;5;243'
 export EXA_COLORS="uu=${GREY_COLOR_3}:\
 un=${GREY_COLOR_3}:\
 gu=${GREY_COLOR_3}:\
@@ -101,71 +70,54 @@ ue=32:\
 ux=32:\
 da=${GREY_COLOR_3}"
 
-# Configure grep color -- Louis 2021/0119
-export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'
+export GREP_COLORS='mt=38;5;232;48;2;136;192;208:ln=01;38;5;222'            # Configure grep color
 
 # ------------------------ Fzf
 FZF_COLORS="fg:#D8DEE9,\
 fg+:#D8DEE9,\
 bg+:#434C5E,\
-hl:#A3BE8C,\
-hl+:#A3BE8C,\
+hl:#EBCB8B,\
+hl+:#EBCB8B,\
 pointer:#BF616A,\
-info:#4C566A,\
+info:#B48EAD,\
 spinner:#4C566A,\
-header:#4C566A,\
+header:#B48EAD,\
 prompt:#81A1C1,\
-marker:#EBCB8B"
+marker:#A3BE8C"
 
-export FZF_DEFAULT_OPTS="--no-mouse\
+export FZF_DEFAULT_OPTS="--style full\
  --height 80%\
  --reverse\
- --color $FZF_COLORS\
  --multi\
  --border\
- --info=inline"
+ --color $FZF_COLORS\
+ --bind 'tab:toggle+down,shift-tab:up+toggle'\
+ --bind 'ctrl-up:preview-page-up,ctrl-down:preview-page-down'\
+ --bind 'ctrl-u:page-up,ctrl-d:page-down'\
+ --bind 'ctrl-y:execute-silent(echo -n {} | pbcopy)+abort'\
+ --bind 'focus:transform-header:file --brief {}'"
 
-export FZF_CTRL_T_COMMAND="fdfind -t f -H -L"
-export FZF_CTRL_T_OPTS="--preview 'bat -f {}'\
- --bind='ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
+export FZF_CTRL_T_COMMAND='fd -t f -H -L --color=always'
+export FZF_CTRL_T_OPTS='--ansi --preview "bat -f {}"'
+export FZF_CTRL_R_OPTS='--reverse'
 
-export FZF_ALT_C_COMMAND="fdfind -t d -H -L"
-export FZF_ALT_C_OPTS="--preview 'eza -aF\
- --group-directories-first\
- --color=always\
- --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}'\
- --bind 'ctrl-l:preview-page-up,ctrl-h:preview-page-down'"
-
-export FZF_CTRL_R_OPTS="--reverse"
-
-export FZF_TMUX_OPTS="-p -w 85% -h 80%"
+export FZF_TMUX_OPTS='-p -w 85% -h 80%'
 
 # ------------------------ Bat (better cat)
 # Use 'bat' to better colorize manpage -- Louis 2023-04-11 15:08
-# export MANPAGER="sh -c 'col -bx | bat -l man -p --theme=\"Monokai Extended\"'"
-# export MANROFFOPT="-c"
+export MANPAGER="sh -c 'col -bx | batcat -l man -p --theme=\"Monokai Extended\"'"
+export MANROFFOPT="-c"
 
-# ------------------------ Delta
-# Add for 'core.pager' setup in 'git/config' -- Louis 2024/0424
-export DELTA_FEATURES='nshiu_nordbase zebra-dark'
-
-# ------------------------ Ripgrep (better grep)
+# ------------------------ Others
 export RIPGREP_CONFIG_PATH="${XDG_CONFIG_HOME}/ripgrep/ripgreprc"
+export DELTA_FEATURES='nshiu_nordbase zebra-dark'   # Add for 'core.pager' setup in 'git/config'
+export GEM_HOME=~/.gem                              # Setup gem home/binary path
 
-# ------------------------ Virtualenv
+# Virtualenv
 export VIRTUALENVWRAPPER_PYTHON=$(which python3)
 export WORKON_HOME=$HOME/.virtualenvs
 export PROJECT_HOME=$HOME/PythonDev
 export VIRTUALENVWRAPPER_WORKON_CD=1
-
-# ------------------------ Others
-# Remove jenv setup since I might not really need multiple Java version
-# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
-#export PATH=/usr/local/opt/openjdk/bin:${PATH}
-#export JAVA_HOME=`/usr/libexec/java_home`
-
-# Setup gem home/binary path -- Louis 2018/1220
-export GEM_HOME=~/.gem
 
 # Set terminal parameter
 export COLORTERM=truecolor
@@ -173,6 +125,10 @@ export TERMINFO_DIRS="$XDG_CONFIG_HOME/terminfo:/usr/share/terminfo"
 export TERM=screen-256color-italic
 
 # ------------------------ Obsolete
+# Remove jenv setup since I might not really need multiple Java version
+# Instead set JAVA_HOME directly, keep jenv binary though -- Louis 2021/0416
+#export PATH=/usr/local/opt/openjdk/bin:${PATH}
+#export JAVA_HOME=`/usr/libexec/java_home`
 # rationalize-path()
 # Later we'll need to trim down the paths that follow because the ones
 # given here are for all my accounts, some of which have unusual

@@ -1,64 +1,75 @@
 # ------------------------ Alias
-# Another better look 'ls' alternative: exa -- Louis 2021/0523
-# Change to 'eza' since exa is unmaintained -- Louis 2023/1109
+# File preview & search
 alias ls='eza -F --color=always --group-directories-first --no-quotes --ignore-glob="Icon?"'
 alias ll="_eza_ll"
 alias lt="_eza_lt"
 alias llt="_eza_llt"
-
-alias grep='grep --line-number -C 2 --color'  # Configure grep color -- Louis 2021/0119
-alias ssh='ssh -Y'
-alias top='top -ocpu -R -F -s 2 -n30'
-alias tree='eza --tree --no-quotes'           # Change to eza -- Louis 2022/0903
-alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du -- Louis 2020/0424
-alias dust='dust --depth 2'                   # New tool for file/directory size calculation -- Louis 2024/0107
-alias tag='/usr/local/bin/ctags'
-alias mux='tmuxinator'
+alias tree='eza --tree --no-quotes'
 alias fd="fdfind --hidden --follow"
+alias grep='grep --line-number -C 2 --color'  # Configure grep color
+
+# System
+alias top='top -ocpu -R -F -s 2 -n30'
+alias du='du -ch -d 1 | sort -hr'             # Add sorting by size to du
+alias dust='dust --depth 2'                   # New tool for file/directory size calculation
+alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility
+alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
+
+# Setup & tools
+alias mux='tmuxinator'
 alias jq='jq -C'
 alias diff='diff -ur --color=always'
+alias vim='nvim'                              # Move to nvim from vim
+alias extract="unarchive"                     # Alias to prezto module 'archive'
 
-# Taskwarror alias
+# Networking
+alias ssh='ssh -Y'
+alias ports='lsof -i -P -n | command rg -C=0 LISTEN'
+
+# Gimmick
+alias onefetch="clear; onefetch"
+alias fastfetch="clear; fastfetch"
+
+# Taskwarror related
 alias task='clear; task'
 alias tasktoday='task scheduled.before:today status.is:pending or due.before:today+2w'
 alias projectinfo='~/.bin/projinfo'
 
-alias updatedb='sudo /usr/libexec/locate.updatedb'
-alias rtime='gtime -f "\n%E elapsed,\n%U user,\n%S system,\n%M memory\n%x status"'
-
-alias brewdep='/opt/homebrew/bin/brew deps --tree --installed'
-
-alias vim='nvim'                              # Move to nvim from vim -- Louis 2022/0207
-# alias nvs='_nvims'
-alias bat='batcat'
-
-alias duf="duf --hide-mp '*timemachine*'"     # Better tool for disk usage/free utility -- Louis 2022/0928
-
-# Add clear command before onefetch/neofetch -- Louis 2022/1004
-alias onefetch="clear; onefetch"
-alias neofetch="clear; neofetch"
-
-alias tf="tmuxfloat"                          # Script to create tmux popup display -- Louis 2024/0311
+# Multimedia
+alias img="chafa"															# Show images in CLI
 
 # ------------------------ Bind keys
-
+# (Moved to 'zshrc')
 
 # ------------------------ Functions
-# Borrow new extract/archieve (alias 'ua') function from oh-my-zsh -- Louis 2023/1110
-source "${HOME}"/.bin/extract.plugin.zsh
-source "${HOME}"/.bin/universalarchive.plugin.zsh
-
 # Add smartresize() function to resize image file(s) by utilizing ImageMagick
 # Reference: https://www.smashingmagazine.com/2015/06/efficient-image-resizing-with-imagemagick/
-# -- Louis 2015/0629
 function smartresize() {
   if [ "$#" -ne 3 ]; then
-    echo -e "Usage: smartresize \$INPUT_FILE \$EXPECTED_WIDTH \$OUTPUT_PATH"
+    printf "Usage: smartresize INPUT_FILE EXPECTED_WIDTH OUTPUT_PATH\n"
+    return 1
+  fi
+
+  local input="$1" width="$2" outdir="$3"
+
+  # ImageMagick 6 vs 7
+  local mogrify_cmd
+  if command -v magick &>/dev/null; then
+    mogrify_cmd="magick mogrify"
+  elif command -v mogrify &>/dev/null; then
+    mogrify_cmd="mogrify"
   else
-    mogrify -path "${3}" \
+    echo "ImageMagick not found"; return 1
+  fi
+
+  mkdir -p "$outdir" || { echo "Cannot create output dir: $outdir"; return 1; }
+
+  $mogrify_cmd \
+    -path "$outdir" \
+    -auto-orient \
     -filter Triangle \
     -define filter:support=2 \
-    -thumbnail "${2}" \
+    -thumbnail "${width}>" \
     -unsharp 0.25x0.08+8.3+0.045 \
     -dither None \
     -posterize 136 \
@@ -67,10 +78,9 @@ function smartresize() {
     -define png:compression-level=9 \
     -define png:compression-strategy=1 \
     -define png:exclude-chunk=all \
-    -interlace none \
-    -colorspace sRGB "${1}"
-    #-define png:compression-filter=5 \
-  fi
+    -interlace Plane \
+    -colorspace sRGB \
+    "$input"
 }
 
 # Remove 'diff ()' 'cuz autocompletion 'diff <TAB>' doesn't work
@@ -85,7 +95,7 @@ function delta () {
     command delta "$@"
   fi
 }
-
+# For zsh completion
 compdef _delta delta
 
 # Replace default 'rg' command for pager 'delta' support
@@ -93,19 +103,70 @@ compdef _delta delta
 # 2. '--grep-*-style' of 'delta' to customize output theme
 # -- Louis 2024/0324
 #
+# In order to fix unexpected ANSI color escape code:
+# 1. Check if input is from a terminal to decide --default-language
+# 2. Add --no-gitconfig
+# -- Louis 2025/0214
+#
 # TODO:
 # 1. 'rg' + 'delta' doesn't parse syntax well which uses '#' as comment tag
 # 2. Have filed issue to 'delta': https://github.com/dandavison/delta/issues/1668
 function rg () {
-  command rg --json "$@" | delta \
-    --tabs=1 \
-    --default-language sh \
-    --grep-file-style "magenta ul" \
-    --grep-line-number-style "grey" \
-    --grep-match-word-style "#000000 italic #ebbb5c"
-}
+	# It seems '-C' conflicts with '--invert-match'
+	# Add condition check to add '-C' dynamically
+	# -- Louis 2025/0603
+  local has_invert_match=0
+  local args=()
 
+  for arg in "$@"; do
+    if [[ "$arg" == "--invert-match" ]]; then
+      has_invert_match=1
+    fi
+    args+=("$arg")
+  done
+
+  if [[ $has_invert_match -eq 0 ]]; then
+    args+=("-C1")
+  fi
+
+	if [[ -t 0 ]]; then
+		# Input from a terminal
+    command rg --json "${args[@]}" | delta \
+	  	--no-gitconfig \
+      --tabs=1 \
+      --default-language sh \
+      --grep-file-style "magenta ul" \
+      --grep-line-number-style "grey" \
+      --grep-match-word-style "#000000 italic #ebbb5c"
+	else
+		# Input from pipe (|)
+    command rg --json "${args[@]}" | delta \
+	  	--no-gitconfig \
+      --tabs=1 \
+      --grep-file-style "magenta ul" \
+      --grep-line-number-style "grey" \
+      --grep-match-word-style "#000000 italic #ebbb5c"
+	fi
+}
+# For zsh completion
 compdef _rg rg
+
+# Replace default 'bat' commmand for better '--map-syntax' support
+# 1. Expand target file with absolute path
+# 2. Absolute path is better for '--map-syntax' interpretation
+function bat() {
+  local args=()
+  for arg in "$@"; do
+    if [[ -f "$arg" ]]; then
+      args+=("$(realpath "$arg")")
+    else
+      args+=("$arg")
+    fi
+  done
+  # echo -e "${args[@]}"
+  command batcat "${args[@]}"
+}
+compdef _batcat bat
 
 # Remove 'Icon?' and '.DS_Store' from result
 # -- Louis 2023/0109
@@ -123,7 +184,7 @@ function _eza_ll() {
     --ignore-glob="Icon?|.DS_Store" "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_ll
 
 # Simple tree view ignoring 'Icon?', '.DS_Store' and .git directory from
@@ -143,7 +204,7 @@ function _eza_lt() {
     -L 3 "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_lt
 
 # Long tree view ignoring 'Icon?', '.DS_Store' and .git directory from
@@ -165,28 +226,97 @@ function _eza_llt() {
     -L 3 "$@" | \
     less -RFX
 }
-
+# For zsh completion
 compdef _eza _eza_llt
+
+# Sync 'package_delta.toml' from 'package.toml' in the yazi config dir.
+# Strips all fields except section headers and 'use', producing a
+# version-trackable file that captures intent without volatile rev/hash data.
+# -- Louis 2026/0325
+function _ya_sync_delta() {
+  local _cfg="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+  local _src="$_cfg/package.toml"
+  local _dst="$_cfg/package_delta.toml"
+
+  if [[ ! -f "$_src" ]]; then
+    echo "ya: warning: $_src not found, skipping delta sync" >&2
+    return 1
+  fi
+
+  awk '
+    /^\[\[plugin\.deps\]\]/ { if (need_blank) printf "\n"; print; need_blank=0; in_block=1; next }
+    /^\[\[flavor\.deps\]\]/ { if (need_blank) printf "\n"; print; need_blank=0; in_block=1; next }
+    in_block && /^use[[:space:]]*=/ { print; need_blank=1; next }
+    in_block && /^(rev|hash)[[:space:]]*=/ { next }
+  ' "$_src" >| "$_dst"
+}
+
+# Wrapper for 'ya' (yazi CLI) that keeps 'package_delta.toml' in sync.
+#
+# For mutating subcommands (pkg add/delete/upgrade/install), after the real
+# 'ya' succeeds, package_delta.toml is regenerated from package.toml,
+# preserving only 'use' fields — suitable for version tracking.
+#
+# Bootstrap flow (pkg install, package.toml absent, package_delta.toml present):
+#   1. Clear plugins/ and flavors/ dirs
+#   2. Copy package_delta.toml → package.toml
+#   3. Run 'ya pkg install' (ya populates rev/hash)
+#   4. Sync delta from the updated package.toml
+#
+# -- Louis 2026/0325
+function ya() {
+  local _cfg="${XDG_CONFIG_HOME:-$HOME/.config}/yazi"
+  local _pkg="$_cfg/package.toml"
+  local _delta="$_cfg/package_delta.toml"
+
+  # Identify if this is a mutating pkg subcommand
+  local _mutating=0
+  if [[ "$1" == "pkg" ]]; then
+    case "$2" in
+      add|delete|upgrade|install) _mutating=1 ;;
+    esac
+  fi
+
+  # Bootstrap: pkg install with no package.toml but package_delta.toml exists
+  if [[ "$1" == "pkg" && "$2" == "install" && ! -f "$_pkg" ]]; then
+    if [[ ! -f "$_delta" ]]; then
+      echo "ya: error: neither package.toml nor package_delta.toml found in $_cfg" >&2
+      return 1
+    fi
+
+    echo "ya: package.toml absent — bootstrapping from package_delta.toml" >&2
+
+    # Clear stale plugin/flavor dirs
+    [[ -d "$_cfg/plugins" ]] && rm -rf "$_cfg/plugins"
+    [[ -d "$_cfg/flavors" ]] && rm -rf "$_cfg/flavors"
+
+    # Seed package.toml from delta (ya will fill in rev/hash on install)
+    cp "$_delta" "$_pkg"
+  fi
+
+  command ya "$@"
+  local _exit=$?
+
+  # Post-step: sync delta on success of any mutating command
+  if [[ $_mutating -eq 1 && $_exit -eq 0 ]]; then
+    _ya_sync_delta
+  fi
+
+  return $_exit
+}
+# For zsh completion
+compdef _ya ya
 
 # Function to enable 'yazi'
 # (https://yazi-rs.github.io/docs/quick-start)
-# -- Louis 2024/0531
+# -- Louis 2025/1230
 function yy() {
-  local _tmp="$(mktemp -t "yazi-cwd.XXXXXX")"
-  yazi "$@" --cwd-file="${_tmp}"
-  if _cwd="$(cat -- "${_tmp}")" && [ -n "${_cwd}" ] && [ "${_cwd}" != "${PWD}" ]; then
-    cd -- "${_cwd}"
-  fi
-  rm -f -- "${_tmp}"
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
+	rm -f -- "$tmp"
 }
-
-# https://github.com/direnv/direnv/wiki/Tmux
-# Avoid issues with 'direnv' environment loading
-#function tmux() {
-#  direnv exec / tmux
-#}
-#compdef _tmux tmux
-
 
 # Function to designate project root directory when createing a python virtual
 # environment
@@ -200,60 +330,8 @@ function mkvirenvhere() {
 }
 
 # ---------------------- Obsolete
-# Setup remote desktop ssh connection to guinevere -- Louis 2021/1013
-# Comment out cuz not that useful -- Louis 2021/1130
-# alias sshguinevere='ssh nshiu@guinevere -L 5901:localhost:5901'
-
-# 'ag' is uninstalled and replaced by 'rg' -- Louis 2024/0329
-#alias ag='ag -i -r --hidden -C 2 --color-match "38;5;232;48;2;136;192;208" --color-line-number "01;38;5;222" --number --pager="less -RFX"'
-
-# Replace vim with this function to force vim opens 'real' files instead of symbolic link
-# -- Louis 2018/0731
-# Make function more generic to different OS platform -- Louis 2018/0813
-# Comment out for now cuz it seems git symbol also shows while editing file alias -- Louis 2018/1219
-#VIM_PATH=`which vim`
 #
-# Select file and open with nvim directly
-# Comment 'fzf' related key-bindings, which are handled in '.zshenrc' by
-# altering default key-binding
-# Reference: https://github.com/junegunn/fzf/issues/546
-# -- Louis 2024/0329
-#bindkey -s '^v' 'nvim_with_fzf\n'
-#bindkey -s '^f' 'cd_with_fzf\n'
-#bindkey -s '^o' 'open_with_fzf\n'
-
-
-#function vim(){
-#    args=()
-#    for i in $@; do
-#        if [[ -h $1 ]]; then
-#            args+=`readlink $i`
-#        else
-#            args+=$i
-#        fi
-#    done
-#    /usr/local/bin/vim -p "${args[@]}"
-#    $VIM_PATH -p "${args[@]}"
-#}
-#
-# Show project info from Taskwarrior -- Louis 2021/1126
-# Remove the aliases, which is covered by script in .bin -- Louis 2022/1024
-#task_project_info() {
-#    re="\+."
-#    if [[ $# -eq 0 ]]; then
-#      task project:OnePage priority != L
-#    else
-#      if [[ $1 =~ $re ]]; then
-#        str="$1"
-#      else
-#        str="+$1"
-#      fi
-#      str=`echo $str | tr '[a-z]' '[A-Z]'`
-##   Fix issue with extra leading white spaces -- Louis 2022/0705
-#      task project:OnePage "$str" | awk '{$1=$1};1' | sed -n '4 p' | cut -d " " -f 1 | xargs -o taskopen
-#    fi
-#}
-#
+#alias tag='/usr/local/bin/ctags'
 #extract() {
 #  if [ -f $1 ]; then
 #    dName="$1_dir"
@@ -288,20 +366,6 @@ function mkvirenvhere() {
 #  fi
 #}
 #
-# Comment out 'fzf' related functions since default key-bindings are
-# altered as expected
-# -- Louis 2024/0329
-# Open file selected from fzf -- Louis 2021/1125
-#open_with_fzf() {
-#  fd -t f -H -I | fzf -m --preview="xdg-mime query default {}" | xargs open 2>&-
-#  fd -t f -H -L | fzf -m --print0 | xargs -0 open 2>&-
-#}
-
-# cd to directory selected from fzf -- Louis 2021/1125
-#cd_with_fzf() {
-#  cd "$(fd -t d -H -L | fzf-tmux -p -w 80% -h 80% --preview="eza -aF --group-directories-first --color=always --ignore-glob=\"Icon?|.DS_Store|.git\" -T -L 2 {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
-#}
-
 # nvim the file selected from fzf -- Louis 2021/1125
 #nvim_with_fzf() {
 #  nvim_file="$(fd -t f -H -L | fzf-tmux -p -w 80% -h 80% --preview="bat -f {}" --bind="space:toggle-preview,ctrl-l:preview-page-up,ctrl-h:preview-page-down" --preview-window=:hidden)"
@@ -319,3 +383,38 @@ function mkvirenvhere() {
 #  # Define side by side or not
 #  /opt/homebrew/bin/diff -ur "${args[@]}" | ([ "$COLS" -ge 110 ] && delta --side-by-side -w $COLS || delta)
 #}
+#
+# # Useful adb commands
+# # Get IMEI with parameter to identify IMEI 1 or 2
+# # Phase out for now -- Louis 2025/1231
+# function getIMEI() {
+#   if [ -z "${1}" ]; then
+#     set "1"
+#   fi
+#   cstring="service call iphonesubinfo 3 i32 \"${1}\" | \
+#     command grep -oE \"[0-9a-f]{8} \" | \
+#     while read hex; \
+#     do echo -ne \"\\u\${hex:4:4}\\u\${hex:0:4}\"; \
+#     done; echo"
+#   IMEI=$(adb shell "${cstring}")
+#   echo -e "IMEI_${1}: ${IMEI}"
+# }
+#
+# # Find and list the formulas which depend on the giving package
+# # Replaced by native command 'brew uses --installed --recursive' -- Louis 2025/1230
+# function brewdep () {
+#     if [ -z "$1" ]; then
+#         echo "Usage: brewdep <package>"
+#         return 1
+#     fi
+#
+#     package="$1"
+#
+#     # List all installed packages and filter those that depend on $package
+#     brew list | while read -r formula; do
+#         if brew deps --installed "$formula" | rg -wq "$package"; then
+#             echo "$formula"
+#         fi
+#     done
+# }
+#
