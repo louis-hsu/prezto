@@ -30,6 +30,8 @@ export ANDROID_USER_HOME=$HOME/.dotfiles/dot-android
 
 # ------------------------ Path
 eval "$(/opt/homebrew/bin/brew shellenv)"         # New brew configuration
+export HOMEBREW_NO_ASK=1                          # Default yes to upgrade
+export HOMEBREW_UPGRADE_GREEDY=1                  # Default yes to cask upgrade
 typeset -gU cdpath fpath mailpath path            # Ensure path arrays do not contain duplicates.
 
 # Set the list of directories that Zsh searches for programs.
