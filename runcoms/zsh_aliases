@@ -40,21 +40,7 @@ alias tasktoday='task scheduled.before:today status.is:pending or due.before:tod
 alias projectinfo='~/.bin/projinfo'
 
 # Multimedia
-function timg() {
-  if [[ -z "$TMUX" ]]; then
-    command timg "$@"
-  else
-    local pane_width
-    pane_width=$(tmux display-message -p '#{pane_width}')
-    if (( pane_width > 120 )); then
-      command timg -g120x "$@"
-    else
-      command timg "$@"
-    fi
-  fi
-}
-compdef _timg timg
-alias img="timg"															# Show images in CLI
+alias img="imgtt"															# Show images in CLI
 
 # ------------------------ Bind keys
 # (Moved to 'zshrc')
