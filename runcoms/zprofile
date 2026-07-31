@@ -42,13 +42,14 @@ path=(
   $ANDROID_HOME/tools                	            # Android SDK path -- Louis 2011/0420
   $ANDROID_HOME/platform-tools
   $HOMEBREW_PREFIX/opt/ruby/bin
-  $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install brew-version coreutilis -- Louis 2015/0209
-  $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu getopt -- Louis 2020/1112
+  $HOMEBREW_PREFIX/opt/coreutils/libexec/gnubin   # Install gnu version coreutilis -- Louis 2015/0209
+  $HOMEBREW_PREFIX/opt/gnu-getopt/bin             # Install gnu version getopt -- Louis 2020/1112
   $HOMEBREW_PREFIX/opt/sqlite/bin                 # Update brew sqlite location
-  $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install brew-version grep  -- Louis 2021/0119
+  $HOMEBREW_PREFIX/opt/grep/libexec/gnubin        # Install gnu version grep  -- Louis 2021/0119
   $HOMEBREW_PREFIX/opt/gnu-time/libexec/gnubin    # Install gnu version time -- Louis 2021/0530
   $HOMEBREW_PREFIX/opt/gnu-sed/libexec/gnubin     # Install gnu version sed -- Louis 2024/0307
   $HOMEBREW_PREFIX/opt/ncurses/bin                # Install gnu version text-based UI library -- Louis 2024/1119
+  $HOMEBREW_PREFIX/opt/findutils/libexec/gnubin   # Install gnu version find/xargs/locate utilis -- Louis 2026/0720
   /opt/{homebrew,local}/{,s}bin(N)
   $HOME/.dotfiles/dot-local/bin                   #Created by `pipx` on 2024-11-01 07:30:06
   /usr/local/{,s}bin(N)
